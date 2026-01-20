@@ -1,0 +1,427 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "industries": "Industries",
+    "pricing": "Pricing",
+    "about": "About",
+    "partners": "Partners",
+    "shop": "Shop",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "blog": "Blog"
+  },
+  "home": {
+    "hero": {
+      "title": "Professional Cloakroom for Events",
+      "subtitle": "Complete cloakroom solutions for events of any size. Fast. Safe. Professional.",
+      "description": "Numbered token system, dedicated staff, complete infrastructure. From 100 to 12,000+ participants.",
+      "cta": "Request a Quote",
+      "cta_secondary": "View Services"
+    },
+    "features": {
+      "title": "Why Choose Us?",
+      "compact": {
+        "title": "Compact System",
+        "description": "Optimized system with numbered tokens for efficient flow management"
+      },
+      "speed": {
+        "title": "Efficient Process",
+        "description": "We minimize wait times through smart zoning and experienced staff"
+      },
+      "safety": {
+        "title": "Maximum Safety",
+        "description": "Strict procedures, access control, duplicate numeric system for verification"
+      },
+      "fullservice": {
+        "title": "Full Service",
+        "description": "Complete infrastructure: racks, counters, barriers, signage, setup and teardown"
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1": {
+        "title": "Check-in",
+        "description": "Participant hands over garments/bags and receives a unique numeric token"
+      },
+      "step2": {
+        "title": "Organization",
+        "description": "Items are systematically organized on correspondingly numbered racks"
+      },
+      "step3": {
+        "title": "Pick-up",
+        "description": "Upon presenting the token, the item is identified and released instantly"
+      },
+      "step4": {
+        "title": "Verification",
+        "description": "Double verification system for maximum safety and zero errors"
+      }
+    },
+    "services": {
+      "title": "Complete Services",
+      "cloakroom": {
+        "title": "Staffed Cloakroom",
+        "description": "Dedicated service points with trained staff and token system"
+      },
+      "vip": {
+        "title": "VIP Services",
+        "description": "Separate VIP areas with priority access and premium services"
+      },
+      "backstage": {
+        "title": "Backstage",
+        "description": "Dedicated cloakroom for artists and technical crews"
+      },
+      "bagcheck": {
+        "title": "Bag Check",
+        "description": "Secure verification and storage for bags and backpacks"
+      },
+      "infrastructure": {
+        "title": "Complete Infrastructure",
+        "description": "We provide all equipment: racks, counters, barriers, signage"
+      },
+      "lostfound": {
+        "title": "Lost & Found",
+        "description": "Organized system for forgotten or lost items"
+      }
+    },
+    "industries": {
+      "title": "Industries Served",
+      "festivals": "Music Festivals",
+      "concerts": "Concerts",
+      "clubs": "Clubs & Parties",
+      "theater": "Theater & Arts",
+      "conferences": "Conferences & Corporate",
+      "sports": "Sports Events"
+    },
+    "safety": {
+      "title": "Safety & Procedures",
+      "subtitle": "We implement the strictest standards for protecting participants' belongings",
+      "procedures": "Strict Procedures",
+      "procedures_desc": "Clear zoning, access control, trained staff, documented procedures",
+      "contingency": "Contingency Plans",
+      "contingency_desc": "Prepared for rush periods and emergency situations (power outage, excessive flow)",
+      "security": "Physical Security",
+      "security_desc": "Surveillance (where available), duplicate numeric system, detailed records"
+    },
+    "cta": {
+      "title": "Ready to work together?",
+      "subtitle": "Request a personalized quote for your event",
+      "button": "Request Quote Now"
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Complete cloakroom solutions tailored to every type of event",
+    "cloakroom": {
+      "title": "Staffed Cloakroom",
+      "description": "Complete cloakroom service with trained staff, numbered token system, efficient rack organization. Ideal for concerts, festivals, conferences.",
+      "features": ["Experienced staff", "Numbered tokens", "Professional racks", "Multiple service points"]
+    },
+    "vip": {
+      "title": "VIP & Lounge Services",
+      "description": "Separate VIP areas with priority access, premium services, maximum discretion. Perfect for artists, sponsors, special guests.",
+      "features": ["Separate access", "Priority service", "Guaranteed discretion", "Dedicated staff"]
+    },
+    "backstage": {
+      "title": "Backstage Cloakroom",
+      "description": "Dedicated solutions for artists, technical crews, event staff. Controlled access, enhanced security.",
+      "features": ["Secured zones", "Controlled access", "24/7 availability", "Confidentiality"]
+    },
+    "infrastructure": {
+      "title": "Complete Infrastructure",
+      "description": "We provide all necessary equipment: heavy-duty racks, mobile counters, barriers, professional signage. Includes transport, setup and teardown.",
+      "features": ["Professional racks", "Mobile counters", "Flow organization barriers", "Customizable signage", "Transport included", "Setup & teardown"]
+    }
+  },
+  "quote": {
+    "title": "Request a Quote",
+    "subtitle": "Fill out the form and we'll contact you as soon as possible",
+    "form": {
+      "contactInfo": "Contact Information",
+      "eventDetails": "Event Details",
+      "servicesNeeded": "Services Needed",
+      "additionalInfo": "Additional Information",
+      "clientName": "Contact Name",
+      "clientEmail": "Email",
+      "clientPhone": "Phone",
+      "clientCompany": "Company (optional)",
+      "eventName": "Event Name",
+      "eventType": "Event Type",
+      "location": "Location",
+      "startDate": "Start Date & Time",
+      "endDate": "End Date & Time",
+      "estimatedParticipants": "Estimated Number of Participants",
+      "needsCloakroom": "Staffed cloakroom",
+      "needsVip": "VIP services",
+      "needsBackstage": "Backstage cloakroom",
+      "needsBagCheck": "Bag check",
+      "needsInfrastructure": "Complete infrastructure (racks, counters, barriers)",
+      "constraints": "Special Constraints",
+      "notes": "Additional Notes",
+      "submit": "Submit Request",
+      "submitting": "Submitting...",
+      "success": "Request submitted successfully! We'll contact you soon.",
+      "error": "An error occurred. Please try again."
+    },
+    "eventTypes": {
+      "festival": "Festival",
+      "concert": "Concert",
+      "club": "Club / Party",
+      "theater": "Theater",
+      "conference": "Conference",
+      "corporate": "Corporate",
+      "sports": "Sports",
+      "other": "Other"
+    }
+  },
+  "shop": {
+    "title": "B2B Shop",
+    "subtitle": "Professional equipment and supplies for events",
+    "search": "Search products...",
+    "filter": "Filter",
+    "sort": "Sort",
+    "categories": "Categories",
+    "allCategories": "All categories",
+    "price": "Price",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "lowStock": "Limited stock",
+    "addToCart": "Add to cart",
+    "viewDetails": "View details",
+    "variants": "Variants",
+    "specifications": "Specifications",
+    "compatibleWith": "Compatible with",
+    "relatedProducts": "Related products",
+    "cart": {
+      "title": "Shopping cart",
+      "empty": "Cart is empty",
+      "subtotal": "Subtotal",
+      "tax": "VAT (19%)",
+      "shipping": "Shipping",
+      "total": "Total",
+      "checkout": "Proceed to checkout",
+      "continueShopping": "Continue shopping",
+      "remove": "Remove",
+      "quantity": "Quantity"
+    }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "billingInfo": "Billing Information",
+    "shippingInfo": "Shipping Information",
+    "paymentMethod": "Payment Method",
+    "orderSummary": "Order Summary",
+    "company": "Company Name",
+    "cui": "Tax ID",
+    "address": "Address",
+    "city": "City",
+    "county": "County",
+    "postalCode": "Postal Code",
+    "phone": "Phone",
+    "email": "Email",
+    "sameAsBilling": "Same as billing",
+    "shippingMethod": "Shipping method",
+    "card": "Credit Card (Stripe)",
+    "cod": "Cash on Delivery",
+    "bankTransfer": "Bank Transfer",
+    "placeOrder": "Place order",
+    "processing": "Processing...",
+    "success": "Order placed successfully!",
+    "error": "An error occurred. Please try again."
+  },
+  "partners": {
+    "title": "Our Partners",
+    "subtitle": "We collaborate with the most important event organizations in Romania"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Answers to the most common questions"
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "We're here to help",
+    "getInTouch": "Get in Touch",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "sendMessage": "Send message",
+    "name": "Name",
+    "message": "Message",
+    "send": "Send",
+    "success": "Message sent successfully!",
+    "error": "An error occurred. Please try again."
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "The leading provider of professional cloakroom services for events in Romania",
+    "story": "Our Story",
+    "mission": "Our Mission",
+    "values": "Our Values"
+  },
+  "footer": {
+    "company": "Company",
+    "services": "Services",
+    "support": "Support",
+    "legal": "Legal",
+    "terms": "Terms and Conditions",
+    "privacy": "Privacy Policy",
+    "cookies": "Cookie Policy",
+    "returns": "Returns Policy",
+    "allRightsReserved": "All rights reserved"
+  },
+  "common": {
+    "learnMore": "Learn more",
+    "readMore": "Read more",
+    "viewAll": "View all",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "from": "from",
+    "to": "to",
+    "language": "Language",
+    "logout": "Logout"
+  },
+  "shop": {
+    "title": "Shop",
+    "subtitle": "Professional equipment for cloakroom and events",
+    "products": "Products",
+    "product": "Product",
+    "categories": "Categories",
+    "category": "Category",
+    "allCategories": "All categories",
+    "price": "Price",
+    "priceMin": "Min price",
+    "priceMax": "Max price",
+    "sort": "Sort by",
+    "sortBy": {
+      "featured": "Featured",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "nameAsc": "Name A-Z",
+      "newest": "Newest"
+    },
+    "filters": "Filters",
+    "clearFilters": "Clear filters",
+    "productsFound": "products found",
+    "noProducts": "No products found",
+    "addToCart": "Add to Cart",
+    "viewDetails": "View Details",
+    "sku": "SKU",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "available": "Available",
+    "stock": "Stock",
+    "delivery": "Delivery",
+    "deliveryTime": "2-5 days",
+    "warranty": "Warranty",
+    "warrantyPeriod": "24 months",
+    "description": "Description",
+    "detailedDescription": "Detailed Description",
+    "features": "Features",
+    "specifications": "Specifications",
+    "weight": "Weight",
+    "dimensions": "Dimensions",
+    "returns": "Returns",
+    "returnPolicy": "14 days",
+    "noReturns": "No returns accepted",
+    "withVAT": "+ VAT",
+    "priceWithVAT": "Price with VAT"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "subtitle": "Complete your order details",
+    "contactInfo": "Contact Information",
+    "billingAddress": "Billing Address",
+    "shippingAddress": "Shipping Address",
+    "deliveryMethod": "Delivery Method",
+    "paymentMethod": "Payment Method",
+    "orderNotes": "Order Notes",
+    "orderNotesPlaceholder": "Additional notes about your order...",
+    "placeOrder": "Place Order",
+    "processing": "Processing...",
+    "orderSummary": "Order Summary",
+    "orderItems": "Order Items",
+    "quantity": "Quantity",
+    "subtotal": "Subtotal",
+    "tax": "VAT (19%)",
+    "deliveryFee": "Delivery Fee",
+    "codFee": "COD Fee",
+    "total": "TOTAL",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "company": "Company",
+    "companyOptional": "Company (optional)",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "city": "City",
+    "county": "County",
+    "postalCode": "Postal Code",
+    "country": "Country",
+    "sameAsBilling": "Same as billing address",
+    "delivery": {
+      "courier": "Courier delivery",
+      "courierDesc": "Delivery in 3-5 business days",
+      "courierPrice": "50 RON",
+      "pickup": "Personal pickup",
+      "pickupDesc": "Pickup from Bucharest, appointment required",
+      "pickupPrice": "FREE"
+    },
+    "payment": {
+      "bankTransfer": "Bank transfer",
+      "bankTransferInstructions": "Bank transfer details:",
+      "beneficiary": "Beneficiary:",
+      "iban": "IBAN:",
+      "bank": "Bank:",
+      "amount": "Amount:",
+      "reference": "Reference:",
+      "bankTransferNote": "* Please include the order number in the transfer details.",
+      "bankTransferNote2": "* Order will be processed after payment confirmation (1-2 business days).",
+      "cashOnDelivery": "Cash on delivery",
+      "cashOnDeliveryDesc": "You will pay the courier the total amount upon receiving the package.",
+      "codNote": "* COD fee: 15 RON (added to total).",
+      "codNote2": "* Available only for deliveries in Romania.",
+      "selectPayment": "Please select a payment method"
+    },
+    "validation": {
+      "emailInvalid": "Invalid email",
+      "phoneInvalid": "Invalid phone",
+      "firstNameRequired": "First name required",
+      "lastNameRequired": "Last name required",
+      "addressRequired": "Address required",
+      "cityRequired": "City required",
+      "countyRequired": "County required",
+      "postalCodeRequired": "Postal code required",
+      "required": "Required field"
+    },
+    "confirmation": {
+      "title": "Order Confirmed!",
+      "subtitle": "Thank you for your order! We've received your details and will process it shortly.",
+      "orderNumber": "Order number:",
+      "paymentDetails": "Payment Details",
+      "deliveryInfo": "Delivery Information",
+      "deliveryAddress": "Delivery Address",
+      "questions": "Questions?",
+      "hours": "Hours: Monday - Friday, 09:00 - 18:00",
+      "continueShopping": "Continue Shopping",
+      "backToHome": "Back to Homepage",
+      "emptyCart": "Cart is empty",
+      "emptyCartDesc": "Add products to cart to proceed with checkout.",
+      "goToShop": "Go to Shop",
+      "securityNote": "Your data is protected by SSL encryption. We do not store credit card information."
+    }
+  }
+}
+

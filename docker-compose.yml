@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Supabase Configuration
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      
+      # App Configuration
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      - NODE_ENV=${NODE_ENV:-production}
+      
+      # Stripe Configuration
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      
+      # Email Configuration
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - EMAIL_ADMIN=${EMAIL_ADMIN}
+      
+      # Company Details
+      - COMPANY_NAME=${COMPANY_NAME}
+      - COMPANY_CUI=${COMPANY_CUI}
+      - COMPANY_ADDRESS=${COMPANY_ADDRESS}
+      - COMPANY_PHONE=${COMPANY_PHONE}
+      - COMPANY_EMAIL=${COMPANY_EMAIL}
+      
+      # Bank Details
+      - BANK_NAME=${BANK_NAME}
+      - BANK_IBAN=${BANK_IBAN}
+      - BANK_SWIFT=${BANK_SWIFT}
+      
+      # Feature Flags
+      - ENABLE_STRIPE_PAYMENTS=${ENABLE_STRIPE_PAYMENTS:-true}
+      - ENABLE_COD=${ENABLE_COD:-true}
+      - ENABLE_BANK_TRANSFER=${ENABLE_BANK_TRANSFER:-true}
+    
+    restart: unless-stopped
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Local Supabase (if not using cloud)
+  # Uncomment to run Supabase locally
+  # supabase:
+  #   image: supabase/postgres:15.1.0.117
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_PASSWORD: your-super-secret-password
+  #     POSTGRES_DB: postgres
+  #   volumes:
+  #     - supabase-db-data:/var/lib/postgresql/data
+  #     - ./supabase/migrations:/docker-entrypoint-initdb.d
+  #   restart: unless-stopped
+
+# volumes:
+#   supabase-db-data:

@@ -1,0 +1,427 @@
+{
+  "nav": {
+    "home": "Acasă",
+    "services": "Servicii",
+    "industries": "Industrii",
+    "pricing": "Prețuri",
+    "about": "Despre",
+    "partners": "Parteneri",
+    "shop": "Magazin",
+    "faq": "Întrebări Frecvente",
+    "contact": "Contact",
+    "blog": "Blog"
+  },
+  "home": {
+    "hero": {
+      "title": "Garderobă Profesională pentru Evenimente",
+      "subtitle": "Soluții complete de garderobă pentru evenimente de orice dimensiune. Rapid. Sigur. Profesionist.",
+      "description": "Sistem cu token-uri numerotate, personal dedicat, infrastructură completă. De la 100 la 12.000+ participanți.",
+      "cta": "Cere Ofertă",
+      "ctaSecondary": "Explorează Shop-ul"
+    },
+    "features": {
+      "title": "De Ce Să Ne Alegi?",
+      "compact": {
+        "title": "Sistem Compact",
+        "description": "Sistem optimizat cu token-uri numerotate pentru management eficient al fluxului"
+      },
+      "speed": {
+        "title": "Proces Eficient",
+        "description": "Minimizăm timpii de așteptare prin zonare inteligentă și personal experimentat"
+      },
+      "safety": {
+        "title": "Siguranță Maximă",
+        "description": "Proceduri stricte, control acces, sistem numeric duplicat pentru verificare"
+      },
+      "fullservice": {
+        "title": "Full Service",
+        "description": "Infrastructură completă: rack-uri, ghișee, bariere, semnalistică, setup și teardown"
+      }
+    },
+    "howItWorks": {
+      "title": "Cum Funcționează",
+      "step1": {
+        "title": "Predare",
+        "description": "Participantul predă hainele/bagajul și primește un token numeric unic"
+      },
+      "step2": {
+        "title": "Organizare",
+        "description": "Articolele sunt organizate sistematic pe rack-uri numerotate corespunzător"
+      },
+      "step3": {
+        "title": "Ridicare",
+        "description": "La prezentarea token-ului, articolul este identificat și eliberat instant"
+      },
+      "step4": {
+        "title": "Verificare",
+        "description": "Sistem de verificare dublă pentru siguranță maximă și zero erori"
+      }
+    },
+    "services": {
+      "title": "Servicii Complete",
+      "cloakroom": {
+        "title": "Garderobă cu Personal",
+        "description": "Puncte de lucru dedicate cu staff instruit și sistem cu token-uri"
+      },
+      "vip": {
+        "title": "Servicii VIP",
+        "description": "Zone separate pentru VIP cu acces prioritar și servicii premium"
+      },
+      "backstage": {
+        "title": "Backstage",
+        "description": "Garderobă dedicată pentru artiști și echipe tehnice"
+      },
+      "bagcheck": {
+        "title": "Bag Check",
+        "description": "Verificare și stocare securizată pentru bagaje și rucsacuri"
+      },
+      "infrastructure": {
+        "title": "Infrastructură Completă",
+        "description": "Furnizăm toate echipamentele: rack-uri, ghișee, bariere, semnalistică"
+      },
+      "lostfound": {
+        "title": "Lost & Found",
+        "description": "Sistem organizat pentru obiecte uitate sau pierdute"
+      }
+    },
+    "industries": {
+      "title": "Industrii Deservite",
+      "festivals": "Festivaluri Muzicale",
+      "concerts": "Concerte",
+      "clubs": "Cluburi & Petreceri",
+      "theater": "Teatru & Artă",
+      "conferences": "Conferințe & Corporate",
+      "sports": "Evenimente Sportive"
+    },
+    "safety": {
+      "title": "Siguranță & Proceduri",
+      "subtitle": "Implementăm cele mai stricte standarde pentru protecția bunurilor participanților",
+      "procedures": "Proceduri Stricte",
+      "procedures_desc": "Zonare clară, control acces, personal instruit, proceduri documentate",
+      "contingency": "Planuri Contingență",
+      "contingency_desc": "Pregătiți pentru rush periods și situații de urgență (power outage, flux excesiv)",
+      "security": "Securitate Fizică",
+      "security_desc": "Supraveghere (unde disponibil), sistem numeric duplicat, evidență detaliată"
+    },
+    "cta": {
+      "title": "Gata să colaborăm?",
+      "subtitle": "Cere o ofertă personalizată pentru evenimentul tău",
+      "button": "Cere Ofertă Acum"
+    }
+  },
+  "services": {
+    "title": "Serviciile Noastre",
+    "subtitle": "Soluții complete de garderobă adaptate fiecărui tip de eveniment",
+    "cloakroom": {
+      "title": "Garderobă cu Personal Dedicat",
+      "description": "Serviciu complet de garderobă cu staff instruit, sistem token-uri numerotate, organizare eficientă pe rack-uri. Ideal pentru concerte, festivaluri, conferințe.",
+      "features": ["Personal experimentat", "Token-uri numerotate", "Rack-uri profesionale", "Multiple puncte de lucru"]
+    },
+    "vip": {
+      "title": "Servicii VIP & Lounge",
+      "description": "Zone separate pentru VIP cu acces prioritar, servicii premium, discreție maximă. Perfect pentru artiști, sponsori, invitați speciali.",
+      "features": ["Acces separat", "Servicii prioritare", "Discreție garantată", "Personal dedicat"]
+    },
+    "backstage": {
+      "title": "Garderobă Backstage",
+      "description": "Soluții dedicate pentru artiști, echipe tehnice, staff eveniment. Acces controlat, securitate sporită.",
+      "features": ["Zone securizate", "Acces controlat", "Disponibilitate 24/7", "Confidențialitate"]
+    },
+    "infrastructure": {
+      "title": "Infrastructură Completă",
+      "description": "Furnizăm toate echipamentele necesare: rack-uri heavy-duty, ghișee mobile, bariere, semnalistică profesională. Include transport, setup și teardown.",
+      "features": ["Rack-uri profesionale", "Ghișee mobile", "Bariere organizare flux", "Semnalistică personalizabilă", "Transport inclus", "Setup & teardown"]
+    }
+  },
+  "quote": {
+    "title": "Cere Ofertă",
+    "subtitle": "Completează formularul și te contactăm în cel mai scurt timp",
+    "form": {
+      "contactInfo": "Informații Contact",
+      "eventDetails": "Detalii Eveniment",
+      "servicesNeeded": "Servicii Necesare",
+      "additionalInfo": "Informații Adiționale",
+      "clientName": "Nume Contact",
+      "clientEmail": "Email",
+      "clientPhone": "Telefon",
+      "clientCompany": "Companie (opțional)",
+      "eventName": "Nume Eveniment",
+      "eventType": "Tip Eveniment",
+      "location": "Locație",
+      "startDate": "Data & Ora Început",
+      "endDate": "Data & Ora Sfârșit",
+      "estimatedParticipants": "Număr Estimat Participanți",
+      "needsCloakroom": "Garderobă cu personal",
+      "needsVip": "Servicii VIP",
+      "needsBackstage": "Garderobă backstage",
+      "needsBagCheck": "Bag check",
+      "needsInfrastructure": "Infrastructură completă (rack-uri, ghișee, bariere)",
+      "constraints": "Constrângeri Speciale",
+      "notes": "Note Adiționale",
+      "submit": "Trimite Cererea",
+      "submitting": "Se trimite...",
+      "success": "Cererea a fost trimisă cu succes! Te vom contacta în curând.",
+      "error": "A apărut o eroare. Te rugăm să încerci din nou."
+    },
+    "eventTypes": {
+      "festival": "Festival",
+      "concert": "Concert",
+      "club": "Club / Petrecere",
+      "theater": "Teatru",
+      "conference": "Conferință",
+      "corporate": "Corporate",
+      "sports": "Sportiv",
+      "other": "Altele"
+    }
+  },
+  "shop": {
+    "title": "Magazin B2B",
+    "subtitle": "Echipamente și consumabile profesionale pentru evenimente",
+    "search": "Caută produse...",
+    "filter": "Filtrează",
+    "sort": "Sortează",
+    "categories": "Categorii",
+    "allCategories": "Toate categoriile",
+    "price": "Preț",
+    "inStock": "În stoc",
+    "outOfStock": "Stoc epuizat",
+    "lowStock": "Stoc limitat",
+    "addToCart": "Adaugă în coș",
+    "viewDetails": "Vezi detalii",
+    "variants": "Variante",
+    "specifications": "Specificații",
+    "compatibleWith": "Compatibil cu",
+    "relatedProducts": "Produse similare",
+    "cart": {
+      "title": "Coș de cumpărături",
+      "empty": "Coșul este gol",
+      "subtotal": "Subtotal",
+      "tax": "TVA (19%)",
+      "shipping": "Transport",
+      "total": "Total",
+      "checkout": "Finalizează comanda",
+      "continueShopping": "Continuă cumpărăturile",
+      "remove": "Șterge",
+      "quantity": "Cantitate"
+    }
+  },
+  "checkout": {
+    "title": "Finalizare Comandă",
+    "billingInfo": "Date de Facturare",
+    "shippingInfo": "Date de Livrare",
+    "paymentMethod": "Metodă de Plată",
+    "orderSummary": "Sumar Comandă",
+    "company": "Denumire Companie",
+    "cui": "CUI",
+    "address": "Adresă",
+    "city": "Oraș",
+    "county": "Județ",
+    "postalCode": "Cod Poștal",
+    "phone": "Telefon",
+    "email": "Email",
+    "sameAsBilling": "Aceeași cu facturarea",
+    "shippingMethod": "Metodă de livrare",
+    "card": "Card Online (Stripe)",
+    "cod": "Ramburs la livrare",
+    "bankTransfer": "Transfer bancar",
+    "placeOrder": "Plasează comanda",
+    "processing": "Se procesează...",
+    "success": "Comanda a fost plasată cu succes!",
+    "error": "A apărut o eroare. Te rugăm să încerci din nou."
+  },
+  "partners": {
+    "title": "Partenerii Noștri",
+    "subtitle": "Colaborăm cu cele mai importante organizații de evenimente din România"
+  },
+  "faq": {
+    "title": "Întrebări Frecvente",
+    "subtitle": "Răspunsuri la cele mai comune întrebări"
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Suntem aici să te ajutăm",
+    "getInTouch": "Ia Legătura",
+    "phone": "Telefon",
+    "email": "Email",
+    "address": "Adresă",
+    "sendMessage": "Trimite mesaj",
+    "name": "Nume",
+    "message": "Mesaj",
+    "send": "Trimite",
+    "success": "Mesajul a fost trimis cu succes!",
+    "error": "A apărut o eroare. Te rugăm să încerci din nou."
+  },
+  "about": {
+    "title": "Despre Noi",
+    "subtitle": "Furnizorul principal de servicii de garderobă profesională pentru evenimente în România",
+    "story": "Povestea Noastră",
+    "mission": "Misiunea Noastră",
+    "values": "Valorile Noastre"
+  },
+  "footer": {
+    "company": "Companie",
+    "services": "Servicii",
+    "support": "Suport",
+    "legal": "Legal",
+    "terms": "Termeni și Condiții",
+    "privacy": "Politica de Confidențialitate",
+    "cookies": "Politica Cookies",
+    "returns": "Politica de Retur",
+    "allRightsReserved": "Toate drepturile rezervate"
+  },
+  "common": {
+    "learnMore": "Află mai multe",
+    "readMore": "Citește mai mult",
+    "viewAll": "Vezi toate",
+    "loading": "Se încarcă...",
+    "error": "Eroare",
+    "success": "Succes",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "edit": "Editează",
+    "delete": "Șterge",
+    "confirm": "Confirmă",
+    "back": "Înapoi",
+    "next": "Următorul",
+    "previous": "Anteriorul",
+    "close": "Închide",
+    "search": "Caută",
+    "filter": "Filtrează",
+    "sort": "Sortează",
+    "from": "de la",
+    "to": "până la",
+    "language": "Limbă",
+    "logout": "Deconectare"
+  },
+  "shop": {
+    "title": "Magazin",
+    "subtitle": "Echipamente profesionale pentru garderobă și evenimente",
+    "products": "Produse",
+    "product": "Produs",
+    "categories": "Categorii",
+    "category": "Categorie",
+    "allCategories": "Toate categoriile",
+    "price": "Preț",
+    "priceMin": "Preț minim",
+    "priceMax": "Preț maxim",
+    "sort": "Sortează după",
+    "sortBy": {
+      "featured": "Recomandate",
+      "priceAsc": "Preț crescător",
+      "priceDesc": "Preț descrescător",
+      "nameAsc": "Nume A-Z",
+      "newest": "Cele mai noi"
+    },
+    "filters": "Filtre",
+    "clearFilters": "Resetează filtre",
+    "productsFound": "produse găsite",
+    "noProducts": "Nu s-au găsit produse",
+    "addToCart": "Adaugă în Coș",
+    "viewDetails": "Vezi Detalii",
+    "sku": "Cod produs",
+    "inStock": "În stoc",
+    "outOfStock": "Epuizat",
+    "available": "Disponibil",
+    "stock": "Stoc",
+    "delivery": "Livrare",
+    "deliveryTime": "2-5 zile",
+    "warranty": "Garanție",
+    "warrantyPeriod": "24 luni",
+    "description": "Descriere",
+    "detailedDescription": "Descriere detaliată",
+    "features": "Caracteristici",
+    "specifications": "Specificații",
+    "weight": "Greutate",
+    "dimensions": "Dimensiuni",
+    "returns": "Retur",
+    "returnPolicy": "14 zile",
+    "noReturns": "Nu se acceptă retur",
+    "withVAT": "+ TVA",
+    "priceWithVAT": "Preț cu TVA"
+  },
+  "checkout": {
+    "title": "Finalizare Comandă",
+    "subtitle": "Completează datele pentru a finaliza comanda",
+    "contactInfo": "Informații de Contact",
+    "billingAddress": "Adresă de Facturare",
+    "shippingAddress": "Adresă de Livrare",
+    "deliveryMethod": "Metodă de Livrare",
+    "paymentMethod": "Metodă de Plată",
+    "orderNotes": "Note Comandă",
+    "orderNotesPlaceholder": "Observații suplimentare despre comandă...",
+    "placeOrder": "Finalizează Comanda",
+    "processing": "Procesare...",
+    "orderSummary": "Rezumat Comandă",
+    "orderItems": "Produse Comandate",
+    "quantity": "Cantitate",
+    "subtotal": "Subtotal",
+    "tax": "TVA (19%)",
+    "deliveryFee": "Taxă Livrare",
+    "codFee": "Taxă Ramburs",
+    "total": "TOTAL",
+    "firstName": "Prenume",
+    "lastName": "Nume",
+    "company": "Companie",
+    "companyOptional": "Companie (opțional)",
+    "email": "Email",
+    "phone": "Telefon",
+    "address": "Adresă",
+    "city": "Oraș",
+    "county": "Județ",
+    "postalCode": "Cod Poștal",
+    "country": "Țară",
+    "sameAsBilling": "Identică cu adresa de facturare",
+    "delivery": {
+      "courier": "Livrare cu curier",
+      "courierDesc": "Livrare în 3-5 zile lucrătoare",
+      "courierPrice": "50 RON",
+      "pickup": "Ridicare personală",
+      "pickupDesc": "Ridicare din București, programare necesară",
+      "pickupPrice": "GRATUIT"
+    },
+    "payment": {
+      "bankTransfer": "Transfer bancar",
+      "bankTransferInstructions": "Detalii transfer bancar:",
+      "beneficiary": "Beneficiar:",
+      "iban": "Cont IBAN:",
+      "bank": "Bancă:",
+      "amount": "Sumă:",
+      "reference": "Referință:",
+      "bankTransferNote": "* Vă rugăm să includeți numărul comenzii în detaliile transferului.",
+      "bankTransferNote2": "* Comanda va fi procesată după confirmarea plății (1-2 zile lucrătoare).",
+      "cashOnDelivery": "Ramburs (plată la livrare)",
+      "cashOnDeliveryDesc": "Veți plăti curierului suma totală la primirea coletului.",
+      "codNote": "* Taxă ramburs: 15 RON (se adaugă la total).",
+      "codNote2": "* Disponibil doar pentru livrări în România.",
+      "selectPayment": "Vă rugăm să selectați o metodă de plată"
+    },
+    "validation": {
+      "emailInvalid": "Email invalid",
+      "phoneInvalid": "Telefon invalid",
+      "firstNameRequired": "Prenume obligatoriu",
+      "lastNameRequired": "Nume obligatoriu",
+      "addressRequired": "Adresă obligatorie",
+      "cityRequired": "Oraș obligatoriu",
+      "countyRequired": "Județ obligatoriu",
+      "postalCodeRequired": "Cod poștal obligatoriu",
+      "required": "Câmp obligatoriu"
+    },
+    "confirmation": {
+      "title": "Comandă Confirmată!",
+      "subtitle": "Mulțumim pentru comandă! Am primit detaliile și o vom procesa în cel mai scurt timp.",
+      "orderNumber": "Număr comandă:",
+      "paymentDetails": "Detalii Plată",
+      "deliveryInfo": "Informații Livrare",
+      "deliveryAddress": "Adresă Livrare",
+      "questions": "Ai întrebări?",
+      "hours": "Program: Luni - Vineri, 09:00 - 18:00",
+      "continueShopping": "Continuă Cumpărăturile",
+      "backToHome": "Înapoi la Pagina Principală",
+      "emptyCart": "Coșul este gol",
+      "emptyCartDesc": "Adaugă produse în coș pentru a putea finaliza comanda.",
+      "goToShop": "Mergi la Magazin",
+      "securityNote": "Datele tale sunt protejate prin criptare SSL. Nu salvăm informații despre carduri bancare."
+    }
+  }
+}
+
