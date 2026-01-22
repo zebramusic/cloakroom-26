@@ -81,17 +81,20 @@ function Calendar({
           classNamesProp?.head_cell,
         ),
         row: cn("mt-2 flex w-full", classNamesProp?.row),
-        cell: cn(
-          "text-center text-sm",
-          classNamesProp?.cell,
-        ),
+        cell: cn("text-center text-sm", classNamesProp?.cell),
         day: cn(
           "group/day relative aspect-square h-full w-full select-none p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md",
           classNamesProp?.day,
         ),
-        day_range_start: cn("bg-accent rounded-l-md", classNamesProp?.day_range_start),
+        day_range_start: cn(
+          "bg-accent rounded-l-md",
+          classNamesProp?.day_range_start,
+        ),
         day_range_middle: cn("rounded-none", classNamesProp?.day_range_middle),
-        day_range_end: cn("bg-accent rounded-r-md", classNamesProp?.day_range_end),
+        day_range_end: cn(
+          "bg-accent rounded-r-md",
+          classNamesProp?.day_range_end,
+        ),
         day_today: cn(
           "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
           classNamesProp?.day_today,
@@ -112,7 +115,10 @@ function Calendar({
           <ChevronLeftIcon className={cn("size-4", className)} {...iconProps} />
         ),
         IconRight: ({ className, ...iconProps }) => (
-          <ChevronRightIcon className={cn("size-4", className)} {...iconProps} />
+          <ChevronRightIcon
+            className={cn("size-4", className)}
+            {...iconProps}
+          />
         ),
         WeekNumber: ({ number, ...weekNumberProps }) => (
           <td {...weekNumberProps}>
