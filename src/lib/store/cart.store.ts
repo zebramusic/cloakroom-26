@@ -1,11 +1,16 @@
 import { create } from "zustand"
-import { persist, createJSONStorage } from "zustand/middleware"
+import { persist, createJSONStorage, StateStorage } from "zustand/middleware"
 
 // Safe storage that works during SSR
-const storage = typeof window !== 'undefined' ? localStorage : {
-  getItem: () => null,
-  setItem: () => {},
-  removeItem: () => {},
+const createStorage = (): StateStorage => {
+  if (typeof window === 'undefined') {
+    return {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    }
+  }
+  return localStorage
 }
 
 export interface CartItem {
@@ -104,7 +109,7 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: "cart-storage",
-      storage: createJSONStorage(() => storage),
+      storage: createJSONStorage(createStorage),
     }
   )
 )
