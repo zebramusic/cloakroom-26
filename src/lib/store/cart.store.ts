@@ -1,6 +1,13 @@
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 
+// Safe storage that works during SSR
+const storage = typeof window !== 'undefined' ? localStorage : {
+  getItem: () => null,
+  setItem: () => {},
+  removeItem: () => {},
+}
+
 export interface CartItem {
   product_id: string
   variant_id: string | null
@@ -97,7 +104,7 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: "cart-storage",
-      storage: createJSONStorage(() => typeof window !== 'undefined' ? localStorage : undefined),
+      storage: createJSONStorage(() => storage),
     }
   )
 )
