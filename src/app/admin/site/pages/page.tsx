@@ -3,6 +3,8 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { redirect } from "next/navigation";
 import { PageList } from "@/components/admin/site/PageList";
 
+export const dynamic = 'force-dynamic';
+
 export default async function SitePagesPage() {
   const session = await auth();
 

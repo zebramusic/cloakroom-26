@@ -8,6 +8,8 @@ import { PortfolioForm } from "@/components/admin/portfolio/PortfolioForm";
 import connectDB from "@/lib/mongodb";
 import { PortfolioItem } from "@/lib/models";
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditPortfolioPage({
   params,
 }: {

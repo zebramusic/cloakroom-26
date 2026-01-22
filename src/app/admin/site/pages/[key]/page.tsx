@@ -3,6 +3,8 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { redirect } from "next/navigation";
 import { PageEditor } from "@/components/admin/site/PageEditor";
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditPagePage({
   params,
 }: {

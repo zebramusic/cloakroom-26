@@ -3,6 +3,8 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { redirect } from "next/navigation";
 import { NavigationManager } from "@/components/admin/site/NavigationManager";
 
+export const dynamic = 'force-dynamic';
+
 export default async function SiteNavigationPage() {
   const session = await auth();
 

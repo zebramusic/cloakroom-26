@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { PortfolioForm } from "@/components/admin/portfolio/PortfolioForm";
 
+export const dynamic = 'force-dynamic';
+
 export default async function NewPortfolioPage() {
   const session = await auth();
 

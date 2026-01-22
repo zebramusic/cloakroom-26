@@ -2,6 +2,8 @@ import connectDB from "@/lib/mongodb";
 import { Order, Quote, Product } from "@/lib/models";
 import { DashboardContent } from "@/components/admin/DashboardContent";
 
+export const dynamic = 'force-dynamic';
+
 interface OrderData {
   id: string;
   orderNumber: string;

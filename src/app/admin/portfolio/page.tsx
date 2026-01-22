@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { PortfolioDataTable } from "@/components/admin/portfolio/PortfolioDataTable";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminPortfolioPage() {
   const session = await auth();
 
