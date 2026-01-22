@@ -9,29 +9,30 @@ import { deleteImageVariants } from '@/lib/utils/image-processor';
 // GET /api/admin/portfolio/[id] - Get single portfolio item
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   const session = await auth();
   
-  if (!session || !hasPermission(session.user.role, 'portfolio.read')) {
+  if (!session || !hasPermission(session.user.role, 'portfolio.view')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   await connectDB();
 
-  if (!mongoose.Types.ObjectId.isValid(params.id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
   }
 
   try {
-    const item = await PortfolioItem.findById(params.id).lean();
+    const item = await PortfolioItem.findById(id).lean();
     
     if (!item) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
     // Get images
-    const images = await PortfolioImage.find({ portfolioItemId: params.id })
+    const images = await PortfolioImage.find({ portfolioItemId: id })
       .sort({ orderIndex: 1 })
       .lean();
 
@@ -45,17 +46,18 @@ export async function GET(
 // PATCH /api/admin/portfolio/[id] - Update portfolio item
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   const session = await auth();
   
-  if (!session || !hasPermission(session.user.role, 'portfolio.write')) {
+  if (!session || !hasPermission(session.user.role, 'portfolio.update')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   await connectDB();
 
-  if (!mongoose.Types.ObjectId.isValid(params.id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
   }
 
@@ -66,7 +68,7 @@ export async function PATCH(
     if (data.slug) {
       const existing = await PortfolioItem.findOne({
         slug: data.slug,
-        _id: { $ne: params.id },
+        _id: { $ne: id },
       }).lean();
       
       if (existing) {
@@ -78,7 +80,7 @@ export async function PATCH(
     }
 
     // If publishing for first time, set publishedAt
-    const item = await PortfolioItem.findById(params.id);
+    const item = await PortfolioItem.findById(id);
     if (!item) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
@@ -88,7 +90,7 @@ export async function PATCH(
     }
 
     const updated = await PortfolioItem.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: data },
       { new: true, runValidators: true }
     ).lean();
@@ -103,8 +105,9 @@ export async function PATCH(
 // DELETE /api/admin/portfolio/[id] - Delete portfolio item
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   const session = await auth();
   
   if (!session || !hasPermission(session.user.role, 'portfolio.delete')) {
@@ -113,13 +116,13 @@ export async function DELETE(
 
   await connectDB();
 
-  if (!mongoose.Types.ObjectId.isValid(params.id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
   }
 
   try {
     // Get all images
-    const images = await PortfolioImage.find({ portfolioItemId: params.id }).lean();
+    const images = await PortfolioImage.find({ portfolioItemId: id }).lean();
     
     // Delete image files
     for (const image of images) {
@@ -127,10 +130,10 @@ export async function DELETE(
     }
     
     // Delete images from DB
-    await PortfolioImage.deleteMany({ portfolioItemId: params.id });
+    await PortfolioImage.deleteMany({ portfolioItemId: id });
     
     // Delete item
-    const deleted = await PortfolioItem.findByIdAndDelete(params.id);
+    const deleted = await PortfolioItem.findByIdAndDelete(id);
     
     if (!deleted) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });

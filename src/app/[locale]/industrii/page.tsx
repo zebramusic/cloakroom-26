@@ -74,11 +74,13 @@ const industries = [
   },
 ];
 
-export default function IndustriesPage({
-  params: { locale },
+export default async function IndustriesPage({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+
   unstable_setRequestLocale(locale);
 
   return (

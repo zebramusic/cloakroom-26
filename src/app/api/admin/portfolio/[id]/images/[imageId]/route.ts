@@ -9,17 +9,18 @@ import { deleteImageVariants } from '@/lib/utils/image-processor';
 // PATCH /api/admin/portfolio/[id]/images/[imageId] - Update image metadata
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string; imageId: string } }
+  context: { params: Promise<{ id: string; imageId: string }> }
 ) {
+  const { id, imageId } = await context.params;
   const session = await auth();
   
-  if (!session || !hasPermission(session.user.role, 'portfolio.write')) {
+  if (!session || !hasPermission(session.user.role, 'portfolio.update')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   await connectDB();
 
-  if (!mongoose.Types.ObjectId.isValid(params.imageId)) {
+  if (!mongoose.Types.ObjectId.isValid(imageId)) {
     return NextResponse.json({ error: 'Invalid image ID' }, { status: 400 });
   }
 
@@ -27,7 +28,7 @@ export async function PATCH(
     const data = await request.json();
     
     const updated = await PortfolioImage.findByIdAndUpdate(
-      params.imageId,
+      imageId,
       { $set: data },
       { new: true, runValidators: true }
     ).lean();
@@ -46,8 +47,9 @@ export async function PATCH(
 // DELETE /api/admin/portfolio/[id]/images/[imageId] - Delete image
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string; imageId: string } }
+  context: { params: Promise<{ id: string; imageId: string }> }
 ) {
+  const { id, imageId } = await context.params;
   const session = await auth();
   
   if (!session || !hasPermission(session.user.role, 'portfolio.delete')) {
@@ -56,12 +58,12 @@ export async function DELETE(
 
   await connectDB();
 
-  if (!mongoose.Types.ObjectId.isValid(params.imageId)) {
+  if (!mongoose.Types.ObjectId.isValid(imageId)) {
     return NextResponse.json({ error: 'Invalid image ID' }, { status: 400 });
   }
 
   try {
-    const image = await PortfolioImage.findById(params.imageId).lean();
+    const image = await PortfolioImage.findById(imageId).lean();
     
     if (!image) {
       return NextResponse.json({ error: 'Image not found' }, { status: 404 });
@@ -71,24 +73,24 @@ export async function DELETE(
     await deleteImageVariants(image.variants);
     
     // Delete from DB
-    await PortfolioImage.findByIdAndDelete(params.imageId);
+    await PortfolioImage.findByIdAndDelete(imageId);
 
     // If this was the cover image, unset it
     await PortfolioItem.updateOne(
-      { _id: params.id, coverImageId: params.imageId },
+      { _id: id, coverImageId: imageId },
       { $unset: { coverImageId: 1 } }
     );
 
     // If there are remaining images, optionally set first as cover
-    const remainingImages = await PortfolioImage.find({ portfolioItemId: params.id })
+    const remainingImages = await PortfolioImage.find({ portfolioItemId: id })
       .sort({ orderIndex: 1 })
       .limit(1)
       .lean();
     
     if (remainingImages.length > 0) {
-      const item = await PortfolioItem.findById(params.id).lean();
+      const item = await PortfolioItem.findById(id).lean();
       if (!item?.coverImageId) {
-        await PortfolioItem.findByIdAndUpdate(params.id, {
+        await PortfolioItem.findByIdAndUpdate(id, {
           $set: { coverImageId: remainingImages[0]._id },
         });
       }

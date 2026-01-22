@@ -14,11 +14,13 @@ const partners = [
   { name: "BT Arena", logo: "/placeholder-logo.svg", featured: false },
 ];
 
-export default function PartnersPage({
-  params: { locale },
+export default async function PartnersPage({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+
   unstable_setRequestLocale(locale);
 
   return (

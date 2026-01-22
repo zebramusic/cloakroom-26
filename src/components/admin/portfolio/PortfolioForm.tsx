@@ -18,12 +18,13 @@ import {
 import { Save, Loader2 } from "lucide-react";
 import { ImageManager } from "./ImageManager";
 import { hasPermission } from "@/lib/auth/permissions";
+import type { Role } from "@/lib/auth/permissions";
 
 interface PortfolioFormProps {
   mode: "create" | "edit";
   itemId?: string;
   initialData?: any;
-  userRole: string;
+  userRole?: string;
 }
 
 const EVENT_TYPES = [
@@ -74,8 +75,9 @@ export function PortfolioForm({
     isFeatured: initialData?.isFeatured || false,
   });
 
-  const canPublish = hasPermission(userRole, "portfolio.publish");
-  const canUpdate = hasPermission(userRole, "portfolio.update");
+  const role = userRole as Role | undefined;
+  const canPublish = role ? hasPermission(role, "portfolio.publish") : false;
+  const canUpdate = role ? hasPermission(role, "portfolio.update") : false;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +88,7 @@ export function PortfolioForm({
         ...formData,
         tags: formData.tags
           .split(",")
-          .map((t) => t.trim())
+          .map((t: string) => t.trim())
           .filter(Boolean),
         eventMeta: {
           ...formData.eventMeta,

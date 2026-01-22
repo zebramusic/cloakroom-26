@@ -10,9 +10,10 @@ import mongoose from "mongoose";
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session || !hasPermission(session.user.role, "products.view")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -20,11 +21,11 @@ export async function GET(
 
     await connectDB();
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
-    const category = await Category.findById(params.id).lean();
+    const category = await Category.findById(id).lean();
     if (!category) {
       return NextResponse.json({ error: "Category not found" }, { status: 404 });
     }
@@ -44,9 +45,10 @@ export async function GET(
  */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session || !hasPermission(session.user.role, "products.update")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -54,7 +56,7 @@ export async function PATCH(
 
     await connectDB();
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
@@ -66,7 +68,7 @@ export async function PATCH(
       // Check if slug is taken by another category
       const existing = await Category.findOne({ 
         slug: body.slug, 
-        _id: { $ne: params.id } 
+        _id: { $ne: id } 
       });
       if (existing) {
         return NextResponse.json(
@@ -83,7 +85,7 @@ export async function PATCH(
     if (body.isActive !== undefined) updateData.isActive = body.isActive;
 
     const category = await Category.findByIdAndUpdate(
-      params.id,
+      id,
       updateData,
       { new: true, runValidators: true }
     ).lean();
@@ -107,9 +109,10 @@ export async function PATCH(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session || !hasPermission(session.user.role, "products.delete")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -117,11 +120,11 @@ export async function DELETE(
 
     await connectDB();
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
-    const category = await Category.findByIdAndDelete(params.id);
+    const category = await Category.findByIdAndDelete(id);
     if (!category) {
       return NextResponse.json({ error: "Category not found" }, { status: 404 });
     }

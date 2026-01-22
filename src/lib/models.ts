@@ -255,6 +255,8 @@ export interface IOrder extends Document {
   items: IOrderItem[];
   subtotal: number;
   shippingCost: number;
+  deliveryFee?: number;
+  codFee?: number;
   tax: number;
   total: number;
   status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
@@ -300,6 +302,8 @@ const OrderSchema = new Schema<IOrder>({
   }],
   subtotal: { type: Number, required: true },
   shippingCost: { type: Number, default: 0 },
+  deliveryFee: { type: Number, default: 0 },
+  codFee: { type: Number, default: 0 },
   tax: { type: Number, default: 0 },
   total: { type: Number, required: true },
   status: {

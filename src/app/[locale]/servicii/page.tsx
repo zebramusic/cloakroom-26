@@ -1,5 +1,4 @@
 import { unstable_setRequestLocale } from "next-intl/server";
-import { useTranslations } from "next-intl";
 import { Hero } from "@/components/sections/Hero";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -12,13 +11,14 @@ import {
 import { QuoteCTA } from "@/components/sections/QuoteCTA";
 import { CheckCircle } from "lucide-react";
 
-export default function ServicesPage({
-  params: { locale },
+export default async function ServicesPage({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+
   unstable_setRequestLocale(locale);
-  const t = useTranslations("home");
 
   return (
     <>

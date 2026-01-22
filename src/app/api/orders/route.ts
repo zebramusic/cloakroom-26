@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import mongoose from "mongoose"
 import connectDB from "@/lib/mongodb"
 import { Order } from "@/lib/models"
 import { Customer } from "@/lib/models-customer"
@@ -81,27 +82,28 @@ export async function POST(request: NextRequest) {
       productName: item.name,
       sku: item.sku,
       variantId: item.variant_id || item.variantId,
+      quantity: item.quantity,
+      price: item.price,
+      subtotal: item.price * item.quantity,
+    }))
+
     // Try to find customer by session or email
-    let customerId = null
+    let customerId: mongoose.Types.ObjectId | undefined
     if (session?.user?.id && session?.user?.principalType === "customer") {
-      customerId = session.user.id
+      if (mongoose.Types.ObjectId.isValid(session.user.id)) {
+        customerId = new mongoose.Types.ObjectId(session.user.id)
+      }
     } else {
-      // Try to find customer by email for guest checkout
       const existingCustomer = await Customer.findOne({ email }).lean()
-      if (existingCustomer) {
-        customerId = existingCustomer._id
+      if (existingCustomer?._id) {
+        customerId = new mongoose.Types.ObjectId(existingCustomer._id.toString())
       }
     }
 
     const order = await Order.create({
       orderNumber,
       status: "pending",
-      customerId, // Link to customer if authenticated or found by emailce * item.quantity,
-    }))
-
-    const order = await Order.create({
-      orderNumber,
-      status: "pending",
+      customerId,
       customerName: `${billingFirstName} ${billingLastName}`,
       customerEmail: email,
       customerPhone: phone,
@@ -125,6 +127,8 @@ export async function POST(request: NextRequest) {
       items: orderItems,
       subtotal,
       shippingCost: deliveryFee,
+      deliveryFee,
+      codFee,
       tax,
       total,
       paymentStatus: "pending",

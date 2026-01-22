@@ -1,9 +1,11 @@
 import PartnerForm from "../../new/page";
 
-export default function EditPartnerPage({
+export default async function EditPartnerPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <PartnerForm partnerId={params.id} />;
+  const { id } = await params;
+
+  return <PartnerForm partnerId={id} />;
 }

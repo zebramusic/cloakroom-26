@@ -10,11 +10,13 @@ import {
 import { QuoteCTA } from "@/components/sections/QuoteCTA";
 import { Target, Users, Award, Heart, Shield } from "lucide-react";
 
-export default function AboutPage({
-  params: { locale },
+export default async function AboutPage({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+
   unstable_setRequestLocale(locale);
 
   return (

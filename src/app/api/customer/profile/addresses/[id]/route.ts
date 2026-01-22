@@ -10,16 +10,17 @@ import mongoose from 'mongoose';
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
 
     if (!session || session.user.principalType !== 'customer') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const addressId = params.id;
+    const addressId = id;
 
     if (!mongoose.Types.ObjectId.isValid(addressId)) {
       return NextResponse.json({ error: 'Invalid address ID' }, { status: 400 });
@@ -89,16 +90,17 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
 
     if (!session || session.user.principalType !== 'customer') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const addressId = params.id;
+    const addressId = id;
 
     if (!mongoose.Types.ObjectId.isValid(addressId)) {
       return NextResponse.json({ error: 'Invalid address ID' }, { status: 400 });

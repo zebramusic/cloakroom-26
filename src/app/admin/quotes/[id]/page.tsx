@@ -57,11 +57,7 @@ interface Quote {
   responded_at: string | null;
 }
 
-export default function QuoteDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function QuoteDetailPage({ params }: any) {
   const router = useRouter();
   const [quote, setQuote] = useState<Quote | null>(null);
   const [isLoading, setIsLoading] = useState(true);

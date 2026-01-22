@@ -13,9 +13,9 @@ export function MarkdownRenderer({
   className,
 }: MarkdownRendererProps) {
   return (
-    <ReactMarkdown
-      className={cn("prose prose-slate max-w-none", className)}
-      components={{
+    <div className={cn("prose prose-slate max-w-none", className)}>
+      <ReactMarkdown
+        components={{
         // Disable dangerous HTML
         html: () => null,
         // Style headings
@@ -68,9 +68,10 @@ export function MarkdownRenderer({
             {...props}
           />
         ),
-      }}
-    >
-      {content}
-    </ReactMarkdown>
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 }

@@ -5,13 +5,14 @@ import { PortfolioItem, PortfolioImage } from '@/lib/models';
 // GET /api/portfolio/[slug] - Public portfolio item detail
 export async function GET(
   request: Request,
-  { params }: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await context.params;
   await connectDB();
 
   try {
     const item = await PortfolioItem.findOne({
-      slug: params.slug,
+      slug,
       isPublished: true,
     }).lean();
 

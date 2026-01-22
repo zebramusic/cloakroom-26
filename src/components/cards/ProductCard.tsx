@@ -23,6 +23,7 @@ interface ProductCardProps {
     name_en: string;
     sku: string;
     base_price: number;
+    tax_rate?: number;
     description_ro?: string;
     description_en?: string;
     is_active: boolean;

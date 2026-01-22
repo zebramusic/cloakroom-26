@@ -11,22 +11,23 @@ import { generateImageVariants } from '@/lib/utils/image-processor';
 // GET /api/admin/portfolio/[id]/images - List images for item
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   const session = await auth();
   
-  if (!session || !hasPermission(session.user.role, 'portfolio.read')) {
+  if (!session || !hasPermission(session.user.role, 'portfolio.view')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   await connectDB();
 
-  if (!mongoose.Types.ObjectId.isValid(params.id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
   }
 
   try {
-    const images = await PortfolioImage.find({ portfolioItemId: params.id })
+    const images = await PortfolioImage.find({ portfolioItemId: id })
       .sort({ orderIndex: 1 })
       .lean();
 
@@ -40,29 +41,30 @@ export async function GET(
 // POST /api/admin/portfolio/[id]/images - Upload new image
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   const session = await auth();
   
-  if (!session || !hasPermission(session.user.role, 'portfolio.write')) {
+  if (!session || !hasPermission(session.user.role, 'portfolio.update')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   await connectDB();
 
-  if (!mongoose.Types.ObjectId.isValid(params.id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
   }
 
   try {
     // Verify item exists
-    const item = await PortfolioItem.findById(params.id);
+    const item = await PortfolioItem.findById(id);
     if (!item) {
       return NextResponse.json({ error: 'Portfolio item not found' }, { status: 404 });
     }
 
     // Count existing images (limit 20)
-    const count = await PortfolioImage.countDocuments({ portfolioItemId: params.id });
+    const count = await PortfolioImage.countDocuments({ portfolioItemId: id });
     if (count >= 20) {
       return NextResponse.json(
         { error: 'Maximum 20 images per item' },
@@ -110,17 +112,17 @@ export async function POST(
     await writeFile(tempPath, buffer);
 
     // Generate variants
-    const variants = await generateImageVariants(tempPath, params.id, sanitizedName);
+    const variants = await generateImageVariants(tempPath, id, sanitizedName);
 
     // Get next orderIndex
-    const lastImage = await PortfolioImage.findOne({ portfolioItemId: params.id })
+    const lastImage = await PortfolioImage.findOne({ portfolioItemId: id })
       .sort({ orderIndex: -1 })
       .lean();
     const nextOrderIndex = (lastImage?.orderIndex || 0) + 1;
 
     // Create image record
     const image = await PortfolioImage.create({
-      portfolioItemId: params.id,
+      portfolioItemId: id,
       variants,
       width: variants.width,
       height: variants.height,
@@ -137,7 +139,7 @@ export async function POST(
 
     // If this is the first image, set as cover
     if (count === 0) {
-      await PortfolioItem.findByIdAndUpdate(params.id, {
+      await PortfolioItem.findByIdAndUpdate(id, {
         $set: { coverImageId: image._id },
       });
     }

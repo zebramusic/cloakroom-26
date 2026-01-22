@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DataTable } from "@/components/admin/DataTable";
-import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -16,9 +16,10 @@ import {
 } from "@/components/ui/select";
 import { Eye, Edit, Trash2, Search } from "lucide-react";
 import { hasPermission } from "@/lib/auth/permissions";
+import type { Role } from "@/lib/auth/permissions";
 
 interface PortfolioDataTableProps {
-  userRole: string;
+  userRole?: string;
 }
 
 export function PortfolioDataTable({ userRole }: PortfolioDataTableProps) {
@@ -28,8 +29,9 @@ export function PortfolioDataTable({ userRole }: PortfolioDataTableProps) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const canUpdate = hasPermission(userRole, "portfolio.update");
-  const canDelete = hasPermission(userRole, "portfolio.delete");
+  const role = userRole as Role | undefined;
+  const canUpdate = role ? hasPermission(role, "portfolio.update") : false;
+  const canDelete = role ? hasPermission(role, "portfolio.delete") : false;
 
   useEffect(() => {
     fetchItems();
@@ -123,11 +125,24 @@ export function PortfolioDataTable({ userRole }: PortfolioDataTableProps) {
       label: "Status",
       render: (item: any) => (
         <div className="flex gap-2">
-          <StatusBadge
-            status={item.isPublished ? "published" : "draft"}
-            variant={item.isPublished ? "success" : "warning"}
-          />
-          {item.isFeatured && <StatusBadge status="featured" variant="info" />}
+          <Badge
+            variant="outline"
+            className={
+              item.isPublished
+                ? "bg-green-50 text-green-700 border-green-200"
+                : "bg-yellow-50 text-yellow-700 border-yellow-200"
+            }
+          >
+            {item.isPublished ? "Published" : "Draft"}
+          </Badge>
+          {item.isFeatured && (
+            <Badge
+              variant="outline"
+              className="bg-blue-50 text-blue-700 border-blue-200"
+            >
+              Featured
+            </Badge>
+          )}
         </div>
       ),
     },
@@ -189,12 +204,17 @@ export function PortfolioDataTable({ userRole }: PortfolioDataTableProps) {
         <Button onClick={fetchItems}>Search</Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={items}
-        loading={loading}
-        emptyMessage="No portfolio items found"
-      />
+      {loading ? (
+        <div className="rounded-lg border bg-white py-12 text-center text-sm text-muted-foreground">
+          Loading portfolio items...
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={items}
+          emptyMessage="No portfolio items found"
+        />
+      )}
     </div>
   );
 }

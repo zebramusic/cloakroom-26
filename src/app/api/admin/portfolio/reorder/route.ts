@@ -8,7 +8,7 @@ import { hasPermission } from '@/lib/auth/permissions';
 export async function POST(request: Request) {
   const session = await auth();
   
-  if (!session || !hasPermission(session.user.role, 'portfolio.write')) {
+  if (!session || !hasPermission(session.user.role, 'portfolio.update')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

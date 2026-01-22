@@ -5,6 +5,7 @@ import connectDB from "./lib/mongodb";
 import { User } from "./lib/models";
 import { Customer } from "./lib/models-customer";
 import { verifyPassword } from "./lib/auth/customer-auth";
+import type { Role } from "./lib/auth/permissions";
 import bcrypt from "bcryptjs";
 
 export const authConfig: NextAuthConfig = {
@@ -88,8 +89,10 @@ export const authConfig: NextAuthConfig = {
 
         await connectDB();
 
+        const normalizedEmail = (credentials.email as string).toLowerCase();
+
         const customer = await Customer.findOne({ 
-          email: credentials.email.toLowerCase() 
+          email: normalizedEmail,
         });
 
         if (!customer || !customer.passwordHash) {
@@ -132,7 +135,7 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id as string;
-        token.role = (user as any).role as string;
+        token.role = (user as any).role as Role;
         token.principalType = (user as any).principalType as "admin" | "customer";
       }
       return token;
@@ -140,7 +143,7 @@ export const authConfig: NextAuthConfig = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.role = token.role as Role;
         session.user.principalType = token.principalType as "admin" | "customer";
       }
       return session;

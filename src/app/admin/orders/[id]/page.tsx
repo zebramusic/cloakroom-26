@@ -31,6 +31,9 @@ export default async function OrderDetailPage({
     notFound();
   }
 
+  const deliveryFee = order.deliveryFee ?? order.shippingCost ?? 0;
+  const codFee = order.codFee ?? 0;
+
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       pending: "bg-gray-100 text-gray-700",
@@ -125,16 +128,16 @@ export default async function OrderDetailPage({
                   <span className="text-gray-600">Tax (19%)</span>
                   <span>{order.tax.toFixed(2)} RON</span>
                 </div>
-                {order.deliveryFee > 0 && (
+                {deliveryFee > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Delivery Fee</span>
-                    <span>{order.deliveryFee.toFixed(2)} RON</span>
+                    <span>{deliveryFee.toFixed(2)} RON</span>
                   </div>
                 )}
-                {order.codFee > 0 && (
+                {codFee > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">COD Fee</span>
-                    <span>{order.codFee.toFixed(2)} RON</span>
+                    <span>{codFee.toFixed(2)} RON</span>
                   </div>
                 )}
                 <Separator className="my-2" />
@@ -231,11 +234,11 @@ export default async function OrderDetailPage({
                   {order.paymentStatus}
                 </Badge>
               </div>
-              {order.stripePaymentIntentId && (
+              {order.paymentIntentId && (
                 <div>
                   <p className="text-sm text-gray-500">Stripe Payment ID</p>
                   <p className="text-xs font-mono break-all">
-                    {order.stripePaymentIntentId}
+                    {order.paymentIntentId}
                   </p>
                 </div>
               )}

@@ -138,7 +138,12 @@ export default async function ShopPage({
   return (
     <div className="py-8">
       {/* Site Builder Hero Block */}
-      {sitePage && <BlockRenderer blocks={sitePage.blocks} locale={locale} />}
+      {sitePage && (
+        <BlockRenderer
+          blocks={(sitePage as any).blocks ?? []}
+          locale={locale}
+        />
+      )}
 
       <div className="container mx-auto px-4">
         <div className="mb-8">

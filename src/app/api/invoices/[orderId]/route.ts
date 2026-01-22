@@ -6,10 +6,10 @@ import mongoose from "mongoose"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { orderId: string } }
+  context: { params: Promise<{ orderId: string }> }
 ) {
   try {
-    const { orderId } = params
+    const { orderId } = await context.params
 
     // Validate orderId
     if (!mongoose.Types.ObjectId.isValid(orderId)) {
@@ -52,8 +52,8 @@ export async function GET(
       })),
       subtotal: order.subtotal,
       tax: order.tax,
-      deliveryFee: order.shippingCost || 0,
-      codFee: 0, // COD fee not stored separately in new schema
+      deliveryFee: order.deliveryFee ?? order.shippingCost ?? 0,
+      codFee: order.codFee ?? 0,
       total: order.total,
       paymentMethod: order.paymentMethod,
       locale: "ro",

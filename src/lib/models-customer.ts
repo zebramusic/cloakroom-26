@@ -30,6 +30,7 @@ export interface ICustomer extends Document {
     postalCode: string;
     country: string;
     isDefault: boolean;
+    _id?: mongoose.Types.ObjectId;
   }>;
   localePreference: 'ro' | 'en';
   lastLogin?: Date;

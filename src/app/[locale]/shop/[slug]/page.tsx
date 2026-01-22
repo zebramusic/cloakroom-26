@@ -25,10 +25,12 @@ import connectDB from "@/lib/mongodb";
 import { Product } from "@/lib/models";
 
 export default async function ProductDetailPage({
-  params: { locale, slug },
+  params,
 }: {
-  params: { locale: string; slug: string };
+  params: Promise<{ locale: string; slug: string }>;
 }) {
+  const { locale, slug } = await params;
+
   unstable_setRequestLocale(locale);
 
   await connectDB();

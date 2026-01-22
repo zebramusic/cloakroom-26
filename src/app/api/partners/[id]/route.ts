@@ -8,16 +8,17 @@ import mongoose from "mongoose";
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     await connectDB();
     
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid partner ID" }, { status: 400 });
     }
 
-    const partner = await Partner.findById(params.id).lean();
+    const partner = await Partner.findById(id).lean();
 
     if (!partner) {
       return NextResponse.json({ error: "Partner not found" }, { status: 404 });
@@ -38,13 +39,14 @@ export async function GET(
  */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const body = await request.json();
     await connectDB();
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid partner ID" }, { status: 400 });
     }
 
@@ -72,7 +74,7 @@ export async function PATCH(
     }
 
     const partner = await Partner.findByIdAndUpdate(
-      params.id,
+      id,
       updateData,
       { new: true, runValidators: true }
     ).lean();
@@ -96,16 +98,17 @@ export async function PATCH(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     await connectDB();
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid partner ID" }, { status: 400 });
     }
 
-    const partner = await Partner.findByIdAndDelete(params.id);
+    const partner = await Partner.findByIdAndDelete(id);
 
     if (!partner) {
       return NextResponse.json({ error: "Partner not found" }, { status: 404 });

@@ -56,11 +56,13 @@ const getPostBySlug = (slug: string) => {
   return posts[slug] || null;
 };
 
-export default function BlogArticlePage({
-  params: { locale, slug },
+export default async function BlogArticlePage({
+  params,
 }: {
-  params: { locale: string; slug: string };
+  params: Promise<{ locale: string; slug: string }>;
 }) {
+  const { locale, slug } = await params;
+
   unstable_setRequestLocale(locale);
 
   const post = getPostBySlug(slug);

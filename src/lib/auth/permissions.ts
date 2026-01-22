@@ -25,6 +25,9 @@ export type Permission =
   | 'portfolio.update'
   | 'portfolio.delete'
   | 'portfolio.publish'
+  | 'support.view'
+  | 'support.respond'
+  | 'support.manage'
   | 'site.read'
   | 'site.write'
   | 'site.publish'
@@ -52,6 +55,7 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'products.view', 'products.create', 'products.update', 'products.delete',
     'partners.view', 'partners.create', 'partners.update', 'partners.delete',
     'portfolio.view', 'portfolio.create', 'portfolio.update', 'portfolio.delete', 'portfolio.publish',
+    'support.view', 'support.respond', 'support.manage',
     'site.read', 'site.write', 'site.publish', 'site.media', 'site.rollback',
     'content.view', 'content.create', 'content.update', 'content.delete',
     'users.view', 'users.create', 'users.update', 'users.delete', 'users.manage',
@@ -66,6 +70,7 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'products.view', 'products.create', 'products.update', 'products.delete',
     'partners.view', 'partners.create', 'partners.update', 'partners.delete',
     'portfolio.view', 'portfolio.create', 'portfolio.update', 'portfolio.delete', 'portfolio.publish',
+    'support.view', 'support.respond',
     'site.read', 'site.write', 'site.publish', 'site.media',
     'content.view', 'content.create', 'content.update', 'content.delete',
     'users.view', 'users.manage',
@@ -79,6 +84,7 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'products.view',
     'partners.view',
     'portfolio.view',
+    'support.view', 'support.respond',
     'site.read',
     'content.view',
   ],

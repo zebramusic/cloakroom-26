@@ -107,11 +107,13 @@ const faqs = [
   },
 ];
 
-export default function PricingPage({
-  params: { locale },
+export default async function PricingPage({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+
   unstable_setRequestLocale(locale);
 
   return (

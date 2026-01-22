@@ -5,16 +5,17 @@ import mongoose from "mongoose";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     await connectDB();
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid quote ID" }, { status: 400 });
     }
 
-    const quote = await Quote.findById(params.id).lean();
+    const quote = await Quote.findById(id).lean();
 
     if (!quote) {
       return NextResponse.json({ error: "Quote not found" }, { status: 404 });
@@ -32,13 +33,14 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     await connectDB();
     const body = await request.json();
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid quote ID" }, { status: 400 });
     }
 
@@ -61,7 +63,7 @@ export async function PATCH(
     }
 
     const quote = await Quote.findByIdAndUpdate(
-      params.id,
+      id,
       updateData,
       { new: true, runValidators: true }
     ).lean();
@@ -82,16 +84,17 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     await connectDB();
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid quote ID" }, { status: 400 });
     }
 
-    const quote = await Quote.findByIdAndDelete(params.id);
+    const quote = await Quote.findByIdAndDelete(id);
 
     if (!quote) {
       return NextResponse.json({ error: "Quote not found" }, { status: 404 });
