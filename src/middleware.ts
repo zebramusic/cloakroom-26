@@ -1,63 +1,111 @@
 import createMiddleware from 'next-intl/middleware';
 import {NextRequest, NextResponse} from 'next/server';
-import {createServerClient, type CookieOptions} from '@supabase/ssr';
+import { getToken } from 'next-auth/jwt';
 
 const intlMiddleware = createMiddleware({
   locales: ['ro', 'en'],
   defaultLocale: 'ro',
-  localePrefix: 'as-needed'
+  localePrefix: 'as-needed',
+  localeDetection: false
 });
 
 export async function middleware(request: NextRequest) {
-  // First, handle i18n
-  let response = intlMiddleware(request);
+  // Skip i18n for admin, api, and account routes
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api');
+  const isAccountRoute = request.nextUrl.pathname.startsWith('/account');
+  
+  // First, handle i18n for non-admin/account routes
+  let response = (isAdminRoute || isApiRoute || isAccountRoute) ? NextResponse.next() : intlMiddleware(request);
 
-  // Then, handle Supabase auth
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-        },
-        remove(name: string, options: CookieOptions) {
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
-        },
-      },
+  // Then, handle auth - use getToken which works in Edge runtime
+  const token = await getToken({ 
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET 
+  });
+
+  // Protect customer account routes
+  if (request.nextUrl.pathname.startsWith('/account')) {
+    // Public account routes (don't require authentication)
+    const publicAccountRoutes = [
+      '/account/login', 
+      '/account/signup', 
+      '/account/forgot-password', 
+      '/account/reset-password',
+      '/account/verify-email',
+    ];
+    const isPublicRoute = publicAccountRoutes.some(route => request.nextUrl.pathname === route);
+    
+    if (isPublicRoute) {
+      // Redirect to shop if already logged in as customer
+      if (token && token.principalType === 'customer' && !request.nextUrl.pathname.startsWith('/account/reset-password')) {
+        return NextResponse.redirect(new URL('/shop', request.url));
+      }
+      return response;
     }
-  );
-
-  // Refresh session if expired
-  const {data: {session}} = await supabase.auth.getSession();
+    
+    // Require customer authentication for all other account routes
+    if (!token || token.principalType !== 'customer') {
+      const loginUrl = new URL('/account/login', request.url);
+      loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
 
   // Protect admin routes
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    // Allow access to login page
-    if (request.nextUrl.pathname === '/admin/login') {
-      // Redirect to dashboard if already logged in
-      if (session) {
+    // Public admin routes (don't require authentication)
+    const publicAdminRoutes = ['/admin/login', '/admin/signup', '/admin/forgot-password', '/admin/reset-password'];
+    const isPublicRoute = publicAdminRoutes.some(route => request.nextUrl.pathname === route);
+    
+    if (isPublicRoute) {
+      // Redirect to dashboard if already logged in as admin (except for password reset)
+      if (token && token.principalType === 'admin' && !request.nextUrl.pathname.startsWith('/admin/reset-password')) {
         return NextResponse.redirect(new URL('/admin', request.url));
       }
       return response;
     }
     
-    // Require authentication for all other admin routes
-    if (!session) {
+    // Require admin authentication for all other admin routes
+    if (!token || token.principalType !== 'admin') {
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
+    }
+
+    // Get user role from token
+    const role = token.role as string;
+    
+    // Role-based route protection
+    const path = request.nextUrl.pathname;
+    
+    // Admin-only routes
+    if ((path.startsWith('/admin/settings') || 
+         path.startsWith('/admin/partners/') ||
+         path === '/admin/partners') && 
+        role !== 'admin') {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
+    
+    // Admin and Manager only routes (users management)
+    if ((path.startsWith('/admin/users/') || path === '/admin/users') &&
+        role !== 'admin' && role !== 'manager') {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
+    
+    // Manager and above routes
+    if ((path.startsWith('/admin/orders/') ||
+         path.startsWith('/admin/quotes/') ||
+         path === '/admin/orders' ||
+         path === '/admin/quotes') &&
+        role !== 'admin' && role !== 'manager' && role !== 'support') {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
+    
+    // Products - editors can view but not edit
+    if (path.startsWith('/admin/products/edit') && 
+        role !== 'admin' && role !== 'manager') {
+      return NextResponse.redirect(new URL('/admin/products', request.url));
     }
   }
 

@@ -1,12 +1,14 @@
-import { unstable_setRequestLocale } from "next-intl/server";
+"use client";
+
 import { QuoteForm } from "@/components/forms/QuoteForm";
+import { use } from "react";
 
 export default function QuoteRequestPage({
-  params: { locale },
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  unstable_setRequestLocale(locale);
+  const { locale } = use(params);
 
   return (
     <div className="py-16">

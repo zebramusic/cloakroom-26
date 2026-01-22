@@ -29,12 +29,14 @@ export function StatsCard({
   };
 
   return (
-    <Card>
+    <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-gray-50 hover:shadow-xl transition-shadow duration-300">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <p className="text-sm text-gray-600 font-medium">{title}</p>
-            <p className="text-3xl font-bold">{value}</p>
+            <p className="text-sm text-gray-600 font-semibold">{title}</p>
+            <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">
+              {value}
+            </p>
             {trend && (
               <div className="flex items-center gap-1">
                 <span
@@ -56,12 +58,12 @@ export function StatsCard({
           </div>
           <div
             className={cn(
-              "w-14 h-14 rounded-full flex items-center justify-center",
+              "w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg",
               iconColorClasses[iconColor as keyof typeof iconColorClasses] ||
                 iconColorClasses.purple,
             )}
           >
-            <Icon className="w-7 h-7" />
+            <Icon className="w-8 h-8" />
           </div>
         </div>
       </CardContent>

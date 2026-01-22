@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { DataTable, Column } from "@/components/admin/DataTable";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Loader2 } from "lucide-react";
@@ -71,14 +70,23 @@ export default function QuotesPage() {
 
   const loadQuotes = async () => {
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("quotes")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const response = await fetch("/api/quotes");
+      if (!response.ok) throw new Error("Failed to fetch quotes");
+      const { quotes: data } = await response.json();
 
-      if (error) throw error;
-      setQuotes(data || []);
+      // Transform MongoDB data to match display format
+      const transformedQuotes = data.map((q: any) => ({
+        id: q._id,
+        quote_number: q.quoteNumber,
+        client_name: q.clientName,
+        client_email: q.clientEmail,
+        client_company: q.clientCompany || "-",
+        estimated_attendees: q.estimatedParticipants,
+        status: q.status,
+        created_at: q.createdAt,
+      }));
+
+      setQuotes(transformedQuotes);
     } catch (error) {
       console.error("Failed to load quotes:", error);
     } finally {

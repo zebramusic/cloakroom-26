@@ -17,7 +17,7 @@
       "subtitle": "Complete cloakroom solutions for events of any size. Fast. Safe. Professional.",
       "description": "Numbered token system, dedicated staff, complete infrastructure. From 100 to 12,000+ participants.",
       "cta": "Request a Quote",
-      "cta_secondary": "View Services"
+      "ctaSecondary": "Explore Shop"
     },
     "features": {
       "title": "Why Choose Us?",
@@ -422,6 +422,46 @@
       "goToShop": "Go to Shop",
       "securityNote": "Your data is protected by SSL encryption. We do not store credit card information."
     }
+  },
+  "portfolio": {
+    "sectionTitle": "Portfolio / Events Served",
+    "sectionSubtitle": "Discover a selection of events where we provided professional cloakroom services",
+    "viewAll": "View All Events",
+    "pageTitle": "Events Portfolio",
+    "pageSubtitle": "Explore the complete gallery of events we've contributed to",
+    "filters": {
+      "all": "All",
+      "year": "Year",
+      "eventType": "Event Type",
+      "search": "Search events..."
+    },
+    "eventTypes": {
+      "conference": "Conference",
+      "concert": "Concert",
+      "festival": "Festival",
+      "corporate": "Corporate",
+      "wedding": "Wedding",
+      "sports": "Sports",
+      "exhibition": "Exhibition",
+      "gala": "Gala"
+    },
+    "location": "Location",
+    "date": "Date",
+    "tags": "Tags",
+    "noResults": "No events found",
+    "noResultsDesc": "Try adjusting your filters or search criteria",
+    "loadMore": "Load More",
+    "viewDetails": "View Details",
+    "backToGallery": "Back to Gallery",
+    "shareEvent": "Share Event",
+    "relatedEvents": "Related Events",
+    "details": {
+      "title": "Event Details",
+      "participants": "Participants",
+      "duration": "Duration",
+      "services": "Services Provided",
+      "description": "Description",
+      "gallery": "Photo Gallery"
+    }
   }
 }
-

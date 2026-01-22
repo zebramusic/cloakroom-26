@@ -20,7 +20,7 @@
       "ctaSecondary": "Explorează Shop-ul"
     },
     "features": {
-      "title": "De Ce Să Ne Alegi?",
+      "title": "De ce să ne alegi?",
       "compact": {
         "title": "Sistem Compact",
         "description": "Sistem optimizat cu token-uri numerotate pentru management eficient al fluxului"
@@ -422,6 +422,46 @@
       "goToShop": "Mergi la Magazin",
       "securityNote": "Datele tale sunt protejate prin criptare SSL. Nu salvăm informații despre carduri bancare."
     }
+  },
+  "portfolio": {
+    "sectionTitle": "Portofoliu / Evenimente Deservite",
+    "sectionSubtitle": "Descoperă o selecție a evenimentelor la care am oferit servicii de garderobă profesională",
+    "viewAll": "Vezi Toate Evenimentele",
+    "pageTitle": "Portofoliu Evenimente",
+    "pageSubtitle": "Explorează galeria completă a evenimentelor la care am contribuit",
+    "filters": {
+      "all": "Toate",
+      "year": "An",
+      "eventType": "Tip Eveniment",
+      "search": "Caută evenimente..."
+    },
+    "eventTypes": {
+      "conference": "Conferință",
+      "concert": "Concert",
+      "festival": "Festival",
+      "corporate": "Corporate",
+      "wedding": "Nuntă",
+      "sports": "Sportiv",
+      "exhibition": "Expoziție",
+      "gala": "Gală"
+    },
+    "location": "Locație",
+    "date": "Dată",
+    "tags": "Tag-uri",
+    "noResults": "Nu am găsit evenimente",
+    "noResultsDesc": "Încearcă să modifici filtrele sau criteriile de căutare",
+    "loadMore": "Încarcă Mai Multe",
+    "viewDetails": "Vezi Detalii",
+    "backToGallery": "Înapoi la Galerie",
+    "shareEvent": "Distribuie Eveniment",
+    "relatedEvents": "Evenimente Similare",
+    "details": {
+      "title": "Detalii Eveniment",
+      "participants": "Participanți",
+      "duration": "Durată",
+      "services": "Servicii Oferite",
+      "description": "Descriere",
+      "gallery": "Galerie Foto"
+    }
   }
 }
-

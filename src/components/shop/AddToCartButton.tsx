@@ -11,6 +11,7 @@ interface AddToCartButtonProps {
     name: string;
     sku: string;
     price: number;
+    tax_rate?: number;
     imageUrl: string;
   };
   locale: string;
@@ -35,6 +36,7 @@ export function AddToCartButton({
       image_url: product.imageUrl,
       sku: product.sku,
       price: product.price,
+      tax_rate: product.tax_rate || 0.21, // Use product's tax rate
     });
 
     setTimeout(() => setIsAdding(false), 1000);

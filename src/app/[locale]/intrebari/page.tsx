@@ -19,9 +19,9 @@ const faqCategories = [
         questionRo: "Ce zone acoperiti?",
         questionEn: "What areas do you cover?",
         answerRo:
-          "Activăm în toată România. Avem baza principală în Cluj-Napoca, dar ne deplasăm pentru evenimente în orice colț al țării. Tariful include transportul echipamentelor și echipei.",
+          "Activăm în toată România. Avem baza principală în Bacău, dar ne deplasăm pentru evenimente în orice colț al țării. Tariful include transportul echipamentelor și echipei.",
         answerEn:
-          "We operate throughout Romania. Our main base is in Cluj-Napoca, but we travel for events anywhere in the country. The fee includes transportation of equipment and team.",
+          "We operate throughout Romania. Our main base is in Bacău, but we travel for events anywhere in the country. The fee includes transportation of equipment and team.",
       },
       {
         questionRo: "Cât timp în avans trebuie să vă contactăm?",
@@ -125,11 +125,12 @@ const faqCategories = [
   },
 ];
 
-export default function FAQPage({
-  params: { locale },
+export default async function FAQPage({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   unstable_setRequestLocale(locale);
 
   return (

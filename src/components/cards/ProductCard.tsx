@@ -61,6 +61,7 @@ export function ProductCard({ product, locale }: ProductCardProps) {
       image_url: imageUrl,
       sku: product.sku,
       price: product.base_price,
+      tax_rate: product.tax_rate || 0.21, // Use product's tax rate
     });
 
     setTimeout(() => setIsAdding(false), 500);

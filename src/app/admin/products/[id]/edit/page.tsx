@@ -1,9 +1,10 @@
-import ProductForm from "../new/page";
+import ProductForm from "../../new/page";
 
-export default function EditProductPage({
+export default async function EditProductPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <ProductForm productId={params.id} />;
+  const { id } = await params;
+  return <ProductForm productId={id} />;
 }

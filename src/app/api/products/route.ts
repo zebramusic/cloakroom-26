@@ -1,42 +1,36 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import connectDB from "@/lib/mongodb";
+import { Product } from "@/lib/models";
+import mongoose from "mongoose";
 
 /**
  * GET /api/products - Get all products
  */
 export async function GET(request: Request) {
   try {
+    await connectDB();
+
     const { searchParams } = new URL(request.url);
     const active = searchParams.get("active");
     const category = searchParams.get("category");
 
-    const supabase = await createClient();
-    let query = (supabase
-      .from("products") as any)
-      .select(`
-        *,
-        category:product_categories(id, name_ro, name_en, slug)
-      `)
-      .order("created_at", { ascending: false });
+    const filter: any = {};
 
     // Filter by active status
     if (active === "true") {
-      query = query.eq("is_active", true);
+      filter.isActive = true;
     }
 
     // Filter by category
     if (category) {
-      query = query.eq("category_id", category);
+      filter.category = category;
     }
 
-    const { data, error } = await query;
+    const products = await Product.find(filter)
+      .sort({ createdAt: -1 })
+      .lean();
 
-    if (error) {
-      console.error("Error fetching products:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ products: data });
+    return NextResponse.json({ products });
   } catch (error: any) {
     console.error("Error in GET /api/products:", error);
     return NextResponse.json(
@@ -51,70 +45,40 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
+    await connectDB();
     const body = await request.json();
-    const supabase = await createClient();
 
-    // Create product
-    const { data: product, error: productError } = (await (supabase
-      .from("products") as any)
-      .insert({
-        category_id: body.category_id,
-        name_ro: body.name_ro,
-        name_en: body.name_en,
-        slug: body.slug,
-        sku: body.sku,
-        description_ro: body.description_ro || null,
-        description_en: body.description_en || null,
-        features_ro: body.features_ro || null,
-        features_en: body.features_en || null,
-        base_price: body.base_price,
-        tax_rate: body.tax_rate || 19.0,
-        has_variants: body.has_variants || false,
-        track_inventory: body.track_inventory ?? true,
-        stock_quantity: body.stock_quantity || 0,
-        low_stock_threshold: body.low_stock_threshold || 5,
-        is_active: body.is_active ?? true,
-        is_featured: body.is_featured || false,
-        is_returnable: body.is_returnable ?? true,
-        weight_kg: body.weight_kg || null,
-        dimensions: body.dimensions || null,
-      })
-      .select()
-      .single()) as any;
+    // Create product with variants
+    const productData: any = {
+      name: body.name || body.name_ro,
+      slug: body.slug,
+      sku: body.sku,
+      description: body.description || body.description_ro,
+      shortDescription: body.shortDescription,
+      category: body.category || body.category_id,
+      subcategory: body.subcategory,
+      basePrice: body.base_price || body.basePrice,
+      compareAtPrice: body.compareAtPrice,
+      taxRate: body.tax_rate !== undefined ? (body.tax_rate / 100) : 0.21, // Convert percentage to decimal, default 21%
+      images: body.images || [],
+      variants: body.variants || [],
+      stock: body.stock_quantity || body.stock || 0,
+      weight: body.weight_kg || body.weight,
+      dimensions: body.dimensions,
+      tags: body.tags || [],
+      isActive: body.is_active ?? body.isActive ?? true,
+      isFeatured: body.is_featured ?? body.isFeatured ?? false,
+      metaTitle: body.metaTitle,
+      metaDescription: body.metaDescription,
+    };
 
-    if (productError) {
-      console.error("Error creating product:", productError);
-      return NextResponse.json({ error: productError.message }, { status: 400 });
-    }
-
-    // Create variants if provided
-    if (body.variants && body.variants.length > 0 && product) {
-      const variants = body.variants.map((v: any) => ({
-        product_id: (product as any).id,
-        sku: v.sku,
-        name_ro: v.name_ro,
-        name_en: v.name_en,
-        attributes: v.attributes || {},
-        price: v.price,
-        stock_quantity: v.stock_quantity || 0,
-        is_active: v.is_active ?? true,
-      }));
-
-      const { error: variantsError } = await (supabase
-        .from("product_variants") as any)
-        .insert(variants);
-
-      if (variantsError) {
-        console.error("Error creating variants:", variantsError);
-        // Don't fail the request, just log the error
-      }
-    }
+    const product = await Product.create(productData);
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (error: any) {
     console.error("Error in POST /api/products:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: error.message || "Internal server error" },
       { status: 500 }
     );
   }

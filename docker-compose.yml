@@ -8,10 +8,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # Supabase Configuration
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      # MongoDB Configuration
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongo:27017/cloakroom}
+      
+      # NextAuth Configuration
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
       
       # App Configuration
       - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}

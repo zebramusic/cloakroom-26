@@ -1,53 +1,46 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { writeFile, mkdir } from "fs/promises";
+import { join } from "path";
+import { existsSync } from "fs";
 
 /**
- * POST /api/upload - Upload file to Supabase Storage
+ * POST /api/upload - Upload file to local filesystem
  */
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;
-    const bucket = (formData.get("bucket") as string) || "public";
     const folder = (formData.get("folder") as string) || "uploads";
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const supabase = await createClient();
-
     // Generate unique filename
     const fileExt = file.name.split(".").pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-    const filePath = `${folder}/${fileName}`;
+    
+    // Create uploads directory structure
+    const uploadsDir = join(process.cwd(), "public", "uploads", folder);
+    if (!existsSync(uploadsDir)) {
+      await mkdir(uploadsDir, { recursive: true });
+    }
 
-    // Convert File to ArrayBuffer then to Buffer
+    // Convert File to Buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, buffer, {
-        contentType: file.type,
-        upsert: false,
-      });
+    // Save file to local filesystem
+    const filePath = join(uploadsDir, fileName);
+    await writeFile(filePath, buffer);
 
-    if (error) {
-      console.error("Supabase upload error:", error);
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
-    }
+    // Generate public URL
+    const publicUrl = `/uploads/${folder}/${fileName}`;
 
-    // Get public URL
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from(bucket).getPublicUrl(filePath);
-
-    return NextResponse.json({ url: publicUrl, path: filePath });
+    return NextResponse.json({ 
+      url: publicUrl, 
+      path: `/uploads/${folder}/${fileName}` 
+    });
   } catch (error: any) {
     console.error("Upload error:", error);
     return NextResponse.json(

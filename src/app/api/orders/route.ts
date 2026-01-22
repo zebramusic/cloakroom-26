@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import connectDB from "@/lib/mongodb"
+import { Order } from "@/lib/models"
+import { Customer } from "@/lib/models-customer"
+import { auth } from "@/auth"
 import { sendOrderConfirmationEmail } from "@/lib/email/orderConfirmation"
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    await connectDB()
     const body = await request.json()
+    
+    // Check if user is authenticated
+    const session = await auth()
 
     const {
       email,
@@ -69,103 +75,83 @@ export async function POST(request: NextRequest) {
     const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase()
     const orderNumber = `ORD-${dateStr}-${randomStr}`
 
-    // Create order
-    const { data: order, error: orderError } = (await (supabase
-      .from("orders") as any)
-      .insert({
-        order_number: orderNumber,
-        status: "pending",
-        
-        // Contact
-        email,
-        phone,
-        
-        // Billing address
-        billing_first_name: billingFirstName,
-        billing_last_name: billingLastName,
-        billing_company: billingCompany || null,
-        billing_address: billingAddress,
-        billing_city: billingCity,
-        billing_county: billingCounty,
-        billing_postal_code: billingPostalCode,
-        billing_country: billingCountry,
-        
-        // Shipping address
-        shipping_is_same: shippingIsSame,
-        shipping_first_name: shippingIsSame ? billingFirstName : shippingFirstName,
-        shipping_last_name: shippingIsSame ? billingLastName : shippingLastName,
-        shipping_address: shippingIsSame ? billingAddress : shippingAddress,
-        shipping_city: shippingIsSame ? billingCity : shippingCity,
-        shipping_county: shippingIsSame ? billingCounty : shippingCounty,
-        shipping_postal_code: shippingIsSame ? billingPostalCode : shippingPostalCode,
-        shipping_country: shippingIsSame ? billingCountry : shippingCountry,
-        
-        // Delivery & Payment
-        delivery_method: deliveryMethod,
-        payment_method: paymentMethod,
-        payment_status: "pending",
-        
-        // Totals
-        subtotal,
-        tax,
-        delivery_fee: deliveryFee,
-        cod_fee: codFee,
-        total,
-        
-        // Notes
-        notes: notes || null,
-        
-        // Metadata
-        locale,
-      })
-      .select()
-      .single()) as any
+    // Create order with embedded items
+    const orderItems = items.map((item: any) => ({
+      productId: item.product_id || item.id,
+      productName: item.name,
+      sku: item.sku,
+      variantId: item.variant_id || item.variantId,
+    // Try to find customer by session or email
+    let customerId = null
+    if (session?.user?.id && session?.user?.principalType === "customer") {
+      customerId = session.user.id
+    } else {
+      // Try to find customer by email for guest checkout
+      const existingCustomer = await Customer.findOne({ email }).lean()
+      if (existingCustomer) {
+        customerId = existingCustomer._id
+      }
+    }
 
-    if (orderError) {
-      console.error("Order creation error:", orderError)
+    const order = await Order.create({
+      orderNumber,
+      status: "pending",
+      customerId, // Link to customer if authenticated or found by emailce * item.quantity,
+    }))
+
+    const order = await Order.create({
+      orderNumber,
+      status: "pending",
+      customerName: `${billingFirstName} ${billingLastName}`,
+      customerEmail: email,
+      customerPhone: phone,
+      
+      billingAddress: {
+        street: billingAddress,
+        city: billingCity,
+        state: billingCounty,
+        postalCode: billingPostalCode,
+        country: billingCountry,
+      },
+      
+      shippingAddress: {
+        street: shippingIsSame ? billingAddress : shippingAddress,
+        city: shippingIsSame ? billingCity : shippingCity,
+        state: shippingIsSame ? billingCounty : shippingCounty,
+        postalCode: shippingIsSame ? billingPostalCode : shippingPostalCode,
+        country: shippingIsSame ? billingCountry : shippingCountry,
+      },
+      
+      items: orderItems,
+      subtotal,
+      shippingCost: deliveryFee,
+      tax,
+      total,
+      paymentStatus: "pending",
+      paymentMethod,
+      shippingMethod: deliveryMethod,
+      notes: notes || undefined,
+    })
+
+    if (!order) {
+      console.error("Order creation error")
       return NextResponse.json(
         { error: "Failed to create order" },
         { status: 500 }
       )
     }
-
-    // Create order items
-    const orderItems = items.map((item: any) => ({
-      order_id: order.id,
-      product_id: item.id,
-      product_name: item.name,
-      product_sku: item.sku,
-      quantity: item.quantity,
-      unit_price: item.price,
-      total_price: item.price * item.quantity,
-    }))
-
-    const { error: itemsError } = (await (supabase
-      .from("order_items") as any)
-      .insert(orderItems)) as any
-
-    if (itemsError) {
-      console.error("Order items creation error:", itemsError)
-      // Rollback order
-      await (supabase.from("orders") as any).delete().eq("id", order.id)
-      return NextResponse.json(
-        { error: "Failed to create order items" },
-        { status: 500 }
-      )
-    }
-
     // Send confirmation email
     try {
       await sendOrderConfirmationEmail({
-        orderId: order.id,
-        orderNumber: order.order_number,
+        orderId: order._id.toString(),
+        orderNumber: order.orderNumber,
         customerEmail: email,
         customerName: `${billingFirstName} ${billingLastName}`,
-        orderItems: orderItems.map((item: any) => ({
-          name: item.product_name,
+        orderItems: order.items.map((item: any) => ({
+          name: item.productName,
           quantity: item.quantity,
-          price: item.unit_price,
-          total: item.total_price,
+          price: item.price,
+          total: item.subtotal,
         })),
         subtotal,
         tax,
@@ -201,8 +187,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      orderId: order.id,
-      orderNumber: order.order_number,
+      orderId: order._id.toString(),
+      orderNumber: order.orderNumber,
     })
   } catch (error) {
     console.error("Order API error:", error)

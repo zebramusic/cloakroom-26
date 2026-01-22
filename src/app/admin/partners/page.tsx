@@ -164,7 +164,11 @@ export default function PartnersPage() {
       </div>
 
       {/* Partners Table */}
-      <DataTable columns={columns} data={partners} searchKey="name" />
+      <DataTable
+        columns={columns}
+        data={partners}
+        searchPlaceholder="Search partners..."
+      />
     </div>
   );
 }

@@ -41,7 +41,19 @@ export default function ProductsPage() {
     try {
       const res = await fetch("/api/products");
       const data = await res.json();
-      setProducts(data.products || []);
+      // Map MongoDB fields to expected format
+      const mappedProducts = (data.products || []).map((p: any) => ({
+        ...p,
+        id: p._id || p.id,
+        base_price: p.basePrice || p.base_price,
+        stock_quantity: p.stock || p.stock_quantity,
+        is_active: p.isActive ?? p.is_active,
+        is_featured: p.isFeatured ?? p.is_featured,
+        has_variants: p.variants && p.variants.length > 0,
+        name_ro: p.name || p.name_ro,
+        name_en: p.name || p.name_en,
+      }));
+      setProducts(mappedProducts);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
@@ -190,7 +202,11 @@ export default function ProductsPage() {
       </div>
 
       {/* Products Table */}
-      <DataTable columns={columns} data={products} searchKey="name_ro" />
+      <DataTable
+        columns={columns}
+        data={products}
+        searchPlaceholder="Search products..."
+      />
     </div>
   );
 }

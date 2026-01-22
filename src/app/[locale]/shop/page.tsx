@@ -1,9 +1,9 @@
 import { unstable_setRequestLocale } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import connectDB from "@/lib/mongodb";
+import { Product, Category } from "@/lib/models";
 import { ProductCard } from "@/components/cards/ProductCard";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { Pagination } from "@/components/shared/Pagination";
-import { Hero } from "@/components/sections/Hero";
 
 interface SearchParams {
   category?: string;
@@ -14,90 +14,131 @@ interface SearchParams {
 }
 
 export default async function ShopPage({
-  params: { locale },
+  params,
   searchParams,
 }: {
-  params: { locale: string };
-  searchParams: SearchParams;
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<SearchParams>;
 }) {
+  const { locale } = await params;
   unstable_setRequestLocale(locale);
 
-  const supabase = await createClient();
-  const page = parseInt(searchParams.page || "1");
+  const awaitedSearchParams = await searchParams;
+
+  await connectDB();
+
+  // Fetch Site Builder blocks for hero section
+  const { SitePage } = await import("@/lib/models");
+  const { BlockRenderer } = await import("@/components/site/BlockRenderer");
+  const sitePage = await SitePage.findOne({
+    slug: "shop",
+    status: "published",
+  }).lean();
+
+  const page = parseInt(awaitedSearchParams.page || "1");
   const limit = 12;
-  const offset = (page - 1) * limit;
+  const skip = (page - 1) * limit;
 
-  // Build query
-  let query = (supabase.from("products") as any)
-    .select("*", { count: "exact" })
-    .eq("is_active", true);
+  // Build filter
+  const filter: any = { isActive: true };
 
-  // Apply filters
-  if (searchParams.category) {
-    query = query.eq("category_id", searchParams.category);
+  if (awaitedSearchParams.category) {
+    filter.categoryId = awaitedSearchParams.category;
   }
 
-  if (searchParams.price_min) {
-    query = query.gte("base_price", parseFloat(searchParams.price_min));
+  if (awaitedSearchParams.price_min) {
+    filter.basePrice = {
+      ...filter.basePrice,
+      $gte: parseFloat(awaitedSearchParams.price_min),
+    };
   }
 
-  if (searchParams.price_max) {
-    query = query.lte("base_price", parseFloat(searchParams.price_max));
+  if (awaitedSearchParams.price_max) {
+    filter.basePrice = {
+      ...filter.basePrice,
+      $lte: parseFloat(awaitedSearchParams.price_max),
+    };
   }
 
-  // Apply sorting
-  switch (searchParams.sort) {
+  // Build sort
+  let sort: any = {};
+  switch (awaitedSearchParams.sort) {
     case "price_asc":
-      query = query.order("base_price", { ascending: true });
+      sort = { basePrice: 1 };
       break;
     case "price_desc":
-      query = query.order("base_price", { ascending: false });
+      sort = { basePrice: -1 };
       break;
     case "name_asc":
-      query = query.order(locale === "ro" ? "name_ro" : "name_en", {
-        ascending: true,
-      });
+      sort = locale === "ro" ? { nameRo: 1 } : { nameEn: 1 };
       break;
     case "newest":
-      query = query.order("created_at", { ascending: false });
+      sort = { createdAt: -1 };
       break;
     default:
       // Featured first, then newest
-      query = query
-        .order("is_featured", { ascending: false })
-        .order("created_at", { ascending: false });
+      sort = { isFeatured: -1, createdAt: -1 };
   }
 
-  // Pagination
-  query = query.range(offset, offset + limit - 1);
+  let products: any[] = [];
+  let count = 0;
 
-  const { data: products, error, count } = await query;
+  try {
+    [products, count] = await Promise.all([
+      Product.find(filter).sort(sort).skip(skip).limit(limit).lean(),
+      Product.countDocuments(filter),
+    ]);
 
-  if (error) {
+    // Map MongoDB fields to expected format
+    products = products.map((p: any) => ({
+      ...p,
+      id: p._id.toString(),
+      name_ro: p.name || p.nameRo || p.name_ro || "",
+      name_en: p.name || p.nameEn || p.name_en || "",
+      base_price: p.basePrice || p.base_price || 0,
+      tax_rate: p.taxRate || p.tax_rate || 0.21, // Default to 21% if not set
+      description_ro:
+        p.description || p.descriptionRo || p.description_ro || "",
+      description_en:
+        p.description || p.descriptionEn || p.description_en || "",
+      is_active: p.isActive ?? p.is_active ?? true,
+      is_featured: p.isFeatured ?? p.is_featured ?? false,
+    }));
+  } catch (error) {
     console.error("Error fetching products:", error);
   }
 
-  const totalPages = count ? Math.ceil(count / limit) : 1;
+  const totalPages = Math.ceil(count / limit) || 1;
 
-  // For now, hardcode categories until database schema is updated
-  const categories = [
-    { id: "racks", name_ro: "Rack-uri", name_en: "Racks" },
-    { id: "counters", name_ro: "Ghișee", name_en: "Counters" },
-    { id: "barriers", name_ro: "Bariere", name_en: "Barriers" },
-    { id: "accessories", name_ro: "Accesorii", name_en: "Accessories" },
-  ];
+  // Fetch categories
+  let categories: any[] = [];
+  try {
+    categories = await Category.find({ isActive: true })
+      .select("name nameRo nameEn slug")
+      .lean();
+
+    // Map MongoDB fields to expected format - serialize to plain objects
+    categories = categories.map((c: any) => ({
+      id: c._id.toString(),
+      name_ro: c.nameRo || c.name_ro || c.name || "",
+      name_en: c.nameEn || c.name_en || c.name || "",
+      slug: c.slug || "",
+    }));
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    // Fallback to hardcoded categories
+    categories = [
+      { id: "racks", name_ro: "Rack-uri", name_en: "Racks" },
+      { id: "counters", name_ro: "Ghișee", name_en: "Counters" },
+      { id: "barriers", name_ro: "Bariere", name_en: "Barriers" },
+      { id: "accessories", name_ro: "Accesorii", name_en: "Accessories" },
+    ];
+  }
 
   return (
     <div className="py-8">
-      <Hero
-        variant="page"
-        title={locale === "ro" ? "Magazin" : "Shop"}
-        subtitle={
-          locale === "ro"
-            ? "Echipamente profesionale pentru garderobă și evenimente"
-            : "Professional equipment for cloakroom and events"
-        }
-      />
+      {/* Site Builder Hero Block */}
+      {sitePage && <BlockRenderer blocks={sitePage.blocks} locale={locale} />}
 
       <div className="container mx-auto px-4">
         <div className="mb-8">
@@ -115,8 +156,11 @@ export default async function ShopPage({
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {products.map((product: any) => (
                 <ProductCard
-                  key={product.id}
-                  product={product}
+                  key={product._id.toString()}
+                  product={{
+                    ...product,
+                    id: product._id.toString(),
+                  }}
                   locale={locale}
                 />
               ))}

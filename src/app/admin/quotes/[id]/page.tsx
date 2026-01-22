@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -77,16 +76,42 @@ export default function QuoteDetailPage({
 
   const loadQuote = async () => {
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("quotes")
-        .select("*")
-        .eq("id", params.id)
-        .single();
+      const response = await fetch(`/api/quotes/${params.id}`);
+      if (!response.ok) throw new Error("Failed to fetch quote");
+      const { quote: data } = await response.json();
 
-      if (error) throw error;
+      // Transform MongoDB data to match display format
+      const quoteData: Quote = {
+        id: data._id,
+        quote_number: data.quoteNumber,
+        event_type: data.eventType,
+        event_date_from: data.startDate,
+        event_date_to: data.endDate,
+        estimated_attendees: data.estimatedParticipants,
+        location: data.location,
+        description: data.notes,
+        services: [
+          data.needsCloakroom && "cloakroom",
+          data.needsVip && "vip",
+          data.needsBackstage && "backstage",
+          data.needsBagCheck && "bag_check",
+          data.needsInfrastructure && "infrastructure",
+        ].filter(Boolean) as string[],
+        client_name: data.clientName,
+        client_email: data.clientEmail,
+        client_phone: data.clientPhone,
+        client_company: data.clientCompany,
+        client_role: data.clientRole,
+        budget_range: data.budgetRange,
+        referral_source: data.referralSource,
+        status: data.status,
+        total_price: data.totalPrice,
+        notes: data.internalNotes,
+        created_at: data.createdAt,
+        updated_at: data.updatedAt,
+        responded_at: data.respondedAt,
+      };
 
-      const quoteData = data as Quote;
       setQuote(quoteData);
       setStatus(quoteData.status);
       setTotalPrice(quoteData.total_price?.toString() || "");

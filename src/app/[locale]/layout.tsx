@@ -1,30 +1,26 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import { Inter } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import "../globals.css";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
-const inter = Inter({ subsets: ["latin"] });
-
-export default async function RootLayout({
+export default async function LocaleLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <body className={inter.className}>
-        <NextIntlClientProvider messages={messages}>
-          <Header locale={locale} />
-          <main>{children}</main>
-          <Footer locale={locale} />
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <AuthProvider>
+      <NextIntlClientProvider messages={messages}>
+        <Header locale={locale} />
+        <main>{children}</main>
+        <Footer />
+      </NextIntlClientProvider>
+    </AuthProvider>
   );
 }

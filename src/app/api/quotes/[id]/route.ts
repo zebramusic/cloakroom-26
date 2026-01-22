@@ -1,33 +1,32 @@
-import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { NextRequest, NextResponse } from "next/server";
+import connectDB from "@/lib/mongodb";
+import { Quote } from "@/lib/models";
+import mongoose from "mongoose";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient()
-    const { data: quote, error } = await supabase
-      .from("quotes")
-      .select("*")
-      .eq("id", params.id)
-      .single()
+    await connectDB();
 
-    if (error) {
-      console.error("Database error:", error)
-      return NextResponse.json(
-        { error: "Quote not found" },
-        { status: 404 }
-      )
+    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+      return NextResponse.json({ error: "Invalid quote ID" }, { status: 400 });
     }
 
-    return NextResponse.json({ quote })
+    const quote = await Quote.findById(params.id).lean();
+
+    if (!quote) {
+      return NextResponse.json({ error: "Quote not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ quote });
   } catch (error) {
-    console.error("Server error:", error)
+    console.error("Server error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -36,45 +35,48 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient()
-    const body = await request.json()
+    await connectDB();
+    const body = await request.json();
+
+    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+      return NextResponse.json({ error: "Invalid quote ID" }, { status: 400 });
+    }
 
     // Build update object with explicit fields
-    const updateData: any = {}
+    const updateData: any = {};
     
-    if (body.status !== undefined) updateData.status = body.status
-    if (body.total_price !== undefined) updateData.total_price = body.total_price
-    if (body.notes !== undefined) updateData.notes = body.notes
-    if (body.responded_at !== undefined) updateData.responded_at = body.responded_at
+    if (body.status !== undefined) updateData.status = body.status;
+    if (body.totalPrice !== undefined) updateData.totalPrice = body.totalPrice;
+    if (body.total_price !== undefined) updateData.totalPrice = body.total_price;
+    if (body.notes !== undefined) updateData.notes = body.notes;
+    if (body.internalNotes !== undefined) updateData.internalNotes = body.internalNotes;
+    if (body.respondedAt !== undefined) updateData.respondedAt = body.respondedAt;
+    if (body.responded_at !== undefined) updateData.respondedAt = body.responded_at;
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
         { error: "No valid fields to update" },
         { status: 400 }
-      )
+      );
     }
 
-    const { data: quote, error } = (await (supabase.from("quotes") as any)
-      .update(updateData)
-      .eq("id", params.id)
-      .select()
-      .single()) as any
+    const quote = await Quote.findByIdAndUpdate(
+      params.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).lean();
 
-    if (error) {
-      console.error("Database error:", error)
-      return NextResponse.json(
-        { error: "Failed to update quote" },
-        { status: 500 }
-      )
+    if (!quote) {
+      return NextResponse.json({ error: "Quote not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ quote })
+    return NextResponse.json({ quote });
   } catch (error) {
-    console.error("Server error:", error)
+    console.error("Server error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -83,26 +85,24 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient()
-    const { error } = await supabase
-      .from("quotes")
-      .delete()
-      .eq("id", params.id)
+    await connectDB();
 
-    if (error) {
-      console.error("Database error:", error)
-      return NextResponse.json(
-        { error: "Failed to delete quote" },
-        { status: 500 }
-      )
+    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+      return NextResponse.json({ error: "Invalid quote ID" }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true })
+    const quote = await Quote.findByIdAndDelete(params.id);
+
+    if (!quote) {
+      return NextResponse.json({ error: "Quote not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Server error:", error)
+    console.error("Server error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
-    )
+    );
   }
 }

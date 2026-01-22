@@ -1,17 +1,68 @@
-import { useTranslations } from "next-intl";
 import { unstable_setRequestLocale } from "next-intl/server";
+import { unstable_cache } from "next/cache";
+import connectDB from "@/lib/mongodb";
+import { SitePage } from "@/lib/models/site";
+import { BlockRenderer } from "@/components/site/BlockRenderer";
+import { PortfolioSection } from "@/components/portfolio/PortfolioSection";
+
+// Fallback sections if no site builder content exists
 import { Hero } from "@/components/sections/Hero";
 import { FeatureGrid } from "@/components/sections/FeatureGrid";
 import { QuoteCTA } from "@/components/sections/QuoteCTA";
-import { Box, Zap, Shield, Users, Building2, PartyPopper } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+import { Box, Zap, Shield } from "lucide-react";
 
-export default function HomePage({
-  params: { locale },
+async function getHomePageContent(locale: string) {
+  return unstable_cache(
+    async () => {
+      await connectDB();
+      const page = await SitePage.findOne({
+        key: "home",
+        status: "published",
+      })
+        .sort({ publishedAt: -1 })
+        .lean();
+
+      if (!page) return null;
+
+      const localeData =
+        locale === "en" && page.localeData.en
+          ? page.localeData.en
+          : page.localeData.ro;
+
+      return localeData.blocks || [];
+    },
+    [`home-${locale}`],
+    {
+      tags: ["site-pages", "site-page-home"],
+      revalidate: 3600,
+    },
+  )();
+}
+
+export default async function HomePage({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   unstable_setRequestLocale(locale);
-  const t = useTranslations("home");
+
+  // Try to get site builder content
+  const blocks = await getHomePageContent(locale);
+
+  // If site builder content exists, use it
+  if (blocks && blocks.length > 0) {
+    return (
+      <>
+        <BlockRenderer blocks={blocks} locale={locale} />
+        <PortfolioSection locale={locale} />
+      </>
+    );
+  }
+
+  // Otherwise, use fallback static content
+  const t = await getTranslations("home");
 
   const features = [
     {
@@ -69,6 +120,9 @@ export default function HomePage({
         ctaLabel={t("hero.cta")}
         ctaHref={`/${locale}/cere-oferta`}
       />
+
+      {/* Portfolio Section */}
+      <PortfolioSection locale={locale} />
     </>
   );
 }

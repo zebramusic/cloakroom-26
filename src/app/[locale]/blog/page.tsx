@@ -57,11 +57,12 @@ const blogPosts = [
   },
 ];
 
-export default function BlogPage({
-  params: { locale },
+export default async function BlogPage({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   unstable_setRequestLocale(locale);
 
   return (

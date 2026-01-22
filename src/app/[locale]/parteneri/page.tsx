@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { QuoteCTA } from "@/components/sections/QuoteCTA";
 import Image from "next/image";
 
-// This would normally fetch from Supabase
+// This would normally fetch from MongoDB
 const partners = [
   { name: "Electric Castle", logo: "/placeholder-logo.svg", featured: true },
   { name: "Untold Festival", logo: "/placeholder-logo.svg", featured: true },

@@ -1,24 +1,19 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import connectDB from "@/lib/mongodb";
+import { Category } from "@/lib/models";
 
 /**
  * GET /api/categories - Get all product categories
  */
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("product_categories")
-      .select("*")
-      .eq("is_active", true)
-      .order("display_order", { ascending: true });
+    await connectDB();
 
-    if (error) {
-      console.error("Error fetching categories:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    const categories = await Category.find({ isActive: true })
+      .sort({ order: 1 })
+      .lean();
 
-    return NextResponse.json({ categories: data });
+    return NextResponse.json({ categories });
   } catch (error: any) {
     console.error("Error in GET /api/categories:", error);
     return NextResponse.json(

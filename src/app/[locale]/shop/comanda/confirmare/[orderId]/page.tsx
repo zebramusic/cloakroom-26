@@ -11,44 +11,37 @@ import {
   MapPin,
   Download,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import connectDB from "@/lib/mongodb";
+import { Order } from "@/lib/models";
+import mongoose from "mongoose";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
 interface OrderConfirmationPageProps {
-  params: {
+  params: Promise<{
     locale: string;
     orderId: string;
-  };
+  }>;
 }
 
 export default async function OrderConfirmationPage({
-  params: { locale, orderId },
+  params,
 }: OrderConfirmationPageProps) {
-  const supabase = await createClient();
+  const { locale, orderId } = await params;
 
-  // Fetch order details
-  const { data: order, error: orderError } = (await (
-    supabase.from("orders") as any
-  )
-    .select("*")
-    .eq("id", orderId)
-    .single()) as any;
-
-  if (orderError || !order) {
+  // Validate orderId
+  if (!mongoose.Types.ObjectId.isValid(orderId)) {
     notFound();
   }
 
-  // Fetch order items
-  const { data: orderItems, error: itemsError } = (await (
-    supabase.from("order_items") as any
-  )
-    .select("*")
-    .eq("order_id", orderId)) as any;
+  await connectDB();
 
-  if (itemsError) {
-    console.error("Error fetching order items:", itemsError);
+  // Fetch order details
+  const order = await Order.findById(orderId).lean();
+
+  if (!order) {
+    notFound();
   }
 
   const formatPrice = (price: number) => {
@@ -90,7 +83,7 @@ export default async function OrderConfirmationPage({
           <p className="mt-4 text-sm text-muted-foreground">
             {locale === "ro" ? "Număr comandă:" : "Order number:"}{" "}
             <strong className="font-mono text-foreground">
-              {order.order_number}
+              {order.orderNumber}
             </strong>
           </p>
         </div>
@@ -99,7 +92,7 @@ export default async function OrderConfirmationPage({
           {/* Left Column: Order Details */}
           <div className="space-y-6 lg:col-span-2">
             {/* Payment Instructions */}
-            {order.payment_method === "bank_transfer" && (
+            {order.paymentMethod === "bank_transfer" && (
               <Card className="border-blue-200 bg-blue-50">
                 <CardHeader>
                   <div className="flex items-center gap-2">
@@ -140,7 +133,7 @@ export default async function OrderConfirmationPage({
                       <strong>
                         {locale === "ro" ? "Referință:" : "Reference:"}
                       </strong>{" "}
-                      {order.order_number}
+                      {order.orderNumber}
                     </p>
                   </div>
                   <p className="text-xs text-blue-800">
@@ -152,7 +145,7 @@ export default async function OrderConfirmationPage({
               </Card>
             )}
 
-            {order.payment_method === "cash_on_delivery" && (
+            {order.paymentMethod === "cash_on_delivery" && (
               <Card className="border-amber-200 bg-amber-50">
                 <CardHeader>
                   <div className="flex items-center gap-2">
@@ -183,20 +176,20 @@ export default async function OrderConfirmationPage({
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {orderItems?.map((item: any) => (
-                    <div key={item.id} className="flex gap-4">
+                  {order.items?.map((item: any, idx: number) => (
+                    <div key={idx} className="flex gap-4">
                       <div className="relative h-20 w-20 overflow-hidden rounded-md border">
                         <Image
                           src="/placeholder-product.jpg"
-                          alt={item.product_name}
+                          alt={item.productName}
                           fill
                           className="object-cover"
                         />
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium">{item.product_name}</p>
+                        <p className="font-medium">{item.productName}</p>
                         <p className="text-sm text-muted-foreground">
-                          SKU: {item.product_sku}
+                          SKU: {item.sku}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {locale === "ro" ? "Cantitate:" : "Quantity:"}{" "}
@@ -205,10 +198,10 @@ export default async function OrderConfirmationPage({
                       </div>
                       <div className="text-right">
                         <p className="font-medium">
-                          {formatPrice(item.total_price)}
+                          {formatPrice(item.subtotal)}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {formatPrice(item.unit_price)} × {item.quantity}
+                          {formatPrice(item.price)} × {item.quantity}
                         </p>
                       </div>
                     </div>
@@ -235,7 +228,7 @@ export default async function OrderConfirmationPage({
                     {locale === "ro" ? "Metodă livrare:" : "Delivery method:"}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {order.delivery_method === "courier"
+                    {order.shippingMethod === "courier"
                       ? locale === "ro"
                         ? "Livrare cu curier (3-5 zile lucrătoare)"
                         : "Courier delivery (3-5 business days)"
@@ -252,15 +245,14 @@ export default async function OrderConfirmationPage({
                     {locale === "ro" ? "Adresă livrare:" : "Delivery address:"}
                   </p>
                   <div className="text-sm text-muted-foreground">
+                    <p>{order.customerName}</p>
+                    <p>{order.shippingAddress.street}</p>
                     <p>
-                      {order.shipping_first_name} {order.shipping_last_name}
+                      {order.shippingAddress.city},{" "}
+                      {order.shippingAddress.state},{" "}
+                      {order.shippingAddress.postalCode}
                     </p>
-                    <p>{order.shipping_address}</p>
-                    <p>
-                      {order.shipping_city}, {order.shipping_county},{" "}
-                      {order.shipping_postal_code}
-                    </p>
-                    <p>{order.shipping_country}</p>
+                    <p>{order.shippingAddress.country}</p>
                   </div>
                 </div>
               </CardContent>
@@ -289,20 +281,12 @@ export default async function OrderConfirmationPage({
                   </span>
                   <span>{formatPrice(order.tax)}</span>
                 </div>
-                {order.delivery_fee > 0 && (
+                {order.shippingCost > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
                       {locale === "ro" ? "Livrare" : "Delivery"}
                     </span>
-                    <span>{formatPrice(order.delivery_fee)}</span>
-                  </div>
-                )}
-                {order.cod_fee > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      {locale === "ro" ? "Taxă ramburs" : "COD fee"}
-                    </span>
-                    <span>{formatPrice(order.cod_fee)}</span>
+                    <span>{formatPrice(order.shippingCost)}</span>
                   </div>
                 )}
                 <Separator />

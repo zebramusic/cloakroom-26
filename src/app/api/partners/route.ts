@@ -1,5 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import connectDB from "@/lib/mongodb";
+import { Partner } from "@/lib/models";
 
 /**
  * GET /api/partners - Get all partners
@@ -9,25 +10,16 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const published = searchParams.get("published");
 
-    const supabase = await createClient();
-    let query = supabase
-      .from("partners")
-      .select("*")
-      .order("display_order", { ascending: true });
-
-    // Filter by published status if requested
+    await connectDB();
+    
+    let query: any = {};
     if (published === "true") {
-      query = query.eq("is_published", true);
+      query.isActive = true;
     }
 
-    const { data, error } = await query;
+    const partners = await Partner.find(query).sort({ order: 1 }).lean();
 
-    if (error) {
-      console.error("Error fetching partners:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ partners: data });
+    return NextResponse.json({ partners });
   } catch (error: any) {
     console.error("Error in GET /api/partners:", error);
     return NextResponse.json(
@@ -43,32 +35,25 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const supabase = await createClient();
+    await connectDB();
 
-    const { data, error } = (await (supabase
-      .from("partners") as any)
-      .insert({
-        name: body.name,
-        slug: body.slug,
-        logo_url: body.logo_url || null,
-        website_url: body.website_url || null,
-        description: body.description || null,
-        display_order: body.display_order || 0,
-        is_published: body.is_published ?? true,
-      })
-      .select()
-      .single()) as any;
+    const partner = await Partner.create({
+      name: body.name,
+      slug: body.slug,
+      logo: body.logo_url || body.logo || undefined,
+      website: body.website_url || body.website || undefined,
+      description: body.description || undefined,
+      order: body.display_order || body.order || 0,
+      isActive: body.is_published ?? body.isActive ?? true,
+      contactEmail: body.contactEmail,
+      contactPhone: body.contactPhone,
+    });
 
-    if (error) {
-      console.error("Error creating partner:", error);
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
-
-    return NextResponse.json({ partner: data }, { status: 201 });
+    return NextResponse.json({ partner }, { status: 201 });
   } catch (error: any) {
     console.error("Error in POST /api/partners:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: error.message || "Internal server error" },
       { status: 500 }
     );
   }

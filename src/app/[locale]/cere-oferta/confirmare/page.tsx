@@ -10,16 +10,18 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, Mail, Clock, Phone } from "lucide-react";
 import Link from "next/link";
 
-export default function QuoteConfirmationPage({
-  params: { locale },
+export default async function QuoteConfirmationPage({
+  params,
   searchParams,
 }: {
-  params: { locale: string };
-  searchParams: { email?: string };
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ email?: string }>;
 }) {
+  const { locale } = await params;
   unstable_setRequestLocale(locale);
 
-  const email = searchParams.email || "";
+  const awaitedSearchParams = await searchParams;
+  const email = awaitedSearchParams.email || "";
 
   return (
     <div className="py-16">

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { stripe } from "@/lib/stripe/client"
-import { createClient } from "@/lib/supabase/server"
+import connectDB from "@/lib/mongodb"
+import { Order } from "@/lib/models"
 import Stripe from "stripe"
+import mongoose from "mongoose"
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Handle the event
-  const supabase = await createClient()
+  await connectDB()
 
   try {
     switch (event.type) {
@@ -41,18 +43,19 @@ export async function POST(request: NextRequest) {
         const paymentIntent = event.data.object as Stripe.PaymentIntent
         const orderId = paymentIntent.metadata.orderId
 
-        if (orderId) {
+        if (orderId && mongoose.Types.ObjectId.isValid(orderId)) {
           // Update order payment status
-          const { error } = (await (supabase
-            .from("orders") as any)
-            .update({
-              payment_status: "paid",
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", orderId)) as any
+          const order = await Order.findByIdAndUpdate(
+            orderId,
+            {
+              paymentStatus: "paid",
+              paymentIntentId: paymentIntent.id,
+            },
+            { new: true }
+          )
 
-          if (error) {
-            console.error("Failed to update order:", error)
+          if (!order) {
+            console.error("Order not found:", orderId)
           } else {
             console.log(`Order ${orderId} marked as paid`)
             // TODO: Send confirmation email
@@ -65,18 +68,16 @@ export async function POST(request: NextRequest) {
         const paymentIntent = event.data.object as Stripe.PaymentIntent
         const orderId = paymentIntent.metadata.orderId
 
-        if (orderId) {
+        if (orderId && mongoose.Types.ObjectId.isValid(orderId)) {
           // Update order payment status
-          const { error } = (await (supabase
-            .from("orders") as any)
-            .update({
-              payment_status: "failed",
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", orderId)) as any
+          const order = await Order.findByIdAndUpdate(
+            orderId,
+            { paymentStatus: "failed" },
+            { new: true }
+          )
 
-          if (error) {
-            console.error("Failed to update order:", error)
+          if (!order) {
+            console.error("Order not found:", orderId)
           } else {
             console.log(`Order ${orderId} payment failed`)
             // TODO: Send payment failed email
@@ -91,13 +92,15 @@ export async function POST(request: NextRequest) {
 
         if (paymentIntentId) {
           // Find order by payment intent and update status
-          const { data: orders } = (await (supabase
-            .from("orders") as any)
-            .select("*")
-            .eq("payment_method", "stripe")) as any
+          const order = await Order.findOneAndUpdate(
+            { paymentIntentId: paymentIntentId as string },
+            { paymentStatus: "refunded" },
+            { new: true }
+          )
 
-          // TODO: Store payment_intent_id in orders table to make this lookup efficient
-          console.log(`Charge refunded for payment intent: ${paymentIntentId}`)
+          if (order) {
+            console.log(`Order ${order._id} refunded for payment intent: ${paymentIntentId}`)
+          }
         }
         break
       }

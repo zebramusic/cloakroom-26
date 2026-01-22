@@ -9,6 +9,7 @@ export interface CartItem {
   image_url: string | null
   sku: string
   price: number
+  tax_rate: number // VAT rate as decimal (0.21 = 21%)
   quantity: number
 }
 
@@ -23,8 +24,6 @@ interface CartStore {
   getTax: () => number
   getTotal: () => number
 }
-
-const TAX_RATE = 0.19 // 19% TVA Romania
 
 export const useCartStore = create<CartStore>()(
   persist(
@@ -43,8 +42,8 @@ export const useCartStore = create<CartStore>()(
           newItems[existingIndex].quantity += item.quantity || 1
           set({ items: newItems })
         } else {
-          // Add new item
-          set({ items: [...items, { ...item, quantity: item.quantity || 1 }] })
+          // Add new item with default tax rate if not provided
+          set({ items: [...items, { ...item, tax_rate: item.tax_rate || 0.21, quantity: item.quantity || 1 }] })
         }
       },
 
@@ -84,7 +83,12 @@ export const useCartStore = create<CartStore>()(
       },
 
       getTax: () => {
-        return get().getSubtotal() * TAX_RATE
+        // Calculate tax based on each product's individual tax rate
+        return get().items.reduce((total, item) => {
+          const itemSubtotal = item.price * item.quantity
+          const itemTax = itemSubtotal * (item.tax_rate || 0.21)
+          return total + itemTax
+        }, 0)
       },
 
       getTotal: () => {

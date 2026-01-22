@@ -21,8 +21,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { DateRange } from "react-day-picker";
 import { Loader2 } from "lucide-react";
+
+interface DateRange {
+  from?: Date;
+  to?: Date;
+}
 
 interface QuoteFormProps {
   locale: string;

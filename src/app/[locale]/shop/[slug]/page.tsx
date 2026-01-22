@@ -1,5 +1,4 @@
 import { unstable_setRequestLocale } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,6 +20,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { AddToCartButton } from "@/components/shop/AddToCartButton";
+import { ProductGallery } from "@/components/shop/ProductGallery";
+import connectDB from "@/lib/mongodb";
+import { Product } from "@/lib/models";
 
 export default async function ProductDetailPage({
   params: { locale, slug },
@@ -29,23 +31,18 @@ export default async function ProductDetailPage({
 }) {
   unstable_setRequestLocale(locale);
 
-  const supabase = await createClient();
+  await connectDB();
 
   // Fetch product
-  const { data: product, error } = await (supabase.from("products") as any)
-    .select("*")
-    .eq("slug", slug)
-    .eq("is_active", true)
-    .single();
+  const product = await Product.findOne({ slug, isActive: true }).lean();
 
-  if (error || !product) {
+  if (!product) {
     notFound();
   }
 
-  const name = locale === "ro" ? product.name_ro : product.name_en;
-  const description =
-    locale === "ro" ? product.description_ro : product.description_en;
-  const features = locale === "ro" ? product.features_ro : product.features_en;
+  const name = product.name;
+  const description = product.description;
+  const features = product.shortDescription;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat(locale === "ro" ? "ro-RO" : "en-US", {
@@ -75,17 +72,7 @@ export default async function ProductDetailPage({
       <div className="container mx-auto px-4">
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Image Gallery */}
-          <div>
-            <div className="relative aspect-square overflow-hidden rounded-lg bg-neutral-100">
-              <Image
-                src="/placeholder-product.jpg"
-                alt={name}
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-          </div>
+          <ProductGallery images={product.images || []} productName={name} />
 
           {/* Product Info */}
           <div className="space-y-6">
@@ -99,7 +86,7 @@ export default async function ProductDetailPage({
             <div>
               <div className="mb-2 flex items-baseline gap-2">
                 <span className="text-4xl font-bold">
-                  {formatPrice(product.base_price)}
+                  {formatPrice(product.basePrice)}
                 </span>
                 <span className="text-sm text-muted-foreground">
                   {locale === "ro" ? "+ TVA" : "+ VAT"}
@@ -107,8 +94,8 @@ export default async function ProductDetailPage({
               </div>
               <p className="text-sm text-muted-foreground">
                 {locale === "ro"
-                  ? `Preț cu TVA: ${formatPrice(product.base_price * 1.19)}`
-                  : `Price with VAT: ${formatPrice(product.base_price * 1.19)}`}
+                  ? `Preț cu TVA: ${formatPrice(product.basePrice * (1 + (product.taxRate || 0.21)))}`
+                  : `Price with VAT: ${formatPrice(product.basePrice * (1 + (product.taxRate || 0.21)))}`}
               </p>
             </div>
 
@@ -125,14 +112,16 @@ export default async function ProductDetailPage({
 
             <AddToCartButton
               product={{
-                id: product.id,
+                id: product._id.toString(),
                 name,
                 sku: product.sku,
-                price: product.base_price,
-                imageUrl: "/placeholder-product.jpg",
+                price: product.basePrice,
+                tax_rate: product.taxRate || 0.21, // Pass product's tax rate
+                imageUrl:
+                  product.images?.[0]?.url || "/placeholder-product.jpg",
               }}
               locale={locale}
-              disabled={!product.is_active || product.stock_quantity === 0}
+              disabled={!product.isActive || product.stock === 0}
             />
 
             <Separator />
@@ -146,7 +135,7 @@ export default async function ProductDetailPage({
                     {locale === "ro" ? "Stoc" : "Stock"}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {product.stock_quantity > 0
+                    {product.stock > 0
                       ? locale === "ro"
                         ? "Disponibil"
                         : "Available"
@@ -244,12 +233,12 @@ export default async function ProductDetailPage({
                       </dt>
                       <dd className="mt-1 text-sm">{product.sku}</dd>
                     </div>
-                    {product.weight_kg && (
+                    {product.weight && (
                       <div>
                         <dt className="text-sm font-medium text-muted-foreground">
                           {locale === "ro" ? "Greutate" : "Weight"}
                         </dt>
-                        <dd className="mt-1 text-sm">{product.weight_kg} kg</dd>
+                        <dd className="mt-1 text-sm">{product.weight} kg</dd>
                       </div>
                     )}
                     {product.dimensions && (
@@ -257,23 +246,13 @@ export default async function ProductDetailPage({
                         <dt className="text-sm font-medium text-muted-foreground">
                           {locale === "ro" ? "Dimensiuni" : "Dimensions"}
                         </dt>
-                        <dd className="mt-1 text-sm">{product.dimensions}</dd>
+                        <dd className="mt-1 text-sm">
+                          {product.dimensions.length} ×{" "}
+                          {product.dimensions.width} ×{" "}
+                          {product.dimensions.height} cm
+                        </dd>
                       </div>
                     )}
-                    <div>
-                      <dt className="text-sm font-medium text-muted-foreground">
-                        {locale === "ro" ? "Retur" : "Return"}
-                      </dt>
-                      <dd className="mt-1 text-sm">
-                        {product.is_returnable
-                          ? locale === "ro"
-                            ? "14 zile"
-                            : "14 days"
-                          : locale === "ro"
-                            ? "Nu se acceptă retur"
-                            : "No returns"}
-                      </dd>
-                    </div>
                   </dl>
                 </CardContent>
               </Card>

@@ -1,34 +1,64 @@
 "use client";
 
-import { useState } from "react";
+import { useState, use, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, ShoppingBag } from "lucide-react";
+import { ChevronRight, ShoppingBag, Loader2 } from "lucide-react";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
+import { StripePaymentForm } from "@/components/checkout/StripePaymentForm";
 import { OrderSummary } from "@/components/shop/OrderSummary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCartStore } from "@/lib/store/cart.store";
 
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+);
+
 interface CheckoutPageProps {
-  params: {
-    locale: string;
-  };
+  params: Promise<{ locale: string }>;
 }
 
-export default function CheckoutPage({
-  params: { locale },
-}: CheckoutPageProps) {
+export default function CheckoutPage({ params }: CheckoutPageProps) {
+  const { locale } = use(params);
   const router = useRouter();
+  const { data: session } = useSession();
   const cartItems = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [orderData, setOrderData] = useState<any>(null);
+  const [clientSecret, setClientSecret] = useState("");
+  const [orderId, setOrderId] = useState("");
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [customerData, setCustomerData] = useState<any>(null);
+  const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
+
+  // Fetch customer data if logged in
+  useEffect(() => {
+    if (session?.user?.id && session?.user?.principalType === "customer") {
+      setIsLoadingCustomer(true);
+      fetch(`/api/customers/${session.user.id}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.customer) {
+            setCustomerData(data.customer);
+          }
+        })
+        .catch((err) => console.error("Failed to fetch customer data:", err))
+        .finally(() => setIsLoadingCustomer(false));
+    }
+  }, [session]);
 
   const handleCheckoutSubmit = async (formData: any) => {
+    setIsCreatingOrder(true);
     try {
-      // Submit order to API
+      // Create order first
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: {
@@ -46,17 +76,58 @@ export default function CheckoutPage({
         throw new Error("Failed to create order");
       }
 
-      const { orderId } = await response.json();
+      const { orderId: newOrderId } = await response.json();
+      setOrderId(newOrderId);
 
-      // Clear cart
-      clearCart();
+      // If Stripe payment, create payment intent
+      if (paymentMethod === "stripe") {
+        const subtotal = cartItems.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0,
+        );
+        const taxRate = 0.19;
+        const tax = subtotal * taxRate;
+        const deliveryFee = formData.deliveryMethod === "courier" ? 50 : 0;
+        const total = subtotal + tax + deliveryFee;
 
-      // Redirect to confirmation page
-      router.push(`/${locale}/shop/comanda/confirmare/${orderId}`);
+        const piResponse = await fetch("/api/stripe/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: Math.round(total * 100), // Convert to cents
+            orderId: newOrderId,
+          }),
+        });
+
+        if (!piResponse.ok) {
+          throw new Error("Failed to create payment intent");
+        }
+
+        const { clientSecret } = await piResponse.json();
+        setClientSecret(clientSecret);
+        setOrderData(formData);
+      } else {
+        // For other payment methods, redirect to confirmation
+        clearCart();
+        router.push(`/${locale}/shop/comanda/confirmare/${newOrderId}`);
+      }
     } catch (error) {
       console.error("Order creation error:", error);
-      throw error;
+      alert(
+        locale === "ro" ? "Eroare la crearea comenzii" : "Error creating order",
+      );
+    } finally {
+      setIsCreatingOrder(false);
     }
+  };
+
+  const handlePaymentSuccess = () => {
+    clearCart();
+    router.push(`/${locale}/shop/comanda/confirmare/${orderId}`);
+  };
+
+  const handlePaymentError = (error: string) => {
+    console.error("Payment error:", error);
   };
 
   // Redirect if cart is empty
@@ -79,6 +150,52 @@ export default function CheckoutPage({
           >
             {locale === "ro" ? "Mergi la magazin" : "Go to shop"}
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Show Stripe payment form if we have client secret
+  if (clientSecret && paymentMethod === "stripe") {
+    return (
+      <div className="py-8">
+        <div className="container mx-auto px-4 max-w-2xl">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold">
+              {locale === "ro" ? "Plată cu cardul" : "Card Payment"}
+            </h1>
+            <p className="mt-2 text-muted-foreground">
+              {locale === "ro"
+                ? "Completează datele cardului pentru a finaliza comanda"
+                : "Complete card details to finish your order"}
+            </p>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {locale === "ro" ? "Detalii plată" : "Payment Details"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Elements
+                stripe={stripePromise}
+                options={{
+                  clientSecret,
+                  appearance: {
+                    theme: "stripe",
+                  },
+                }}
+              >
+                <StripePaymentForm
+                  clientSecret={clientSecret}
+                  locale={locale}
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                />
+              </Elements>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -133,6 +250,8 @@ export default function CheckoutPage({
             <CheckoutForm
               locale={locale}
               paymentMethod={paymentMethod}
+              customerData={customerData}
+              isLoadingCustomer={isLoadingCustomer}
               onSubmit={handleCheckoutSubmit}
             />
           </div>

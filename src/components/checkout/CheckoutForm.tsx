@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -53,12 +53,16 @@ type CheckoutFormData = z.infer<typeof checkoutSchema>;
 interface CheckoutFormProps {
   locale: string;
   paymentMethod: string;
+  customerData?: any;
+  isLoadingCustomer?: boolean;
   onSubmit: (data: CheckoutFormData) => Promise<void>;
 }
 
 export function CheckoutForm({
   locale,
   paymentMethod,
+  customerData,
+  isLoadingCustomer,
   onSubmit,
 }: CheckoutFormProps) {
   const router = useRouter();
@@ -69,17 +73,48 @@ export function CheckoutForm({
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
+      email: "",
+      phone: "",
+      billingFirstName: "",
+      billingLastName: "",
+      billingCompany: "",
+      billingAddress: "",
+      billingCity: "",
+      billingCounty: "",
+      billingPostalCode: "",
+      billingCountry: "România",
       shippingIsSame: true,
       deliveryMethod: "courier",
-      billingCountry: "România",
     },
   });
 
   const shippingIsSame = watch("shippingIsSame");
+
+  // Update form when customer data is loaded
+  useEffect(() => {
+    if (customerData) {
+      const nameParts = customerData.name?.split(" ") || [];
+      reset({
+        email: customerData.email || "",
+        phone: customerData.phone || "",
+        billingFirstName: nameParts[0] || "",
+        billingLastName: nameParts.slice(1).join(" ") || "",
+        billingCompany: customerData.companyName || "",
+        billingAddress: customerData.billingAddress?.street || "",
+        billingCity: customerData.billingAddress?.city || "",
+        billingCounty: customerData.billingAddress?.county || "",
+        billingPostalCode: customerData.billingAddress?.postalCode || "",
+        billingCountry: customerData.billingAddress?.country || "România",
+        shippingIsSame: true,
+        deliveryMethod: "courier",
+      });
+    }
+  }, [customerData, reset]);
 
   const onFormSubmit = async (data: CheckoutFormData) => {
     if (cartItems.length === 0) {

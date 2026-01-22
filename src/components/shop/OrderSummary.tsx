@@ -37,7 +37,7 @@ export function OrderSummary({ locale }: OrderSummaryProps) {
 
         <div className="flex justify-between">
           <span className="text-muted-foreground">
-            {locale === "ro" ? "TVA (19%)" : "VAT (19%)"}
+            {locale === "ro" ? "TVA" : "VAT"}
           </span>
           <span className="font-medium">{formatPrice(tax)}</span>
         </div>

@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Menu, ShoppingCart } from "lucide-react";
+import { Menu, ShoppingCart, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -14,6 +15,7 @@ import {
 import { LocaleSwitch } from "./LocaleSwitch";
 import { cn } from "@/lib/utils/cn";
 import { useCartStore } from "@/lib/store/cart.store";
+import { useSession } from "next-auth/react";
 
 interface HeaderProps {
   locale: string;
@@ -23,6 +25,36 @@ interface HeaderProps {
 export function Header({ locale, transparent = false }: HeaderProps) {
   const t = useTranslations("nav");
   const itemCount = useCartStore((state) => state.getItemCount());
+  const { data: session } = useSession();
+  const [showAdminLink, setShowAdminLink] = useState(false);
+  const [keySequence, setKeySequence] = useState<string[]>([]);
+
+  // Show admin link if user has admin role
+  const isAdmin =
+    session?.user?.role === "admin" || session?.user?.role === "manager";
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+
+      setKeySequence((prev) => {
+        const newSequence = [...prev, key].slice(-3); // Keep only last 3 keys
+
+        // Check if the sequence is 'adm'
+        if (newSequence.join("") === "adm") {
+          setShowAdminLink(true);
+          // Hide after 10 seconds
+          setTimeout(() => setShowAdminLink(false), 10000);
+          return [];
+        }
+
+        return newSequence;
+      });
+    };
+
+    window.addEventListener("keypress", handleKeyPress);
+    return () => window.removeEventListener("keypress", handleKeyPress);
+  }, []);
 
   const navItems = [
     { href: `/${locale}`, label: t("home") },
@@ -71,6 +103,20 @@ export function Header({ locale, transparent = false }: HeaderProps) {
 
         {/* Actions */}
         <div className="flex items-center space-x-4">
+          {/* Admin Link - visible when logged in as admin or via ADM keyboard shortcut */}
+          {(showAdminLink || isAdmin) && (
+            <Link href="/admin">
+              <Button
+                variant="outline"
+                size="sm"
+                className="animate-in fade-in slide-in-from-top-2 duration-300 border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Admin
+              </Button>
+            </Link>
+          )}
+
           <LocaleSwitch currentLocale={locale} variant="dropdown" />
 
           <Link href={`/${locale}/shop/cos`}>
@@ -82,6 +128,12 @@ export function Header({ locale, transparent = false }: HeaderProps) {
               )}
               <ShoppingCart className="h-5 w-5" />
               <span className="sr-only">Coș</span>
+            </Button>
+          </Link>
+
+          <Link href="/account" className="hidden sm:block">
+            <Button variant="outline">
+              {locale === "ro" ? "Contul Meu" : "My Account"}
             </Button>
           </Link>
 
@@ -112,6 +164,11 @@ export function Header({ locale, transparent = false }: HeaderProps) {
                   </Link>
                 ))}
                 <hr className="my-4" />
+                <Link href="/account">
+                  <Button variant="outline" className="w-full mb-2">
+                    {locale === "ro" ? "Contul Meu" : "My Account"}
+                  </Button>
+                </Link>
                 <Link href={`/${locale}/cere-oferta`}>
                   <Button className="w-full">
                     {locale === "ro" ? "Cere Ofertă" : "Request Quote"}

@@ -1,4 +1,4 @@
-import PartnerForm from "../new/page";
+import PartnerForm from "../../new/page";
 
 export default function EditPartnerPage({
   params,

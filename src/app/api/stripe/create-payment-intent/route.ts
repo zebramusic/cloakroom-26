@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { stripe } from "@/lib/stripe/client"
-import { createClient } from "@/lib/supabase/server"
+import connectDB from "@/lib/mongodb"
+import { Order } from "@/lib/models"
+import mongoose from "mongoose"
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,15 +15,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify order exists
-    const supabase = await createClient()
-    const { data: order, error: orderError } = (await (supabase
-      .from("orders") as any)
-      .select("*")
-      .eq("id", orderId)
-      .single()) as any
+    // Validate orderId
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return NextResponse.json(
+        { error: "Invalid order ID" },
+        { status: 400 }
+      )
+    }
 
-    if (orderError || !order) {
+    // Verify order exists
+    await connectDB()
+    const order = await Order.findById(orderId).lean()
+
+    if (!order) {
       return NextResponse.json(
         { error: "Order not found" },
         { status: 404 }
@@ -33,8 +39,8 @@ export async function POST(request: NextRequest) {
       amount, // Amount in cents
       currency: "ron",
       metadata: {
-        orderId: order.id,
-        orderNumber: order.order_number,
+        orderId: order._id.toString(),
+        orderNumber: order.orderNumber,
       },
       automatic_payment_methods: {
         enabled: true,

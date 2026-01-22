@@ -1,5 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import connectDB from "@/lib/mongodb";
+import { Partner } from "@/lib/models";
+import mongoose from "mongoose";
 
 /**
  * GET /api/partners/[id] - Get single partner
@@ -9,19 +11,19 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("partners")
-      .select("*")
-      .eq("id", params.id)
-      .single();
+    await connectDB();
+    
+    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+      return NextResponse.json({ error: "Invalid partner ID" }, { status: 400 });
+    }
 
-    if (error) {
-      console.error("Error fetching partner:", error);
+    const partner = await Partner.findById(params.id).lean();
+
+    if (!partner) {
       return NextResponse.json({ error: "Partner not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ partner: data });
+    return NextResponse.json({ partner });
   } catch (error: any) {
     console.error("Error in GET /api/partners/[id]:", error);
     return NextResponse.json(
@@ -40,17 +42,27 @@ export async function PATCH(
 ) {
   try {
     const body = await request.json();
-    const supabase = await createClient();
+    await connectDB();
+
+    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+      return NextResponse.json({ error: "Invalid partner ID" }, { status: 400 });
+    }
 
     // Build update object with only allowed fields
     const updateData: any = {};
     if (body.name !== undefined) updateData.name = body.name;
     if (body.slug !== undefined) updateData.slug = body.slug;
-    if (body.logo_url !== undefined) updateData.logo_url = body.logo_url;
-    if (body.website_url !== undefined) updateData.website_url = body.website_url;
+    if (body.logo_url !== undefined) updateData.logo = body.logo_url;
+    if (body.logo !== undefined) updateData.logo = body.logo;
+    if (body.website_url !== undefined) updateData.website = body.website_url;
+    if (body.website !== undefined) updateData.website = body.website;
     if (body.description !== undefined) updateData.description = body.description;
-    if (body.display_order !== undefined) updateData.display_order = body.display_order;
-    if (body.is_published !== undefined) updateData.is_published = body.is_published;
+    if (body.display_order !== undefined) updateData.order = body.display_order;
+    if (body.order !== undefined) updateData.order = body.order;
+    if (body.is_published !== undefined) updateData.isActive = body.is_published;
+    if (body.isActive !== undefined) updateData.isActive = body.isActive;
+    if (body.contactEmail !== undefined) updateData.contactEmail = body.contactEmail;
+    if (body.contactPhone !== undefined) updateData.contactPhone = body.contactPhone;
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
@@ -59,23 +71,21 @@ export async function PATCH(
       );
     }
 
-    const { data, error } = (await (supabase
-      .from("partners") as any)
-      .update(updateData)
-      .eq("id", params.id)
-      .select()
-      .single()) as any;
+    const partner = await Partner.findByIdAndUpdate(
+      params.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).lean();
 
-    if (error) {
-      console.error("Error updating partner:", error);
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    if (!partner) {
+      return NextResponse.json({ error: "Partner not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ partner: data });
+    return NextResponse.json({ partner });
   } catch (error: any) {
     console.error("Error in PATCH /api/partners/[id]:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: error.message || "Internal server error" },
       { status: 500 }
     );
   }
@@ -89,15 +99,16 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient();
-    const { error } = await supabase
-      .from("partners")
-      .delete()
-      .eq("id", params.id);
+    await connectDB();
 
-    if (error) {
-      console.error("Error deleting partner:", error);
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+      return NextResponse.json({ error: "Invalid partner ID" }, { status: 400 });
+    }
+
+    const partner = await Partner.findByIdAndDelete(params.id);
+
+    if (!partner) {
+      return NextResponse.json({ error: "Partner not found" }, { status: 404 });
     }
 
     return NextResponse.json({ success: true });
