@@ -3,7 +3,7 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { redirect } from "next/navigation";
 import { MediaLibrary } from "@/components/admin/site/MediaLibrary";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function SiteMediaPage() {
   const session = await auth();

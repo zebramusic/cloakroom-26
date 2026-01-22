@@ -2,7 +2,7 @@ import connectDB from "@/lib/mongodb";
 import { Order } from "@/lib/models";
 import { OrdersList } from "@/components/admin/OrdersList";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 interface OrderDisplay {
   id: string;

@@ -17,7 +17,7 @@ import { Order } from "@/lib/models";
 import { formatDate } from "@/lib/utils/format";
 import { OrderStatusUpdater } from "@/components/admin/OrderStatusUpdater";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function OrderDetailPage({
   params,

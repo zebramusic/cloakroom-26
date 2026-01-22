@@ -1,6 +1,6 @@
 import PartnerForm from "../../new/page";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function EditPartnerPage({
   params,
