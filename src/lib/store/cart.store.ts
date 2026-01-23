@@ -1,17 +1,5 @@
 import { create } from "zustand"
-import { persist, createJSONStorage, StateStorage } from "zustand/middleware"
-
-// Safe storage that works during SSR
-const createStorage = (): StateStorage => {
-  if (typeof window === 'undefined') {
-    return {
-      getItem: () => null,
-      setItem: () => {},
-      removeItem: () => {},
-    }
-  }
-  return localStorage
-}
+import { persist, createJSONStorage } from "zustand/middleware"
 
 export interface CartItem {
   product_id: string
@@ -38,7 +26,64 @@ interface CartStore {
 }
 
 export const useCartStore = create<CartStore>()(
-  persist(
+  typeof window === 'undefined' 
+    ? (set, get) => ({
+        items: [],
+        addItem: (item) => {
+          const items = get().items
+          const existingIndex = items.findIndex(
+            (i) => i.variant_id === item.variant_id || i.product_id === item.product_id
+          )
+
+          if (existingIndex > -1) {
+            const newItems = [...items]
+            newItems[existingIndex].quantity += item.quantity || 1
+            set({ items: newItems })
+          } else {
+            set({ items: [...items, { ...item, tax_rate: item.tax_rate || 0.21, quantity: item.quantity || 1 }] })
+          }
+        },
+        updateQuantity: (variantId, quantity) => {
+          if (quantity <= 0) {
+            get().removeItem(variantId)
+            return
+          }
+          const items = get().items
+          const newItems = items.map((item) =>
+            item.variant_id === variantId || item.product_id === variantId
+              ? { ...item, quantity }
+              : item
+          )
+          set({ items: newItems })
+        },
+        removeItem: (variantId) => {
+          const items = get().items
+          const newItems = items.filter(
+            (item) => item.variant_id !== variantId && item.product_id !== variantId
+          )
+          set({ items: newItems })
+        },
+        clearCart: () => {
+          set({ items: [] })
+        },
+        getItemCount: () => {
+          return get().items.reduce((total, item) => total + item.quantity, 0)
+        },
+        getSubtotal: () => {
+          return get().items.reduce((total, item) => total + item.price * item.quantity, 0)
+        },
+        getTax: () => {
+          return get().items.reduce((total, item) => {
+            const itemSubtotal = item.price * item.quantity
+            const itemTax = itemSubtotal * (item.tax_rate || 0.21)
+            return total + itemTax
+          }, 0)
+        },
+        getTotal: () => {
+          return get().getSubtotal() + get().getTax()
+        },
+      })
+    : persist(
     (set, get) => ({
       items: [],
 
@@ -109,7 +154,7 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: "cart-storage",
-      storage: createJSONStorage(createStorage),
+      storage: createJSONStorage(() => localStorage),
     }
   )
 )
