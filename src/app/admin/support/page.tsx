@@ -175,7 +175,7 @@ export default function AdminSupportPage() {
                   <SelectValue placeholder="All types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="order_support">Order Support</SelectItem>
                   <SelectItem value="general_support">
                     General Support

@@ -86,7 +86,7 @@ export default async function IndustriesPage({
   return (
     <>
       <Hero
-        title={locale === "ro" ? "Industrii Deservite" : "Industries We Serve"}
+        title={locale === "ro" ? "Cui ne adresăm" : "Who We Serve"}
         subtitle={
           locale === "ro"
             ? "Experiență vastă în diverse tipuri de evenimente. Adaptăm soluțiile la specificul fiecărei industrii."

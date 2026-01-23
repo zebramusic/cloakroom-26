@@ -11,7 +11,12 @@ export const dynamic = "force-dynamic";
 export default async function AdminPortfolioPage() {
   const session = await auth();
 
-  if (!session || !hasPermission(session.user.role, "portfolio.view")) {
+  if (
+    !session ||
+    !session.user ||
+    !session.user.role ||
+    !hasPermission(session.user.role, "portfolio.view")
+  ) {
     redirect("/admin/login");
   }
 

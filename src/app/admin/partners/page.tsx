@@ -9,16 +9,16 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 
 interface Partner {
-  id: string;
+  _id: string;
   name: string;
   slug: string;
-  logo_url: string | null;
-  website_url: string | null;
+  logo: string | null;
+  website: string | null;
   description: string | null;
-  display_order: number;
-  is_published: boolean;
-  created_at: string;
-  updated_at: string;
+  order: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function PartnersPage() {
@@ -57,7 +57,7 @@ export default function PartnersPage() {
 
   const columns = [
     {
-      key: "logo_url",
+      key: "logo",
       label: "Logo",
       render: (value: string | null) =>
         value ? (
@@ -81,7 +81,7 @@ export default function PartnersPage() {
       sortable: true,
     },
     {
-      key: "website_url",
+      key: "website",
       label: "Website",
       render: (value: string | null) =>
         value ? (
@@ -98,12 +98,12 @@ export default function PartnersPage() {
         ),
     },
     {
-      key: "display_order",
+      key: "order",
       label: "Order",
       sortable: true,
     },
     {
-      key: "is_published",
+      key: "isActive",
       label: "Status",
       render: (value: boolean) =>
         value ? (
@@ -122,7 +122,7 @@ export default function PartnersPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => router.push(`/admin/partners/${partner.id}/edit`)}
+            onClick={() => router.push(`/admin/partners/${partner._id}/edit`)}
           >
             <Pencil className="w-4 h-4 mr-1" />
             Edit
@@ -130,7 +130,7 @@ export default function PartnersPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleDelete(partner.id)}
+            onClick={() => handleDelete(partner._id)}
           >
             <Trash2 className="w-4 h-4 text-red-500" />
           </Button>

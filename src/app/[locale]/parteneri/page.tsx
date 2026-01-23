@@ -3,16 +3,31 @@ import { Hero } from "@/components/sections/Hero";
 import { Card } from "@/components/ui/card";
 import { QuoteCTA } from "@/components/sections/QuoteCTA";
 import Image from "next/image";
+import connectDB from "@/lib/mongodb";
+import { Partner } from "@/lib/models";
 
-// This would normally fetch from MongoDB
-const partners = [
-  { name: "Electric Castle", logo: "/placeholder-logo.svg", featured: true },
-  { name: "Untold Festival", logo: "/placeholder-logo.svg", featured: true },
-  { name: "Jazz in the Park", logo: "/placeholder-logo.svg", featured: true },
-  { name: "ARTmania Festival", logo: "/placeholder-logo.svg", featured: false },
-  { name: "Cluj Arena", logo: "/placeholder-logo.svg", featured: false },
-  { name: "BT Arena", logo: "/placeholder-logo.svg", featured: false },
-];
+async function getPartners() {
+  try {
+    await connectDB();
+    const partners = await Partner.find({ isActive: true })
+      .sort({ order: 1 })
+      .lean();
+    
+    // Convert MongoDB documents to plain objects with string IDs
+    return partners.map((partner) => ({
+      _id: partner._id.toString(),
+      name: partner.name,
+      slug: partner.slug,
+      logo: partner.logo,
+      website: partner.website,
+      description: partner.description,
+      order: partner.order,
+    }));
+  } catch (error) {
+    console.error("Error fetching partners:", error);
+    return [];
+  }
+}
 
 export default async function PartnersPage({
   params,
@@ -20,6 +35,7 @@ export default async function PartnersPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const partners = await getPartners();
 
   unstable_setRequestLocale(locale);
 
@@ -46,24 +62,54 @@ export default async function PartnersPage({
           </div>
 
           <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4">
-            {partners.map((partner, index) => (
-              <Card
-                key={index}
-                className="flex items-center justify-center p-8 transition-shadow hover:shadow-lg"
-              >
-                <div className="text-center">
-                  <div className="mb-2 flex h-20 items-center justify-center">
-                    {/* Placeholder for logo */}
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <span className="text-2xl font-bold">
-                        {partner.name.charAt(0)}
-                      </span>
+            {partners.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground">
+                  {locale === "ro"
+                    ? "Nu există parteneri momentan."
+                    : "No partners available at the moment."}
+                </p>
+              </div>
+            ) : (
+              partners.map((partner) => (
+                <Card
+                  key={partner._id}
+                  className="flex items-center justify-center p-8 transition-shadow hover:shadow-lg"
+                >
+                  {partner.logo ? (
+                    <a
+                      href={partner.website || "#"}
+                      target={partner.website ? "_blank" : undefined}
+                      rel={partner.website ? "noopener noreferrer" : undefined}
+                      className="text-center w-full"
+                    >
+                      <div className="mb-2 flex h-20 items-center justify-center">
+                        <div className="relative h-16 w-full">
+                          <Image
+                            src={partner.logo}
+                            alt={partner.name}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-sm font-medium">{partner.name}</p>
+                    </a>
+                  ) : (
+                    <div className="text-center">
+                      <div className="mb-2 flex h-20 items-center justify-center">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <span className="text-2xl font-bold">
+                            {partner.name.charAt(0)}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-sm font-medium">{partner.name}</p>
                     </div>
-                  </div>
-                  <p className="text-sm font-medium">{partner.name}</p>
-                </div>
-              </Card>
-            ))}
+                  )}
+                </Card>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -81,7 +127,9 @@ export default async function PartnersPage({
             </p>
             <div className="grid gap-6 sm:grid-cols-3">
               <div>
-                <div className="mb-2 text-4xl font-bold text-primary">50+</div>
+                <div className="mb-2 text-4xl font-bold text-primary">
+                  {partners.length}+
+                </div>
                 <div className="text-sm text-muted-foreground">
                   {locale === "ro" ? "Parteneri activi" : "Active partners"}
                 </div>

@@ -2,7 +2,7 @@
   "nav": {
     "home": "Home",
     "services": "Services",
-    "industries": "Industries",
+    "industries": "Clients",
     "pricing": "Pricing",
     "about": "About",
     "partners": "Partners",
@@ -85,7 +85,7 @@
       }
     },
     "industries": {
-      "title": "Industries Served",
+      "title": "Who We Serve",
       "festivals": "Music Festivals",
       "concerts": "Concerts",
       "clubs": "Clubs & Parties",

@@ -2,7 +2,7 @@
   "nav": {
     "home": "Acasă",
     "services": "Servicii",
-    "industries": "Industrii",
+    "industries": "Clienți",
     "pricing": "Prețuri",
     "about": "Despre",
     "partners": "Parteneri",
@@ -85,7 +85,7 @@
       }
     },
     "industries": {
-      "title": "Industrii Deservite",
+      "title": "Cui ne adresăm",
       "festivals": "Festivaluri Muzicale",
       "concerts": "Concerte",
       "clubs": "Cluburi & Petreceri",

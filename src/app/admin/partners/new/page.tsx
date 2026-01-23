@@ -35,7 +35,17 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
       const res = await fetch(`/api/partners/${partnerId}`);
       const data = await res.json();
       if (data.partner) {
-        setFormData(data.partner);
+        // Map MongoDB field names to form field names
+        const partner = data.partner;
+        setFormData({
+          name: partner.name || "",
+          slug: partner.slug || "",
+          logo_url: partner.logo || null,
+          website_url: partner.website || "",
+          description: partner.description || "",
+          display_order: partner.order || 0,
+          is_published: partner.isActive ?? true,
+        });
       }
     } catch (error) {
       console.error("Error fetching partner:", error);

@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
+import { hasPermission } from "@/lib/auth/permissions";
 import connectDB from "@/lib/mongodb";
 import { Partner } from "@/lib/models";
 import mongoose from "mongoose";
@@ -35,12 +37,21 @@ export async function GET(
 }
 
 /**
- * PATCH /api/partners/[id] - Update partner
+ * PATCH /api/partners/[id] - Update partner (requires auth + partners.update)
  */
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth();
+  
+  if (!session || !hasPermission(session.user.role, 'partners.update')) {
+    return NextResponse.json(
+      { error: 'Unauthorized - partners.update permission required' },
+      { status: 401 }
+    );
+  }
+
   try {
     const { id } = await context.params;
     const body = await request.json();
@@ -94,12 +105,21 @@ export async function PATCH(
 }
 
 /**
- * DELETE /api/partners/[id] - Delete partner
+ * DELETE /api/partners/[id] - Delete partner (requires auth + partners.delete)
  */
 export async function DELETE(
   request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth();
+  
+  if (!session || !hasPermission(session.user.role, 'partners.delete')) {
+    return NextResponse.json(
+      { error: 'Unauthorized - partners.delete permission required' },
+      { status: 401 }
+    );
+  }
+
   try {
     const { id } = await context.params;
     await connectDB();

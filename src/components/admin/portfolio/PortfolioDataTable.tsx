@@ -44,11 +44,31 @@ export function PortfolioDataTable({ userRole }: PortfolioDataTableProps) {
         params.append("search", search);
       }
 
-      const res = await fetch(`/api/admin/portfolio?${params}`);
+      const url = `/api/admin/portfolio?${params}`;
+
+      const res = await fetch(url);
       const data = await res.json();
-      setItems(data.items || []);
+
+      if (!res.ok) {
+        const errorMessage =
+          data.error || `Error ${res.status}: ${res.statusText}`;
+        console.error("API Error:", errorMessage);
+        alert(`Failed to load portfolio items: ${errorMessage}`);
+        setItems([]);
+        return;
+      }
+
+      // Filter out any undefined or invalid items
+      const validItems = (data.items || []).filter(
+        (item: any) => item && typeof item === "object",
+      );
+      setItems(validItems);
     } catch (error) {
       console.error("Failed to fetch portfolio items:", error);
+      alert(
+        `Failed to load portfolio items: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -71,15 +91,21 @@ export function PortfolioDataTable({ userRole }: PortfolioDataTableProps) {
       const res = await fetch(`/api/admin/portfolio/${id}`, {
         method: "DELETE",
       });
+      const data = await res.json();
 
       if (res.ok) {
         fetchItems();
       } else {
-        alert("Failed to delete item");
+        const errorMessage =
+          data.error || `Error ${res.status}: ${res.statusText}`;
+        console.error("Delete error:", errorMessage);
+        alert(`Failed to delete item: ${errorMessage}`);
       }
     } catch (error) {
       console.error("Failed to delete:", error);
-      alert("Failed to delete item");
+      alert(
+        `Failed to delete item: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   };
 
@@ -87,32 +113,39 @@ export function PortfolioDataTable({ userRole }: PortfolioDataTableProps) {
     {
       key: "title",
       label: "Title",
-      render: (item: any) => (
-        <div>
-          <div className="font-medium">{item.localeContent.ro.title}</div>
-          {item.localeContent.en.title && (
-            <div className="text-sm text-muted-foreground">
-              {item.localeContent.en.title}
+      render: (_value: any, item: any) => {
+        if (!item || !item.localeContent?.ro) {
+          return <div className="font-medium text-gray-400">-</div>;
+        }
+        return (
+          <div>
+            <div className="font-medium">
+              {item.localeContent.ro.title || "Untitled"}
             </div>
-          )}
-        </div>
-      ),
+            {item.localeContent?.en?.title && (
+              <div className="text-sm text-muted-foreground">
+                {item.localeContent.en.title}
+              </div>
+            )}
+          </div>
+        );
+      },
     },
     {
       key: "eventType",
       label: "Type",
-      render: (item: any) => item.eventMeta?.eventType || "-",
+      render: (_value: any, item: any) => item?.eventMeta?.eventType || "-",
     },
     {
       key: "location",
       label: "Location",
-      render: (item: any) => item.eventMeta?.location || "-",
+      render: (_value: any, item: any) => item?.eventMeta?.location || "-",
     },
     {
       key: "date",
       label: "Date",
-      render: (item: any) =>
-        item.eventMeta?.startsAt
+      render: (_value: any, item: any) =>
+        item?.eventMeta?.startsAt
           ? new Date(item.eventMeta.startsAt).toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",
@@ -123,57 +156,63 @@ export function PortfolioDataTable({ userRole }: PortfolioDataTableProps) {
     {
       key: "status",
       label: "Status",
-      render: (item: any) => (
-        <div className="flex gap-2">
-          <Badge
-            variant="outline"
-            className={
-              item.isPublished
-                ? "bg-green-50 text-green-700 border-green-200"
-                : "bg-yellow-50 text-yellow-700 border-yellow-200"
-            }
-          >
-            {item.isPublished ? "Published" : "Draft"}
-          </Badge>
-          {item.isFeatured && (
+      render: (_value: any, item: any) => {
+        if (!item) return <div>-</div>;
+        return (
+          <div className="flex gap-2">
             <Badge
               variant="outline"
-              className="bg-blue-50 text-blue-700 border-blue-200"
+              className={
+                item.isPublished
+                  ? "bg-green-50 text-green-700 border-green-200"
+                  : "bg-yellow-50 text-yellow-700 border-yellow-200"
+              }
             >
-              Featured
+              {item.isPublished ? "Published" : "Draft"}
             </Badge>
-          )}
-        </div>
-      ),
+            {item.isFeatured && (
+              <Badge
+                variant="outline"
+                className="bg-blue-50 text-blue-700 border-blue-200"
+              >
+                Featured
+              </Badge>
+            )}
+          </div>
+        );
+      },
     },
     {
       key: "actions",
       label: "Actions",
-      render: (item: any) => (
-        <div className="flex gap-2">
-          <Link href={`/ro/portfolio/${item.slug}`} target="_blank">
-            <Button variant="ghost" size="sm">
-              <Eye className="h-4 w-4" />
-            </Button>
-          </Link>
-          {canUpdate && (
-            <Link href={`/admin/portfolio/${item._id}`}>
+      render: (_value: any, item: any) => {
+        if (!item || !item._id || !item.slug) return <div>-</div>;
+        return (
+          <div className="flex gap-2">
+            <Link href={`/ro/portfolio/${item.slug}`} target="_blank">
               <Button variant="ghost" size="sm">
-                <Edit className="h-4 w-4" />
+                <Eye className="h-4 w-4" />
               </Button>
             </Link>
-          )}
-          {canDelete && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDelete(item._id)}
-            >
-              <Trash2 className="h-4 w-4 text-destructive" />
-            </Button>
-          )}
-        </div>
-      ),
+            {canUpdate && (
+              <Link href={`/admin/portfolio/${item._id}`}>
+                <Button variant="ghost" size="sm">
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </Link>
+            )}
+            {canDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleDelete(item._id)}
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            )}
+          </div>
+        );
+      },
     },
   ];
 

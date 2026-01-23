@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
+import { hasPermission } from "@/lib/auth/permissions";
 import connectDB from "@/lib/mongodb";
 import { Partner } from "@/lib/models";
 
 /**
- * GET /api/partners - Get all partners
+ * GET /api/partners - Get all partners (public)
  */
 export async function GET(request: Request) {
   try {
@@ -30,9 +32,18 @@ export async function GET(request: Request) {
 }
 
 /**
- * POST /api/partners - Create new partner
+ * POST /api/partners - Create new partner (requires auth + partners.create)
  */
 export async function POST(request: Request) {
+  const session = await auth();
+  
+  if (!session || !hasPermission(session.user.role, 'partners.create')) {
+    return NextResponse.json(
+      { error: 'Unauthorized - partners.create permission required' },
+      { status: 401 }
+    );
+  }
+
   try {
     const body = await request.json();
     await connectDB();
