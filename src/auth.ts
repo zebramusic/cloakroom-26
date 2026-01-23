@@ -1,17 +1,11 @@
-import NextAuth, { NextAuthConfig } from "next-auth";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { CredentialsSignin } from "next-auth";
 import type { Role } from "./lib/auth/permissions";
+import { authConfig } from "./auth.config";
 
-export const authConfig: NextAuthConfig = {
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
-  pages: {
-    signIn: "/admin/login", // Admin sign in page
-  },
-  trustHost: true,
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   providers: [
     // Admin login
     CredentialsProvider({
@@ -135,24 +129,4 @@ export const authConfig: NextAuthConfig = {
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id as string;
-        token.role = (user as any).role as Role;
-        token.principalType = (user as any).principalType as "admin" | "customer";
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as Role;
-        session.user.principalType = token.principalType as "admin" | "customer";
-      }
-      return session;
-    },
-  },
-};
-
-export const { handlers, signIn, signOut, auth } = NextAuth(authConfig);
+});
