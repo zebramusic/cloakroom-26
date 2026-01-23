@@ -450,6 +450,15 @@ export function PortfolioForm({
         </div>
       )}
 
+      {/* Note for create mode */}
+      {mode === "create" && (
+        <div className="bg-muted/50 rounded-lg border border-dashed p-6">
+          <p className="text-sm text-muted-foreground">
+            💡 <strong>Note:</strong> After creating this portfolio item, you'll be able to upload images on the edit page.
+          </p>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex gap-4">
         <Button type="submit" disabled={loading || !canUpdate}>
