@@ -47,8 +47,8 @@ export default function AdminLoginClient() {
       }
 
       if (result?.ok) {
-        router.push(redirect);
-        router.refresh();
+        // Use window.location for hard navigation to ensure cookies are set
+        window.location.href = redirect;
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");

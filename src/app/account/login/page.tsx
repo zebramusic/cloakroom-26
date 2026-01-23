@@ -58,8 +58,8 @@ export default function CustomerLoginPage() {
         setError(result.error);
       } else if (result?.ok) {
         console.log("Login successful, redirecting...");
-        router.push("/shop");
-        router.refresh();
+        // Use window.location for hard navigation to ensure cookies are set
+        window.location.href = "/shop";
       }
     } catch (err) {
       console.error("Login exception:", err);
