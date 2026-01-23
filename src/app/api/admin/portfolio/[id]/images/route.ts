@@ -104,7 +104,8 @@ export async function POST(
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     
-    const tempDir = path.join(process.cwd(), 'tmp');
+    // Use /tmp directory in Vercel (writable in serverless)
+    const tempDir = '/tmp';
     const timestamp = Date.now();
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const tempPath = path.join(tempDir, `${timestamp}-${sanitizedName}`);
