@@ -112,11 +112,7 @@ export function PortfolioForm({
       const data = await res.json();
 
       if (res.ok) {
-        if (mode === "create") {
-          router.push(`/admin/portfolio/${data.item._id}`);
-        } else {
-          router.refresh();
-        }
+        router.push("/admin/portfolio");
       } else {
         alert(data.error || "Failed to save portfolio item");
       }
@@ -454,7 +450,8 @@ export function PortfolioForm({
       {mode === "create" && (
         <div className="bg-muted/50 rounded-lg border border-dashed p-6">
           <p className="text-sm text-muted-foreground">
-            💡 <strong>Note:</strong> After creating this portfolio item, you'll be able to upload images on the edit page.
+            💡 <strong>Note:</strong> After creating this portfolio item, you'll
+            be able to upload images on the edit page.
           </p>
         </div>
       )}
