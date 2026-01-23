@@ -3,6 +3,7 @@ import { getMessages } from "next-intl/server";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { CartStoreHydration } from "@/components/shared/CartStoreHydration";
 
 export default async function LocaleLayout({
   children,
@@ -17,6 +18,7 @@ export default async function LocaleLayout({
   return (
     <AuthProvider>
       <NextIntlClientProvider messages={messages}>
+        <CartStoreHydration />
         <Header locale={locale} />
         <main>{children}</main>
         <Footer locale={locale} />

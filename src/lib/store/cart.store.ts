@@ -1,5 +1,4 @@
 import { create } from "zustand"
-import { persist, createJSONStorage } from "zustand/middleware"
 
 export interface CartItem {
   product_id: string
@@ -23,138 +22,109 @@ interface CartStore {
   getSubtotal: () => number
   getTax: () => number
   getTotal: () => number
+  hydrate: () => void
 }
 
-export const useCartStore = create<CartStore>()(
-  typeof window === 'undefined' 
-    ? (set, get) => ({
-        items: [],
-        addItem: (item) => {
-          const items = get().items
-          const existingIndex = items.findIndex(
-            (i) => i.variant_id === item.variant_id || i.product_id === item.product_id
-          )
+// Helper functions for localStorage (client-side only)
+const STORAGE_KEY = "cart-storage"
 
-          if (existingIndex > -1) {
-            const newItems = [...items]
-            newItems[existingIndex].quantity += item.quantity || 1
-            set({ items: newItems })
-          } else {
-            set({ items: [...items, { ...item, tax_rate: item.tax_rate || 0.21, quantity: item.quantity || 1 }] })
-          }
-        },
-        updateQuantity: (variantId, quantity) => {
-          if (quantity <= 0) {
-            get().removeItem(variantId)
-            return
-          }
-          const items = get().items
-          const newItems = items.map((item) =>
-            item.variant_id === variantId || item.product_id === variantId
-              ? { ...item, quantity }
-              : item
-          )
-          set({ items: newItems })
-        },
-        removeItem: (variantId) => {
-          const items = get().items
-          const newItems = items.filter(
-            (item) => item.variant_id !== variantId && item.product_id !== variantId
-          )
-          set({ items: newItems })
-        },
-        clearCart: () => {
-          set({ items: [] })
-        },
-        getItemCount: () => {
-          return get().items.reduce((total, item) => total + item.quantity, 0)
-        },
-        getSubtotal: () => {
-          return get().items.reduce((total, item) => total + item.price * item.quantity, 0)
-        },
-        getTax: () => {
-          return get().items.reduce((total, item) => {
-            const itemSubtotal = item.price * item.quantity
-            const itemTax = itemSubtotal * (item.tax_rate || 0.21)
-            return total + itemTax
-          }, 0)
-        },
-        getTotal: () => {
-          return get().getSubtotal() + get().getTax()
-        },
-      })
-    : persist(
-    (set, get) => ({
-      items: [],
+const getStoredItems = (): CartItem[] => {
+  if (typeof window === 'undefined') return []
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (!stored) return []
+    const parsed = JSON.parse(stored)
+    return parsed.state?.items || []
+  } catch {
+    return []
+  }
+}
 
-      addItem: (item) => {
-        const items = get().items
-        const existingIndex = items.findIndex(
-          (i) => i.variant_id === item.variant_id || i.product_id === item.product_id
-        )
+const setStoredItems = (items: CartItem[]) => {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: { items }, version: 0 }))
+  } catch {
+    // Silently fail if localStorage is not available
+  }
+}
 
-        if (existingIndex > -1) {
-          // Update quantity if item exists
-          const newItems = [...items]
-          newItems[existingIndex].quantity += item.quantity || 1
-          set({ items: newItems })
-        } else {
-          // Add new item with default tax rate if not provided
-          set({ items: [...items, { ...item, tax_rate: item.tax_rate || 0.21, quantity: item.quantity || 1 }] })
-        }
-      },
+export const useCartStore = create<CartStore>()((set, get) => ({
+  items: [],
 
-      updateQuantity: (variantId, quantity) => {
-        if (quantity <= 0) {
-          get().removeItem(variantId)
-          return
-        }
+  hydrate: () => {
+    const items = getStoredItems()
+    set({ items })
+  },
 
-        const items = get().items
-        const newItems = items.map((item) =>
-          item.variant_id === variantId || item.product_id === variantId
-            ? { ...item, quantity }
-            : item
-        )
-        set({ items: newItems })
-      },
+  addItem: (item) => {
+    const items = get().items
+    const existingIndex = items.findIndex(
+      (i) => i.variant_id === item.variant_id || i.product_id === item.product_id
+    )
 
-      removeItem: (variantId) => {
-        const items = get().items
-        const newItems = items.filter(
-          (item) => item.variant_id !== variantId && item.product_id !== variantId
-        )
-        set({ items: newItems })
-      },
-
-      clearCart: () => {
-        set({ items: [] })
-      },
-
-      getItemCount: () => {
-        return get().items.reduce((total, item) => total + item.quantity, 0)
-      },
-
-      getSubtotal: () => {
-        return get().items.reduce((total, item) => total + item.price * item.quantity, 0)
-      },
-
-      getTax: () => {
-        // Calculate tax based on each product's individual tax rate
-        return get().items.reduce((total, item) => {
-          const itemSubtotal = item.price * item.quantity
-          const itemTax = itemSubtotal * (item.tax_rate || 0.21)
-          return total + itemTax
-        }, 0)
-      },
-
-      getTotal: () => {
-        return get().getSubtotal() + get().getTax()
-      },
-    }),
-    {
-      name: "cart-storage",
-      storage: createJSONStorage(() => localStorage),
+    let newItems: CartItem[]
+    if (existingIndex > -1) {
+      newItems = [...items]
+      newItems[existingIndex].quantity += item.quantity || 1
+    } else {
+      newItems = [...items, { ...item, tax_rate: item.tax_rate || 0.21, quantity: item.quantity || 1 }]
     }
-  )
-)
+    
+    set({ items: newItems })
+    setStoredItems(newItems)
+  },
+
+  updateQuantity: (variantId, quantity) => {
+    if (quantity <= 0) {
+      get().removeItem(variantId)
+      return
+    }
+
+    const items = get().items
+    const newItems = items.map((item) =>
+      item.variant_id === variantId || item.product_id === variantId
+        ? { ...item, quantity }
+        : item
+    )
+    
+    set({ items: newItems })
+    setStoredItems(newItems)
+  },
+
+  removeItem: (variantId) => {
+    const items = get().items
+    const newItems = items.filter(
+      (item) => item.variant_id !== variantId && item.product_id !== variantId
+    )
+    
+    set({ items: newItems })
+    setStoredItems(newItems)
+  },
+
+  clearCart: () => {
+    set({ items: [] })
+    setStoredItems([])
+  },
+
+  getItemCount: () => {
+    return get().items.reduce((total, item) => total + item.quantity, 0)
+  },
+
+  getSubtotal: () => {
+    return get().items.reduce((total, item) => total + item.price * item.quantity, 0)
+  },
+
+  getTax: () => {
+    return get().items.reduce((total, item) => {
+      const itemSubtotal = item.price * item.quantity
+      const itemTax = itemSubtotal * (item.tax_rate || 0.21)
+      return total + itemTax
+    }, 0)
+  },
+
+  getTotal: () => {
+    return get().getSubtotal() + get().getTax()
+  },
+}))
+
