@@ -19,7 +19,23 @@ export async function middleware(request: NextRequest) {
   let response = (isAdminRoute || isApiRoute || isAccountRoute) ? NextResponse.next() : intlMiddleware(request);
 
   // Then, handle auth - use getToken which works in Edge runtime
-  const token = await getToken({ req: request });
+  const token = await getToken({ 
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  // Debug logging
+  const path = request.nextUrl.pathname;
+  if (isAdminRoute || isAccountRoute) {
+    console.log('=== MIDDLEWARE DEBUG ===');
+    console.log('Path:', path);
+    console.log('Has token:', !!token);
+    console.log('Token principalType:', token?.principalType);
+    console.log('Token role:', token?.role);
+    console.log('Cookies:', request.cookies.getAll().map(c => `${c.name}=${c.value.substring(0, 20)}...`));
+    console.log('NEXTAUTH_SECRET exists:', !!process.env.NEXTAUTH_SECRET);
+    console.log('========================');
+  }
 
   // Protect customer account routes
   if (request.nextUrl.pathname.startsWith('/account')) {
