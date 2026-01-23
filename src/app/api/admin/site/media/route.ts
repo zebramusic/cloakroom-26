@@ -7,9 +7,11 @@ import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import sharp from 'sharp';
+import { put } from '@vercel/blob';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'public/uploads/site');
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const isProduction = process.env.NODE_ENV === 'production';
 
 // GET - List media assets
 export async function GET(request: NextRequest) {
@@ -82,36 +84,60 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Create upload directory
-    const folderPath = path.join(UPLOAD_DIR, folder);
-    if (!existsSync(folderPath)) {
-      await mkdir(folderPath, { recursive: true });
-    }
+    // Process image with sharp
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const image = sharp(buffer);
+    const metadata = await image.metadata();
 
     // Generate unique filename
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
     const ext = path.extname(file.name);
     const filename = `${timestamp}-${randomString}${ext}`;
-    const filepath = path.join(folderPath, filename);
 
-    // Process image with sharp
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const image = sharp(buffer);
-    const metadata = await image.metadata();
+    let assetUrl: string;
+    let storageKey: string;
 
-    // Optimize and save
-    await image
-      .resize(2000, 2000, { fit: 'inside', withoutEnlargement: true })
-      .jpeg({ quality: 85 })
-      .png({ compressionLevel: 8 })
-      .webp({ quality: 85 })
-      .toFile(filepath);
+    if (isProduction) {
+      // Use Vercel Blob storage in production
+      const optimizedBuffer = await image
+        .resize(2000, 2000, { fit: 'inside', withoutEnlargement: true })
+        .jpeg({ quality: 85 })
+        .toBuffer();
+
+      const blob = await put(`site/${folder}/${filename}`, optimizedBuffer, {
+        access: 'public',
+        contentType: 'image/jpeg',
+      });
+
+      assetUrl = blob.url;
+      storageKey = `site/${folder}/${filename}`;
+    } else {
+      // Use local filesystem in development
+      const folderPath = path.join(UPLOAD_DIR, folder);
+      if (!existsSync(folderPath)) {
+        await mkdir(folderPath, { recursive: true });
+      }
+
+      const filepath = path.join(folderPath, filename);
+
+      // Optimize and save
+      await image
+        .resize(2000, 2000, { fit: 'inside', withoutEnlargement: true })
+        .jpeg({ quality: 85 })
+        .toFile(filepath);
+
+      assetUrl = `/uploads/site/${folder}/${filename}`;
+      storageKey = `${folder}/${filename}`;
+    }
+
+      storageKey = `${folder}/${filename}`;
+    }
 
     // Create database record
     const asset = await MediaAsset.create({
-      url: `/uploads/site/${folder}/${filename}`,
-      storageKey: `${folder}/${filename}`,
+      url: assetUrl,
+      storageKey,
       folder,
       filename,
       mimeType: file.type,
