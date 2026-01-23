@@ -26,9 +26,9 @@ interface QuoteData {
 
 export default async function AdminDashboardPage() {
   const session = await auth();
-  
-  if (!session?.user || session.user.principalType !== 'admin') {
-    redirect('/admin/login');
+
+  if (!session?.user || session.user.principalType !== "admin") {
+    redirect("/admin/login");
   }
 
   // Lazy-load database operations

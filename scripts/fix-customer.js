@@ -1,12 +1,12 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const fs = require('fs');
-const path = require('path');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const fs = require("fs");
+const path = require("path");
 
 // Read .env.local manually
-const envPath = path.join(__dirname, '..', '.env.local');
-const envContent = fs.readFileSync(envPath, 'utf8');
-envContent.split('\n').forEach(line => {
+const envPath = path.join(__dirname, "..", ".env.local");
+const envContent = fs.readFileSync(envPath, "utf8");
+envContent.split("\n").forEach((line) => {
   const match = line.match(/^([^=:#]+)=(.*)$/);
   if (match) {
     const key = match[1].trim();
@@ -33,26 +33,27 @@ const CustomerSchema = new mongoose.Schema({
   lastLogin: Date,
 });
 
-const Customer = mongoose.models.Customer || mongoose.model('Customer', CustomerSchema);
+const Customer =
+  mongoose.models.Customer || mongoose.model("Customer", CustomerSchema);
 
 async function fixCustomer() {
   try {
     await connectDB();
-    console.log('Connected to MongoDB\n');
+    console.log("Connected to MongoDB\n");
 
-    const email = 'customer@test.com';
-    const password = 'Test123456';
-    
+    const email = "customer@test.com";
+    const password = "Test123456";
+
     // Delete existing customer
     await Customer.deleteOne({ email });
-    console.log('✅ Deleted old customer\n');
+    console.log("✅ Deleted old customer\n");
 
     // Create fresh customer with correct password
     const passwordHash = await bcrypt.hash(password, 10);
-    
+
     const customer = await Customer.create({
       email,
-      name: 'Test Customer',
+      name: "Test Customer",
       passwordHash,
       emailVerified: true, // Skip verification for testing
       isActive: true,
@@ -60,18 +61,17 @@ async function fixCustomer() {
       updatedAt: new Date(),
     });
 
-    console.log('✅ Customer created successfully!\n');
-    console.log('================');
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('Name:', customer.name);
-    console.log('Email Verified:', customer.emailVerified);
-    console.log('Is Active:', customer.isActive);
-    console.log('================\n');
-    console.log('Login at: https://cloakroom-26.vercel.app/account/login\n');
-
+    console.log("✅ Customer created successfully!\n");
+    console.log("================");
+    console.log("Email:", email);
+    console.log("Password:", password);
+    console.log("Name:", customer.name);
+    console.log("Email Verified:", customer.emailVerified);
+    console.log("Is Active:", customer.isActive);
+    console.log("================\n");
+    console.log("Login at: https://cloakroom-26.vercel.app/account/login\n");
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   } finally {
     await mongoose.disconnect();
   }

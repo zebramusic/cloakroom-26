@@ -477,7 +477,7 @@ const PortfolioItemSchema = new Schema<IPortfolioItem>({
   isFeatured: { type: Boolean, default: false },
   orderIndex: { type: Number, default: 0 },
   coverImageId: { type: Schema.Types.ObjectId, ref: 'PortfolioImage' },
-}, { timestamps: true });
+}, { timestamps: true, collection: 'portfolio_items' });
 
 // Indexes (slug index is automatic from unique: true in schema)
 PortfolioItemSchema.index({ isPublished: 1, isFeatured: 1, orderIndex: 1 });
@@ -526,7 +526,7 @@ const PortfolioImageSchema = new Schema<IPortfolioImage>({
     en: { type: String, default: '' },
   },
   orderIndex: { type: Number, default: 0 },
-}, { timestamps: true });
+}, { timestamps: true, collection: 'portfolio_images' });
 
 // Indexes
 PortfolioImageSchema.index({ portfolioItemId: 1, orderIndex: 1 });
