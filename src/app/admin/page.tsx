@@ -1,5 +1,6 @@
-import connectDB from "@/lib/mongodb";
-import { Order, Quote, Product } from "@/lib/models";
+import { auth } from "@/auth";
+import { hasPermission } from "@/lib/auth/permissions";
+import { redirect } from "next/navigation";
 import { DashboardContent } from "@/components/admin/DashboardContent";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,16 @@ interface QuoteData {
 }
 
 export default async function AdminDashboardPage() {
+  const session = await auth();
+  
+  if (!session?.user || session.user.principalType !== 'admin') {
+    redirect('/admin/login');
+  }
+
+  // Lazy-load database operations
+  const connectDB = (await import("@/lib/mongodb")).default;
+  const { Order, Quote, Product } = await import("@/lib/models");
+
   await connectDB();
 
   // Fetch stats
