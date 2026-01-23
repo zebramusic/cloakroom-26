@@ -18,19 +18,30 @@ export default async function PortfolioDetailPage({
   unstable_setRequestLocale(locale);
   const t = await getTranslations("portfolio");
 
-  // Fetch portfolio item
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/portfolio/${slug}`,
-    { cache: "no-store" },
-  );
+  // Fetch portfolio item directly from database
+  const connectDB = (await import("@/lib/mongodb")).default;
+  const { PortfolioItem, PortfolioImage } = await import("@/lib/models");
+  
+  await connectDB();
+  
+  const item = await PortfolioItem.findOne({
+    slug,
+    isPublished: true,
+  }).lean();
 
-  if (!res.ok) {
+  if (!item) {
     notFound();
   }
 
-  const data = await res.json();
-  const item = data.item;
-  const images = data.images || [];
+  // Get all images for this item
+  const images = await PortfolioImage.find({ portfolioItemId: item._id })
+    .sort({ orderIndex: 1 })
+    .lean();
+
+  // Get all images for this item
+  const images = await PortfolioImage.find({ portfolioItemId: item._id })
+    .sort({ orderIndex: 1 })
+    .lean();
 
   const content =
     locale === "en" && item.localeContent.en.title
