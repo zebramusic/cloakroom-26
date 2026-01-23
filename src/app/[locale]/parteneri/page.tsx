@@ -12,7 +12,7 @@ async function getPartners() {
     const partners = await Partner.find({ isActive: true })
       .sort({ order: 1 })
       .lean();
-    
+
     // Convert MongoDB documents to plain objects with string IDs
     return partners.map((partner) => ({
       _id: partner._id.toString(),

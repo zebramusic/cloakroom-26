@@ -96,6 +96,7 @@ export default async function HomePage({
           href: `/${locale}/shop`,
         }}
         variant="home"
+        backgroundImage="/images/hero-cloakroom.jpg"
       />
 
       {/* Features Section */}

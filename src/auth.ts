@@ -11,6 +11,7 @@ import bcrypt from "bcryptjs";
 export const authConfig: NextAuthConfig = {
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: "/admin/login", // Admin sign in page
@@ -18,6 +19,7 @@ export const authConfig: NextAuthConfig = {
   },
   trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,
+  useSecureCookies: process.env.NODE_ENV === 'production',
   providers: [
     // Admin login
     CredentialsProvider({

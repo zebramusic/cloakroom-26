@@ -21,8 +21,16 @@ export async function middleware(request: NextRequest) {
   // Then, handle auth - use getToken which works in Edge runtime
   const token = await getToken({ 
     req: request,
-    secret: process.env.NEXTAUTH_SECRET 
+    secret: process.env.NEXTAUTH_SECRET,
   });
+
+  // Debug logging in production
+  if (process.env.NODE_ENV === 'production' && isAdminRoute) {
+    console.log('[Middleware] Path:', request.nextUrl.pathname);
+    console.log('[Middleware] Token exists:', !!token);
+    console.log('[Middleware] Token principalType:', token?.principalType);
+    console.log('[Middleware] Cookies:', request.cookies.getAll().map(c => c.name).join(', '));
+  }
 
   // Protect customer account routes
   if (request.nextUrl.pathname.startsWith('/account')) {
