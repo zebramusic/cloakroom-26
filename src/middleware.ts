@@ -19,18 +19,7 @@ export async function middleware(request: NextRequest) {
   let response = (isAdminRoute || isApiRoute || isAccountRoute) ? NextResponse.next() : intlMiddleware(request);
 
   // Then, handle auth - use getToken which works in Edge runtime
-  const token = await getToken({ 
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-
-  // Debug logging in production
-  if (process.env.NODE_ENV === 'production' && isAdminRoute) {
-    console.log('[Middleware] Path:', request.nextUrl.pathname);
-    console.log('[Middleware] Token exists:', !!token);
-    console.log('[Middleware] Token principalType:', token?.principalType);
-    console.log('[Middleware] Cookies:', request.cookies.getAll().map(c => c.name).join(', '));
-  }
+  const token = await getToken({ req: request });
 
   // Protect customer account routes
   if (request.nextUrl.pathname.startsWith('/account')) {
@@ -121,5 +110,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+  // Exclude: API routes, Next.js internals, static files
+  // Include: All other routes including /admin and /account for auth checks
+  matcher: [
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)',
+  ]
 };

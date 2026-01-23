@@ -15,11 +15,8 @@ export const authConfig: NextAuthConfig = {
   },
   pages: {
     signIn: "/admin/login", // Admin sign in page
-    // Don't set error page - let it be handled by the login forms
   },
   trustHost: true,
-  secret: process.env.NEXTAUTH_SECRET,
-  useSecureCookies: process.env.NODE_ENV === 'production',
   providers: [
     // Admin login
     CredentialsProvider({
