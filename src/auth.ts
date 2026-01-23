@@ -1,12 +1,7 @@
 import NextAuth, { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { CredentialsSignin } from "next-auth";
-import connectDB from "./lib/mongodb";
-import { User } from "./lib/models";
-import { Customer } from "./lib/models-customer";
-import { verifyPassword } from "./lib/auth/customer-auth";
 import type { Role } from "./lib/auth/permissions";
-import bcrypt from "bcryptjs";
 
 export const authConfig: NextAuthConfig = {
   session: {
@@ -36,6 +31,11 @@ export const authConfig: NextAuthConfig = {
         if (credentials.principalType !== "admin") {
           throw new CredentialsSignin("Invalid login method");
         }
+
+        // Lazy-load Mongoose to avoid bundling it in Edge Runtime (middleware)
+        const connectDB = (await import("./lib/mongodb")).default;
+        const { User } = await import("./lib/models");
+        const bcrypt = await import("bcryptjs");
 
         await connectDB();
 
@@ -85,6 +85,11 @@ export const authConfig: NextAuthConfig = {
         if (credentials.principalType !== "customer") {
           throw new CredentialsSignin("Invalid login method");
         }
+
+        // Lazy-load Mongoose to avoid bundling it in Edge Runtime (middleware)
+        const connectDB = (await import("./lib/mongodb")).default;
+        const { Customer } = await import("./lib/models-customer");
+        const { verifyPassword } = await import("./lib/auth/customer-auth");
 
         await connectDB();
 
