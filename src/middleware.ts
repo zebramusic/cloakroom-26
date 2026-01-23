@@ -1,6 +1,6 @@
 import createMiddleware from 'next-intl/middleware';
 import {NextRequest, NextResponse} from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import { auth } from '@/auth';
 
 const intlMiddleware = createMiddleware({
   locales: ['ro', 'en'],
@@ -18,24 +18,8 @@ export async function middleware(request: NextRequest) {
   // First, handle i18n for non-admin/account routes
   let response = (isAdminRoute || isApiRoute || isAccountRoute) ? NextResponse.next() : intlMiddleware(request);
 
-  // Then, handle auth - use getToken which works in Edge runtime
-  const token = await getToken({ 
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-
-  // Debug logging
-  const path = request.nextUrl.pathname;
-  if (isAdminRoute || isAccountRoute) {
-    console.log('=== MIDDLEWARE DEBUG ===');
-    console.log('Path:', path);
-    console.log('Has token:', !!token);
-    console.log('Token principalType:', token?.principalType);
-    console.log('Token role:', token?.role);
-    console.log('Cookies:', request.cookies.getAll().map(c => `${c.name}=${c.value.substring(0, 20)}...`));
-    console.log('NEXTAUTH_SECRET exists:', !!process.env.NEXTAUTH_SECRET);
-    console.log('========================');
-  }
+  // Then, handle auth - use auth() which actually works
+  const session = await auth();
 
   // Protect customer account routes
   if (request.nextUrl.pathname.startsWith('/account')) {
@@ -51,14 +35,14 @@ export async function middleware(request: NextRequest) {
     
     if (isPublicRoute) {
       // Redirect to shop if already logged in as customer
-      if (token && token.principalType === 'customer' && !request.nextUrl.pathname.startsWith('/account/reset-password')) {
+      if (session?.user?.principalType === 'customer' && !request.nextUrl.pathname.startsWith('/account/reset-password')) {
         return NextResponse.redirect(new URL('/shop', request.url));
       }
       return response;
     }
     
     // Require customer authentication for all other account routes
-    if (!token || token.principalType !== 'customer') {
+    if (!session?.user || session.user.principalType !== 'customer') {
       const loginUrl = new URL('/account/login', request.url);
       loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
@@ -73,21 +57,21 @@ export async function middleware(request: NextRequest) {
     
     if (isPublicRoute) {
       // Redirect to dashboard if already logged in as admin (except for password reset)
-      if (token && token.principalType === 'admin' && !request.nextUrl.pathname.startsWith('/admin/reset-password')) {
+      if (session?.user?.principalType === 'admin' && !request.nextUrl.pathname.startsWith('/admin/reset-password')) {
         return NextResponse.redirect(new URL('/admin', request.url));
       }
       return response;
     }
     
     // Require admin authentication for all other admin routes
-    if (!token || token.principalType !== 'admin') {
+    if (!session?.user || session.user.principalType !== 'admin') {
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
     }
 
-    // Get user role from token
-    const role = token.role as string;
+    // Get user role from session
+    const role = session.user.role as string;
     
     // Role-based route protection
     const path = request.nextUrl.pathname;
