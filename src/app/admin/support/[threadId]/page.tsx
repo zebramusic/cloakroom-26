@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useCallback, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -86,11 +86,7 @@ export default function AdminConversationPage({
   const [error, setError] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
-  useEffect(() => {
-    fetchConversation();
-  }, [threadId]);
-
-  const fetchConversation = async () => {
+  const fetchConversation = useCallback(async () => {
     setIsLoading(true);
     setError("");
 
@@ -113,7 +109,11 @@ export default function AdminConversationPage({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [threadId]);
+
+  useEffect(() => {
+    fetchConversation();
+  }, [fetchConversation]);
 
   const handleMessageSent = () => {
     fetchConversation();

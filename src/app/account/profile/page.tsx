@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import CustomerNav from "@/components/customer/CustomerNav";
 import AddressForm from "@/components/customer/AddressForm";
@@ -119,11 +119,7 @@ export default function CustomerProfilePage() {
     null,
   );
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const response = await fetch("/api/customer/profile");
       const data = await response.json();
@@ -159,7 +155,11 @@ export default function CustomerProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleSavePersonalInfo = async () => {
     setError("");

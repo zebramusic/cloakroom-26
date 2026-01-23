@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DataTable } from "@/components/admin/DataTable";
@@ -33,11 +33,7 @@ export function PortfolioDataTable({ userRole }: PortfolioDataTableProps) {
   const canUpdate = role ? hasPermission(role, "portfolio.update") : false;
   const canDelete = role ? hasPermission(role, "portfolio.delete") : false;
 
-  useEffect(() => {
-    fetchItems();
-  }, [statusFilter]);
-
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -56,7 +52,11 @@ export function PortfolioDataTable({ userRole }: PortfolioDataTableProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, search]);
+
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
 
   const handleDelete = async (id: string) => {
     if (

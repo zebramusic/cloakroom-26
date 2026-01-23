@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,14 +63,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
     dimensions: "",
   });
 
-  useEffect(() => {
-    fetchCategories();
-    if (productId) {
-      fetchProduct();
-    }
-  }, [productId]);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const res = await fetch("/api/categories");
       const data = await res.json();
@@ -78,9 +71,9 @@ export default function ProductForm({ productId }: ProductFormProps) {
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
-  };
+  }, []);
 
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await fetch(`/api/products/${productId}`);
@@ -122,7 +115,14 @@ export default function ProductForm({ productId }: ProductFormProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [productId]);
+
+  useEffect(() => {
+    fetchCategories();
+    if (productId) {
+      fetchProduct();
+    }
+  }, [fetchCategories, productId, fetchProduct]);
 
   const generateSlug = (name: string) => {
     // Normalize Romanian and other diacritics

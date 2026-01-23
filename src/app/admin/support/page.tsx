@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -57,11 +57,7 @@ export default function AdminSupportPage() {
   const [typeFilter, setTypeFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    fetchThreads();
-  }, [statusFilter, typeFilter]);
-
-  const fetchThreads = async () => {
+  const fetchThreads = useCallback(async () => {
     setIsLoading(true);
     setError("");
 
@@ -85,7 +81,11 @@ export default function AdminSupportPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [statusFilter, typeFilter, searchQuery]);
+
+  useEffect(() => {
+    fetchThreads();
+  }, [fetchThreads]);
 
   const handleSearch = () => {
     fetchThreads();

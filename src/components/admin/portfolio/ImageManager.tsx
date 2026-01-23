@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Upload, Trash2, Star, Edit2 } from "lucide-react";
@@ -17,11 +17,7 @@ export function ImageManager({ itemId }: ImageManagerProps) {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [editingImage, setEditingImage] = useState<any>(null);
 
-  useEffect(() => {
-    fetchImages();
-  }, [itemId]);
-
-  const fetchImages = async () => {
+  const fetchImages = useCallback(async () => {
     try {
       const res = await fetch(`/api/admin/portfolio/${itemId}/images`);
       const data = await res.json();
@@ -31,7 +27,11 @@ export function ImageManager({ itemId }: ImageManagerProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [itemId]);
+
+  useEffect(() => {
+    fetchImages();
+  }, [fetchImages]);
 
   const handleDelete = async (imageId: string) => {
     if (!confirm("Are you sure you want to delete this image?")) {

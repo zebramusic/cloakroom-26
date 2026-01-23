@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,11 +66,7 @@ export default function QuoteDetailPage({ params }: any) {
   const [totalPrice, setTotalPrice] = useState("");
   const [adminNotes, setAdminNotes] = useState("");
 
-  useEffect(() => {
-    loadQuote();
-  }, [params.id]);
-
-  const loadQuote = async () => {
+  const loadQuote = useCallback(async () => {
     try {
       const response = await fetch(`/api/quotes/${params.id}`);
       if (!response.ok) throw new Error("Failed to fetch quote");
@@ -117,7 +113,11 @@ export default function QuoteDetailPage({ params }: any) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.id]);
+
+  useEffect(() => {
+    loadQuote();
+  }, [loadQuote]);
 
   const handleUpdateQuote = async () => {
     if (!quote) return;

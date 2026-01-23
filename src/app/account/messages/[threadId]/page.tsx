@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useCallback, use } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -78,16 +78,7 @@ export default function ConversationPage({
     }
   }, [status, session, router]);
 
-  useEffect(() => {
-    if (
-      status === "authenticated" &&
-      session?.user.principalType === "customer"
-    ) {
-      fetchConversation();
-    }
-  }, [status, session, threadId]);
-
-  const fetchConversation = async () => {
+  const fetchConversation = useCallback(async () => {
     setIsLoading(true);
     setError("");
 
@@ -111,7 +102,16 @@ export default function ConversationPage({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [threadId]);
+
+  useEffect(() => {
+    if (
+      status === "authenticated" &&
+      session?.user.principalType === "customer"
+    ) {
+      fetchConversation();
+    }
+  }, [status, session, fetchConversation]);
 
   const handleMessageSent = () => {
     fetchConversation();

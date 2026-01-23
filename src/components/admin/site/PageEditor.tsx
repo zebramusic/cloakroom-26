@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -35,11 +35,7 @@ export function PageEditor({ pageKey, canWrite, canPublish }: PageEditorProps) {
   const [roBlocks, setRoBlocks] = useState<any[]>([]);
   const [enBlocks, setEnBlocks] = useState<any[]>([]);
 
-  useEffect(() => {
-    fetchPage();
-  }, [pageKey]);
-
-  const fetchPage = async () => {
+  const fetchPage = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/admin/site/pages/${pageKey}?status=draft`);
@@ -68,7 +64,11 @@ export function PageEditor({ pageKey, canWrite, canPublish }: PageEditorProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pageKey]);
+
+  useEffect(() => {
+    fetchPage();
+  }, [fetchPage]);
 
   const handleSave = async () => {
     if (!canWrite) return;

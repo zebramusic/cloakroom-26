@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,13 +29,7 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
     is_published: true,
   });
 
-  useEffect(() => {
-    if (partnerId) {
-      fetchPartner();
-    }
-  }, [partnerId]);
-
-  const fetchPartner = async () => {
+  const fetchPartner = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await fetch(`/api/partners/${partnerId}`);
@@ -48,7 +42,13 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [partnerId]);
+
+  useEffect(() => {
+    if (partnerId) {
+      fetchPartner();
+    }
+  }, [partnerId, fetchPartner]);
 
   const generateSlug = (name: string) => {
     return name

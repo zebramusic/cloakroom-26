@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -65,13 +65,13 @@ export function MagnifierModal({
   const currentImage = images[currentIndex];
   const hasMultiple = images.length > 1;
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
-  };
+  }, [images.length]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
-  };
+  }, [images.length]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -92,7 +92,7 @@ export function MagnifierModal({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, currentIndex]);
+  }, [isOpen, currentIndex, handlePrevious, handleNext, onClose]);
 
   // Prefetch next/prev images
   useEffect(() => {

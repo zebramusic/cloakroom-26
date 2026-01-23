@@ -28,10 +28,12 @@ interface CartStore {
 // Helper functions for localStorage (client-side only)
 const STORAGE_KEY = "cart-storage"
 
+const isBrowser = typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+
 const getStoredItems = (): CartItem[] => {
-  if (typeof window === 'undefined') return []
+  if (!isBrowser) return []
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = window.localStorage.getItem(STORAGE_KEY)
     if (!stored) return []
     const parsed = JSON.parse(stored)
     return parsed.state?.items || []
@@ -41,9 +43,9 @@ const getStoredItems = (): CartItem[] => {
 }
 
 const setStoredItems = (items: CartItem[]) => {
-  if (typeof window === 'undefined') return
+  if (!isBrowser) return
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: { items }, version: 0 }))
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: { items }, version: 0 }))
   } catch {
     // Silently fail if localStorage is not available
   }
