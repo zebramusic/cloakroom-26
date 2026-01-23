@@ -54,7 +54,7 @@ export function ImageUploadDialog({
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
         const formData = new FormData();
-        formData.append("image", file);
+        formData.append("file", file);
         formData.append("altText.ro", altTextRo || file.name);
         formData.append("altText.en", altTextEn || altTextRo || file.name);
         if (captionRo) formData.append("caption.ro", captionRo);
