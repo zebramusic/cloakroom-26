@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { getHeroSettings } from "@/lib/utils/hero-settings";
 import { ContactForm } from "@/components/forms/ContactForm";
