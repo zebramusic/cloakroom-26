@@ -53,28 +53,7 @@ export default function SettingsPage() {
   return (
     <div className="p-6 lg:p-8 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-gray-600 mt-1">
-            Configure your application settings
-          </p>
-        </div>
-        <Button onClick={handleSave}>Save Settings</Button>
-      </div>
-
-      {saved && (
-        <Alert className="bg-green-50 border-green-200">
-          <CheckCircle2 className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800">
-            Settings saved successfully! Note: Most settings require .env.local
-            changes and server restart.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Company Information */}
-      <Car>
+      <div>
         <h1 className="text-3xl font-bold">Technical Settings</h1>
         <p className="text-gray-600 mt-1">
           View technical configuration (environment variables)
@@ -112,10 +91,28 @@ export default function SettingsPage() {
               Go to Company Settings
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
-          </Link value={settings.smtpHost}
-                onChange={(e) =>
-                  setSettings({ ...settings, smtpHost: e.target.value })
-                }
+          </Link>
+        </CardContent>
+      </Card>
+
+      {/* Email Configuration */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Mail className="w-5 h-5" />
+            Email Configuration
+          </CardTitle>
+          <CardDescription>
+            SMTP settings for sending emails. Configured in .env.local
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="smtpHost">SMTP Host</Label>
+              <Input
+                id="smtpHost"
+                value={settings.smtpHost}
                 placeholder="smtp.gmail.com"
                 disabled
               />
@@ -125,9 +122,6 @@ export default function SettingsPage() {
               <Input
                 id="smtpPort"
                 value={settings.smtpPort}
-                onChange={(e) =>
-                  setSettings({ ...settings, smtpPort: e.target.value })
-                }
                 placeholder="587"
                 disabled
               />
@@ -137,9 +131,6 @@ export default function SettingsPage() {
               <Input
                 id="smtpUser"
                 value={settings.smtpUser}
-                onChange={(e) =>
-                  setSettings({ ...settings, smtpUser: e.target.value })
-                }
                 placeholder="your-email@gmail.com"
                 disabled
               />
@@ -150,9 +141,6 @@ export default function SettingsPage() {
                 id="emailAdmin"
                 type="email"
                 value={settings.emailAdmin}
-                onChange={(e) =>
-                  setSettings({ ...settings, emailAdmin: e.target.value })
-                }
                 placeholder="admin@company.com"
                 disabled
               />
@@ -165,9 +153,6 @@ export default function SettingsPage() {
             </div>
             <Switch
               checked={settings.smtpSecure}
-              onCheckedChange={(checked: boolean) =>
-                setSettings({ ...settings, smtpSecure: checked })
-              }
               disabled
             />
           </div>
@@ -199,12 +184,6 @@ export default function SettingsPage() {
               <Input
                 id="stripeKey"
                 value={settings.stripePublishableKey}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    stripePublishableKey: e.target.value,
-                  })
-                }
                 placeholder="pk_test_..."
                 disabled
               />
@@ -222,57 +201,17 @@ export default function SettingsPage() {
               <Input
                 id="vatRate"
                 value={settings.vatRate}
-                onChange={(e) =>
-                  setSettings({ ...settings, vatRate: e.target.value })
-                }
                 placeholder="19"
               />
             </div>
           </div>
 
-          <Separator />
-
-          <div>
-            <h4 className="font-semibold mb-3">Bank Transfer Details</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="bankName">Bank Name</Label>
-                <Input
-                  id="bankName"
-                  value={settings.bankName}
-                  onChange={(e) =>
-                    setSettings({ ...settings, bankName: e.target.value })
-                  }
-                  placeholder="Bank Name"
-                  disabled
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bankIBAN">IBAN</Label>
-                <Input
-                  id="bankIBAN"
-                  value={settings.bankIBAN}
-                  onChange={(e) =>
-                    setSettings({ ...settings, bankIBAN: e.target.value })
-                  }
-                  placeholder="RO00 BANK 0000 0000 0000 0000"
-                  disabled
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bankSwift">SWIFT/BIC</Label>
-                <Input
-                  id="bankSwift"
-                  value={settings.bankSwift}
-                  onChange={(e) =>
-                    setSettings({ ...settings, bankSwift: e.target.value })
-                  }
-                  placeholder="BANKROBU"
-                  disabled
-                />
-              </div>
-            </div>
-          </div>
+          <Alert>
+            <AlertDescription className="text-sm">
+              Stripe keys are configured via NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY.
+              Bank transfer details are managed in Company Settings.
+            </AlertDescription>
+          </Alert>
         </CardContent>
       </Card>
 
@@ -303,12 +242,49 @@ export default function SettingsPage() {
             />
           </div>
           <Separator />
-          <Alert>
-            <AlertDescription className="text-sm">
-              Stripe keys are configured via NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY.
-              Bank transfer details are managed in Company Settings.
-            </AlertDescription>
-          </Alerteader>
+          <div className="flex items-center justify-between py-2">
+            <div className="space-y-0.5">
+              <Label>New Quote Requests</Label>
+              <p className="text-sm text-gray-500">
+                Get notified when a customer requests a quote
+              </p>
+            </div>
+            <Switch
+              checked={settings.emailOnNewQuote}
+              onCheckedChange={(checked: boolean) =>
+                setSettings({ ...settings, emailOnNewQuote: checked })
+              }
+            />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between py-2">
+            <div className="space-y-0.5">
+              <Label>New Support Messages</Label>
+              <p className="text-sm text-gray-500">
+                Get notified when customers send support messages
+              </p>
+            </div>
+            <Switch
+              checked={settings.emailOnNewMessage}
+              onCheckedChange={(checked: boolean) =>
+                setSettings({ ...settings, emailOnNewMessage: checked })
+              }
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Security Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="w-5 h-5" />
+            Security Settings
+          </CardTitle>
+          <CardDescription>
+            Configure security and authentication options
+          </CardDescription>
+        </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -358,16 +334,6 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
-
-      <Alert>
-        <AlertDescription>
-          <strong>Important:</strong> Most settings (email, payment, bank
-          details) are configured via environment variables in{" "}
-          <code className="bg-gray-100 px-1 py-0.5 rounded">.env.local</code>.
-          Changes here are for reference only. Update the .env.local file and
-          restart the server to apply changes.
-        </AlertDescription>
-      </Alert>
     </div>
   );
 }
