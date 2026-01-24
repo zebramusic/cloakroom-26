@@ -6,6 +6,10 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import { CartStoreHydration } from "@/components/shared/CartStoreHydration";
 import { getCompanySettings } from "@/lib/utils/company-settings";
 
+// Force dynamic rendering to prevent stale cached data
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function LocaleLayout({
   children,
   params,

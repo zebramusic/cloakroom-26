@@ -18,6 +18,8 @@ export async function GET(request: NextRequest) {
 
     const settings = await CompanySettings.findOne({ key: 'main' }).lean();
 
+    console.log('[CompanySettings] GET - Found settings:', settings ? 'Yes' : 'No', settings?._id);
+
     return NextResponse.json({ settings });
   } catch (error: any) {
     console.error('GET /api/admin/site/company-settings error:', error);
@@ -40,6 +42,8 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const { localeData, socialNetworks, legalInfo, logo } = body;
 
+    console.log('[CompanySettings] Saving settings:', { localeData, socialNetworks, legalInfo });
+
     await connectDB();
 
     // Upsert (update or create)
@@ -59,6 +63,8 @@ export async function PATCH(request: NextRequest) {
         runValidators: true 
       }
     );
+
+    console.log('[CompanySettings] Settings saved successfully:', settings._id);
 
     // Revalidate cache
     revalidateTag('company-settings');

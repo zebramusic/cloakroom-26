@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +49,7 @@ interface CompanySettings {
 }
 
 export default function CompanySettingsEditor() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<CompanySettings>({
@@ -96,12 +98,13 @@ export default function CompanySettingsEditor() {
     try {
       const res = await fetch("/api/admin/site/company-settings");
       const data = await res.json();
+      console.log('[CompanySettingsEditor] Fetched settings:', data);
       
       if (data.settings) {
         setSettings(data.settings);
       }
     } catch (error) {
-      console.error("Failed to fetch settings:", error);
+      console.error("[CompanySettingsEditor] Failed to fetch settings:", error);
     } finally {
       setLoading(false);
     }
@@ -118,8 +121,11 @@ export default function CompanySettingsEditor() {
 
       if (res.ok) {
         alert("Settings saved successfully!");
+        // Refresh the router to clear any client-side cache
+        router.refresh();
       } else {
-        alert("Failed to save settings");
+        const data = await res.json();
+        alert(`Failed to save settings: ${data.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Save error:", error);

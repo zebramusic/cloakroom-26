@@ -12,7 +12,7 @@ export async function getCompanySettings(locale: 'ro' | 'en') {
     ['company-settings'],
     {
       tags: ['company-settings'],
-      revalidate: 3600, // 1 hour
+      revalidate: 60, // 1 minute for faster updates
     }
   );
 
