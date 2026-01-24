@@ -110,7 +110,7 @@ export function Header({ locale, transparent = false }: HeaderProps) {
               {item.label}
             </Link>
           ))}
-          
+
           {/* About Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 transition-colors hover:text-primary focus:outline-none">
@@ -132,7 +132,11 @@ export function Header({ locale, transparent = false }: HeaderProps) {
             <Link
               key={item.href}
               href={item.href}
-              title={item.href.includes('/intrebari') && locale === 'ro' ? 'Răspunsuri la Întrebări Frecvente' : undefined}
+              title={
+                item.href.includes("/intrebari") && locale === "ro"
+                  ? "Răspunsuri la Întrebări Frecvente"
+                  : undefined
+              }
               className="transition-colors hover:text-primary"
             >
               {item.label}
@@ -203,7 +207,7 @@ export function Header({ locale, transparent = false }: HeaderProps) {
                     {item.label}
                   </Link>
                 ))}
-                
+
                 {/* About Section */}
                 <div className="space-y-2">
                   <div className="text-lg font-semibold text-muted-foreground">
@@ -226,7 +230,11 @@ export function Header({ locale, transparent = false }: HeaderProps) {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    title={item.href.includes('/intrebari') && locale === 'ro' ? 'Răspunsuri la Întrebări Frecvente' : undefined}
+                    title={
+                      item.href.includes("/intrebari") && locale === "ro"
+                        ? "Răspunsuri la Întrebări Frecvente"
+                        : undefined
+                    }
                     className="text-lg font-medium transition-colors hover:text-primary"
                   >
                     {item.label}
@@ -238,7 +246,10 @@ export function Header({ locale, transparent = false }: HeaderProps) {
                     {locale === "ro" ? "Contul Meu" : "My Account"}
                   </Button>
                 </Link>
-                <Link href={`/${locale}/cere-oferta`} onClick={() => setMobileMenuOpen(false)}>
+                <Link
+                  href={`/${locale}/cere-oferta`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   <Button className="w-full">
                     {locale === "ro" ? "Cere Ofertă" : "Request Quote"}
                   </Button>

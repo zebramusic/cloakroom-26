@@ -90,10 +90,13 @@ export default async function PortfolioDetailPage({
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   <span>
-                    {new Date(serializedItem.eventMeta.startsAt).toLocaleDateString(
-                      locale === "ro" ? "ro-RO" : "en-US",
-                      { year: "numeric", month: "long", day: "numeric" },
-                    )}
+                    {new Date(
+                      serializedItem.eventMeta.startsAt,
+                    ).toLocaleDateString(locale === "ro" ? "ro-RO" : "en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </span>
                 </div>
               )}

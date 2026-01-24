@@ -18,24 +18,32 @@ export default async function ContactPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const heroSettings = await getHeroSettings('contact', locale as 'ro' | 'en');
-  const companySettings = await getCompanySettings(locale as 'ro' | 'en');
+  const heroSettings = await getHeroSettings("contact", locale as "ro" | "en");
+  const companySettings = await getCompanySettings(locale as "ro" | "en");
 
   // Fallback values
   const email = companySettings?.email || "contact@garderobapro.ro";
   const phone = companySettings?.phone || "+40 123 456 789";
   const address = companySettings?.address || "Cluj-Napoca, România";
-  const businessHours = companySettings?.businessHours || (locale === "ro" ? "Luni - Vineri, 9:00 - 18:00" : "Monday - Friday, 9:00 - 18:00");
+  const businessHours =
+    companySettings?.businessHours ||
+    (locale === "ro"
+      ? "Luni - Vineri, 9:00 - 18:00"
+      : "Monday - Friday, 9:00 - 18:00");
 
   return (
     <>
       <Hero
-        title={heroSettings?.title || (locale === "ro" ? "Contactează-ne" : "Contact Us")}
-        subtitle={heroSettings?.subtitle || (
-          locale === "ro"
+        title={
+          heroSettings?.title ||
+          (locale === "ro" ? "Contactează-ne" : "Contact Us")
+        }
+        subtitle={
+          heroSettings?.subtitle ||
+          (locale === "ro"
             ? "Suntem aici să răspundem la toate întrebările tale"
-            : "We're here to answer all your questions"
-        )}
+            : "We're here to answer all your questions")
+        }
         primaryCTA={heroSettings?.primaryCTA}
         secondaryCTA={heroSettings?.secondaryCTA}
         backgroundImage={heroSettings?.backgroundImage}
@@ -88,15 +96,13 @@ export default async function ContactPage({
                       <CardTitle>
                         {locale === "ro" ? "Telefon" : "Phone"}
                       </CardTitle>
-                      <CardDescription>
-                        {businessHours}
-                      </CardDescription>
+                      <CardDescription>{businessHours}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <a
-                    href={`tel:${phone.replace(/\s/g, '')}`}
+                    href={`tel:${phone.replace(/\s/g, "")}`}
                     className="text-lg font-medium text-primary hover:underline"
                   >
                     {phone}

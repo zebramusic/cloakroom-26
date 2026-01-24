@@ -17,7 +17,7 @@ export default async function PortfolioPage({
   let items = [];
   try {
     await connectDB();
-    
+
     const portfolioItems = await PortfolioItem.find({ isPublished: true })
       .sort({ isFeatured: -1, orderIndex: 1, publishedAt: -1 })
       .limit(100)
@@ -34,9 +34,9 @@ export default async function PortfolioPage({
 
         if (item.coverImageId) {
           const coverImage = await PortfolioImage.findById(item.coverImageId)
-            .select('variants altText')
+            .select("variants altText")
             .lean();
-          
+
           if (coverImage) {
             serializedItem.coverImage = {
               ...coverImage,
@@ -45,7 +45,7 @@ export default async function PortfolioPage({
           }
         }
         return serializedItem;
-      })
+      }),
     );
   } catch (error) {
     console.error("Error fetching portfolio items:", error);

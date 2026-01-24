@@ -138,7 +138,7 @@ export function MagnifierModal({
                 </div>
               )}
             </div>
-            <Link href={`/${locale}/portfolio/${itemSlug}`} target="_blank">
+            <Link href={`/${locale}/portfolio/${itemSlug}`}>
               <Button variant="ghost" size="sm">
                 <ExternalLink className="h-4 w-4 mr-2" />
                 {locale === "ro" ? "Vezi detalii" : "View details"}

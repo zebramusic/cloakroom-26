@@ -66,7 +66,8 @@ export default function SettingsPage() {
         <AlertDescription className="text-blue-800">
           These settings are configured via environment variables in{" "}
           <code className="bg-blue-100 px-1 py-0.5 rounded">.env.local</code>.
-          This page is read-only for reference. Update .env.local and restart the server to apply changes.
+          This page is read-only for reference. Update .env.local and restart
+          the server to apply changes.
         </AlertDescription>
       </Alert>
 
@@ -78,13 +79,15 @@ export default function SettingsPage() {
             Company Information
           </CardTitle>
           <CardDescription>
-            Manage company details, contact info, social networks, and legal information
+            Manage company details, contact info, social networks, and legal
+            information
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-gray-600 mb-4">
-            Company information is now managed through the new Company Settings system, 
-            which serves as the single source of truth for all company data displayed throughout the website.
+            Company information is now managed through the new Company Settings
+            system, which serves as the single source of truth for all company
+            data displayed throughout the website.
           </p>
           <Link href="/admin/site/company-settings">
             <Button className="group">
@@ -151,10 +154,7 @@ export default function SettingsPage() {
               <Label>Use TLS/SSL</Label>
               <p className="text-sm text-gray-500">Secure SMTP connection</p>
             </div>
-            <Switch
-              checked={settings.smtpSecure}
-              disabled
-            />
+            <Switch checked={settings.smtpSecure} disabled />
           </div>
           <Alert>
             <AlertDescription className="text-sm">
@@ -198,18 +198,15 @@ export default function SettingsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="vatRate">VAT Rate (%)</Label>
-              <Input
-                id="vatRate"
-                value={settings.vatRate}
-                placeholder="19"
-              />
+              <Input id="vatRate" value={settings.vatRate} placeholder="19" />
             </div>
           </div>
 
           <Alert>
             <AlertDescription className="text-sm">
-              Stripe keys are configured via NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY.
-              Bank transfer details are managed in Company Settings.
+              Stripe keys are configured via NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+              and STRIPE_SECRET_KEY. Bank transfer details are managed in
+              Company Settings.
             </AlertDescription>
           </Alert>
         </CardContent>
