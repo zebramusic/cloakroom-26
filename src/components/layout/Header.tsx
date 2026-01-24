@@ -132,6 +132,7 @@ export function Header({ locale, transparent = false }: HeaderProps) {
             <Link
               key={item.href}
               href={item.href}
+              title={item.href.includes('/intrebari') && locale === 'ro' ? 'Răspunsuri la Întrebări Frecvente' : undefined}
               className="transition-colors hover:text-primary"
             >
               {item.label}
@@ -225,6 +226,7 @@ export function Header({ locale, transparent = false }: HeaderProps) {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
+                    title={item.href.includes('/intrebari') && locale === 'ro' ? 'Răspunsuri la Întrebări Frecvente' : undefined}
                     className="text-lg font-medium transition-colors hover:text-primary"
                   >
                     {item.label}

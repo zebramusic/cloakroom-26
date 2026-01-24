@@ -323,3 +323,4 @@ const product = await Product.findByIdAndUpdate(
 
 - Any request in copilot chat must strictly follow these instructions and the architectural patterns described above and must be written in a file with the full documentation.
 - Any request must generate a TODO list and questions to clarify requirements before proceeding to code generation.
+- Ask me if I am satisfied with the outcome and then commit the changes to git.
