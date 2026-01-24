@@ -131,9 +131,6 @@ export async function POST(request: NextRequest) {
       storageKey = `${folder}/${filename}`;
     }
 
-      storageKey = `${folder}/${filename}`;
-    }
-
     // Create database record
     const asset = await MediaAsset.create({
       url: assetUrl,
