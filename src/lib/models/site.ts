@@ -478,7 +478,5 @@ const HeroSettingsSchema = new Schema<IHeroSettings>({
   updatedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
 
-HeroSettingsSchema.index({ pageKey: 1 });
-
 export const HeroSettings: Model<IHeroSettings> = 
   mongoose.models.HeroSettings || mongoose.model<IHeroSettings>('HeroSettings', HeroSettingsSchema);

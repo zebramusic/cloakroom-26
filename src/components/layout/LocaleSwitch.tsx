@@ -1,8 +1,8 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Globe } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useTransition } from "react";
 
 interface LocaleSwitchProps {
   currentLocale: string;
@@ -14,32 +14,33 @@ export function LocaleSwitch({
   variant = "dropdown",
 }: LocaleSwitchProps) {
   const pathname = usePathname();
-  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
-  const handleSwitch = () => {
-    let newPath: string;
-
-    if (currentLocale === "ro") {
-      newPath = pathname === "/" ? "/en" : `/en${pathname}`;
-    } else {
-      if (pathname === "/en") {
-        newPath = "/";
-      } else if (pathname.startsWith("/en/")) {
-        newPath = pathname.substring(3);
+  const handleSwitch = (newLocale: string) => {
+    startTransition(() => {
+      // Build the new path
+      let newPath: string;
+      
+      if (newLocale === "en") {
+        // Switch to English: add /en prefix if not already there
+        newPath = pathname.startsWith('/en') ? pathname : `/en${pathname}`;
       } else {
-        newPath = pathname;
+        // Switch to Romanian: remove /en prefix if present
+        newPath = pathname.startsWith('/en') 
+          ? pathname.substring(3) || '/'
+          : pathname;
       }
-    }
-
-    window.location.href = newPath;
+      
+      window.location.href = newPath;
+    });
   };
 
   if (variant === "toggle") {
     return (
       <div className="flex items-center rounded-lg border">
         <button
-          onClick={() => currentLocale !== "ro" && handleSwitch()}
-          disabled={currentLocale === "ro"}
+          onClick={() => handleSwitch("ro")}
+          disabled={currentLocale === "ro" || isPending}
           className={`px-3 py-1.5 text-sm font-medium transition-colors ${
             currentLocale === "ro"
               ? "bg-primary text-primary-foreground"
@@ -49,8 +50,8 @@ export function LocaleSwitch({
           RO
         </button>
         <button
-          onClick={() => currentLocale !== "en" && handleSwitch()}
-          disabled={currentLocale === "en"}
+          onClick={() => handleSwitch("en")}
+          disabled={currentLocale === "en" || isPending}
           className={`px-3 py-1.5 text-sm font-medium transition-colors ${
             currentLocale === "en"
               ? "bg-primary text-primary-foreground"
@@ -65,7 +66,8 @@ export function LocaleSwitch({
 
   return (
     <button
-      onClick={handleSwitch}
+      onClick={() => handleSwitch(currentLocale === "ro" ? "en" : "ro")}
+      disabled={isPending}
       className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground h-9 w-9"
       title={currentLocale === "ro" ? "Switch to English" : "Schimbă în Română"}
     >

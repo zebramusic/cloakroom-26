@@ -100,7 +100,7 @@ export default async function HomePage({
           href: `/${locale}/shop`,
         }}
         variant="home"
-        backgroundImage={heroSettings?.backgroundImage || "/images/hero-cloakroom.jpg"}
+        backgroundImage={heroSettings?.backgroundImage}
       />
 
       {/* Features Section */}

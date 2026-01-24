@@ -1,5 +1,6 @@
 import createMiddleware from 'next-intl/middleware';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 
@@ -13,22 +14,25 @@ const intlMiddleware = createMiddleware({
 const { auth } = NextAuth(authConfig);
 
 export default auth((request) => {
-  // Skip i18n for admin, api, and account routes
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
-  const isApiRoute = request.nextUrl.pathname.startsWith('/api');
-  const isAccountRoute = request.nextUrl.pathname.startsWith('/account');
+  const pathname = request.nextUrl.pathname;
   
-  // Handle i18n for public routes only
-  if (!isAdminRoute && !isApiRoute && !isAccountRoute) {
-    return intlMiddleware(request);
+  // Skip middleware for admin, api, account routes, and static assets
+  if (
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/account') ||
+    pathname.startsWith('/_next') ||
+    pathname.includes('/_next/') ||
+    pathname.includes('/favicon')
+  ) {
+    return NextResponse.next();
   }
   
-  return NextResponse.next();
+  // Apply i18n middleware for public routes
+  return intlMiddleware(request);
 });
 
 export const config = {
-  // Exclude: API routes, Next.js internals, static files
-  // Include: All other routes including /admin and /account for auth checks
   matcher: [
     '/((?!api/auth|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)',
   ]

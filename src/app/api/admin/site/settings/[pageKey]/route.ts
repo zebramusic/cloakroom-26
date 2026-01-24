@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { hasPermission } from '@/lib/auth/permissions';
 import connectDB from '@/lib/mongodb';
 import { HeroSettings } from '@/lib/models/site';
+import { revalidateTag } from 'next/cache';
 
 // GET - Fetch single page hero settings
 export async function GET(
@@ -64,7 +65,11 @@ export async function PATCH(
         runValidators: true 
       }
     );
+// Revalidate the cache for this page's hero settings
+    revalidateTag('hero-settings');
+    revalidateTag(`hero-settings-${pageKey}`);
 
+    
     return NextResponse.json({ settings });
   } catch (error: any) {
     console.error('PATCH /api/admin/site/settings/[pageKey] error:', error);
