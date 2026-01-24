@@ -319,8 +319,7 @@ const product = await Product.findByIdAndUpdate(
 - All API routes updated to use Mongoose instead of Supabase client
 - Docker compose updated to include MongoDB container
 
-## Any request in copilot chat must strictly follow these instructions and the architectural patterns described above and must be written down here to complete this file.
-- Any request in copilot chat must strictly follow these instructions and the architectural patterns described above and must be written down here to complete this file.
+## Rules for code generation:
 
-## Any request must generate a TODO list and questions to clarify requirements before proceeding to code generation.
-  - Any request must generate a TODO list and questions to clarify requirements before proceeding to code generation.
+- Any request in copilot chat must strictly follow these instructions and the architectural patterns described above and must be written in a file with the full documentation.
+- Any request must generate a TODO list and questions to clarify requirements before proceeding to code generation.
