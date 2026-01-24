@@ -33,15 +33,28 @@ export default async function PortfolioDetailPage({
     notFound();
   }
 
+  // Serialize item for client components
+  const serializedItem: any = {
+    ...item,
+    _id: (item as any)._id.toString(),
+  };
+
   // Get all images for this item
-  const images = await PortfolioImage.find({ portfolioItemId: item._id })
+  const imagesRaw = await PortfolioImage.find({ portfolioItemId: item._id })
     .sort({ orderIndex: 1 })
     .lean();
 
+  // Serialize images for client components
+  const images = imagesRaw.map((img: any) => ({
+    ...img,
+    _id: img._id.toString(),
+    portfolioItemId: img.portfolioItemId.toString(),
+  }));
+
   const content =
-    locale === "en" && item.localeContent.en.title
-      ? item.localeContent.en
-      : item.localeContent.ro;
+    locale === "en" && serializedItem.localeContent.en.title
+      ? serializedItem.localeContent.en
+      : serializedItem.localeContent.ro;
 
   return (
     <div className="min-h-screen">
@@ -67,17 +80,17 @@ export default async function PortfolioDetailPage({
             </h1>
 
             <div className="flex flex-wrap gap-4 text-muted-foreground mb-6">
-              {item.eventMeta?.location && (
+              {serializedItem.eventMeta?.location && (
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  <span>{item.eventMeta.location}</span>
+                  <span>{serializedItem.eventMeta.location}</span>
                 </div>
               )}
-              {item.eventMeta?.startsAt && (
+              {serializedItem.eventMeta?.startsAt && (
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   <span>
-                    {new Date(item.eventMeta.startsAt).toLocaleDateString(
+                    {new Date(serializedItem.eventMeta.startsAt).toLocaleDateString(
                       locale === "ro" ? "ro-RO" : "en-US",
                       { year: "numeric", month: "long", day: "numeric" },
                     )}
@@ -89,7 +102,7 @@ export default async function PortfolioDetailPage({
             {item.tags && item.tags.length > 0 && (
               <div className="flex items-center gap-2 flex-wrap">
                 <Tag className="h-4 w-4 text-muted-foreground" />
-                {item.tags.map((tag: string) => (
+                {serializedItem.tags.map((tag: string) => (
                   <span
                     key={tag}
                     className="inline-block px-3 py-1 text-sm bg-secondary rounded-full"
@@ -143,7 +156,7 @@ export default async function PortfolioDetailPage({
                 images={images}
                 itemTitle={content.title}
                 itemSlug={slug}
-                itemMeta={item.eventMeta}
+                itemMeta={serializedItem.eventMeta}
                 locale={locale}
               />
             </div>
@@ -161,19 +174,23 @@ export async function generateMetadata({
 }) {
   const { locale, slug } = await params;
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/portfolio/${slug}`,
-    { cache: "no-store" },
-  );
+  // Query database directly instead of HTTP fetch
+  const connectDB = (await import("@/lib/mongodb")).default;
+  const { PortfolioItem } = await import("@/lib/models");
 
-  if (!res.ok) {
+  await connectDB();
+
+  const item = await PortfolioItem.findOne({
+    slug,
+    isPublished: true,
+  }).lean();
+
+  if (!item) {
     return {
       title: "Not Found",
     };
   }
 
-  const data = await res.json();
-  const item = data.item;
   const content =
     locale === "en" && item.localeContent.en.title
       ? item.localeContent.en
