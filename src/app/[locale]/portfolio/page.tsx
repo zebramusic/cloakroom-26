@@ -12,15 +12,29 @@ export default async function PortfolioPage({
   const t = await getTranslations("portfolio");
 
   // Fetch portfolio items
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/portfolio?limit=100`,
-    {
-      cache: "no-store",
-    },
-  );
+  let items = [];
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL 
+      || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
+      || "http://localhost:3000";
+    
+    const res = await fetch(
+      `${baseUrl}/api/portfolio?limit=100`,
+      {
+        cache: "no-store",
+      },
+    );
 
-  const data = await res.json();
-  const items = data.items || [];
+    if (!res.ok) {
+      throw new Error(`Failed to fetch portfolio: ${res.status}`);
+    }
+
+    const data = await res.json();
+    items = data.items || [];
+  } catch (error) {
+    console.error("Error fetching portfolio items:", error);
+    // Continue with empty items array
+  }
 
   return (
     <div className="min-h-screen">
