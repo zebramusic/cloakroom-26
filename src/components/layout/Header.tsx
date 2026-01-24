@@ -34,6 +34,7 @@ export function Header({ locale, transparent = false }: HeaderProps) {
   const { data: session } = useSession();
   const [showAdminLink, setShowAdminLink] = useState(false);
   const [keySequence, setKeySequence] = useState<string[]>([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Show admin link if user has admin role
   const isAdmin =
@@ -179,7 +180,7 @@ export function Header({ locale, transparent = false }: HeaderProps) {
           </Link>
 
           {/* Mobile Menu */}
-          <Sheet>
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
@@ -195,6 +196,7 @@ export function Header({ locale, transparent = false }: HeaderProps) {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
                     className="text-lg font-medium transition-colors hover:text-primary"
                   >
                     {item.label}
@@ -210,6 +212,7 @@ export function Header({ locale, transparent = false }: HeaderProps) {
                     <Link
                       key={item.href}
                       href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
                       className="block pl-4 text-base font-medium transition-colors hover:text-primary"
                     >
                       {item.label}
@@ -221,18 +224,19 @@ export function Header({ locale, transparent = false }: HeaderProps) {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
                     className="text-lg font-medium transition-colors hover:text-primary"
                   >
                     {item.label}
                   </Link>
                 ))}
                 <hr className="my-4" />
-                <Link href="/account">
+                <Link href="/account" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="outline" className="w-full mb-2">
                     {locale === "ro" ? "Contul Meu" : "My Account"}
                   </Button>
                 </Link>
-                <Link href={`/${locale}/cere-oferta`}>
+                <Link href={`/${locale}/cere-oferta`} onClick={() => setMobileMenuOpen(false)}>
                   <Button className="w-full">
                     {locale === "ro" ? "Cere Ofertă" : "Request Quote"}
                   </Button>
