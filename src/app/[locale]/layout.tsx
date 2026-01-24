@@ -7,7 +7,7 @@ import { CartStoreHydration } from "@/components/shared/CartStoreHydration";
 import { getCompanySettings } from "@/lib/utils/company-settings";
 
 // Force dynamic rendering to prevent stale cached data
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function LocaleLayout({
@@ -19,7 +19,7 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
   const messages = await getMessages();
-  const companySettings = await getCompanySettings(locale as 'ro' | 'en');
+  const companySettings = await getCompanySettings(locale as "ro" | "en");
 
   return (
     <AuthProvider>

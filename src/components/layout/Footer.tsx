@@ -42,12 +42,14 @@ export function Footer({ locale, companySettings }: FooterProps) {
 
   // Fallback values if no settings
   const companyName = companySettings?.companyName || "Garderobă Pro";
-  const description = companySettings?.description || (locale === "ro"
-    ? "Soluții profesionale de garderobă pentru evenimente de orice dimensiune."
-    : "Professional cloakroom solutions for events of any size.");
+  const description =
+    companySettings?.description ||
+    (locale === "ro"
+      ? "Soluții profesionale de garderobă pentru evenimente de orice dimensiune."
+      : "Professional cloakroom solutions for events of any size.");
 
   const socialNetworks = companySettings?.socialNetworks || {};
-  const hasSocialNetworks = Object.values(socialNetworks).some(url => !!url);
+  const hasSocialNetworks = Object.values(socialNetworks).some((url) => !!url);
 
   return (
     <footer className="border-t bg-background">
@@ -63,9 +65,7 @@ export function Footer({ locale, companySettings }: FooterProps) {
               </div>
               <span className="font-bold">{companyName}</span>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {description}
-            </p>
+            <p className="text-sm text-muted-foreground">{description}</p>
             {hasSocialNetworks && (
               <div className="flex space-x-4">
                 {socialNetworks.facebook && (

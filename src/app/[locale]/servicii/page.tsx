@@ -21,21 +21,23 @@ export default async function ServicesPage({
 
   unstable_setRequestLocale(locale);
 
-  const heroSettings = await getHeroSettings('services', locale as 'ro' | 'en');
+  const heroSettings = await getHeroSettings("services", locale as "ro" | "en");
 
   return (
     <>
       <Hero
-        title={heroSettings?.title || (
-          locale === "ro"
+        title={
+          heroSettings?.title ||
+          (locale === "ro"
             ? "Servicii Complete pentru Evenimente"
-            : "Complete Event Services"
-        )}
-        subtitle={heroSettings?.subtitle || (
-          locale === "ro"
+            : "Complete Event Services")
+        }
+        subtitle={
+          heroSettings?.subtitle ||
+          (locale === "ro"
             ? "De la garderobă cu personal la infrastructură completă. Personalizăm soluția pentru evenimentul tău."
-            : "From staffed cloakroom to complete infrastructure. We customize the solution for your event."
-        )}
+            : "From staffed cloakroom to complete infrastructure. We customize the solution for your event.")
+        }
         primaryCTA={heroSettings?.primaryCTA}
         secondaryCTA={heroSettings?.secondaryCTA}
         backgroundImage={heroSettings?.backgroundImage}

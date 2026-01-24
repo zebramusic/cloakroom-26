@@ -66,7 +66,7 @@ export default async function HomePage({
   const t = await getTranslations("home");
 
   // Check for custom hero settings
-  const heroSettings = await getHeroSettings('home', locale as 'ro' | 'en');
+  const heroSettings = await getHeroSettings("home", locale as "ro" | "en");
 
   const features = [
     {
@@ -91,14 +91,18 @@ export default async function HomePage({
       <Hero
         title={heroSettings?.title || t("hero.title")}
         subtitle={heroSettings?.subtitle || t("hero.subtitle")}
-        primaryCTA={heroSettings?.primaryCTA || {
-          label: t("hero.cta"),
-          href: `/${locale}/cere-oferta`,
-        }}
-        secondaryCTA={heroSettings?.secondaryCTA || {
-          label: t("hero.ctaSecondary"),
-          href: `/${locale}/shop`,
-        }}
+        primaryCTA={
+          heroSettings?.primaryCTA || {
+            label: t("hero.cta"),
+            href: `/${locale}/cere-oferta`,
+          }
+        }
+        secondaryCTA={
+          heroSettings?.secondaryCTA || {
+            label: t("hero.ctaSecondary"),
+            href: `/${locale}/shop`,
+          }
+        }
         variant="home"
         backgroundImage={heroSettings?.backgroundImage}
       />

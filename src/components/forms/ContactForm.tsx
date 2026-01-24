@@ -18,10 +18,10 @@ export function ContactForm({ locale }: { locale: string }) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // TODO: Implement form submission
     console.log("Form submitted");
-    
+
     setTimeout(() => {
       setIsSubmitting(false);
     }, 1000);
@@ -74,7 +74,9 @@ export function ContactForm({ locale }: { locale: string }) {
               id="phone"
               name="phone"
               type="tel"
-              placeholder={locale === "ro" ? "+40 xxx xxx xxx" : "+40 xxx xxx xxx"}
+              placeholder={
+                locale === "ro" ? "+40 xxx xxx xxx" : "+40 xxx xxx xxx"
+              }
             />
           </div>
 

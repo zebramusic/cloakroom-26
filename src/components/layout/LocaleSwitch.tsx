@@ -20,17 +20,17 @@ export function LocaleSwitch({
     startTransition(() => {
       // Build the new path
       let newPath: string;
-      
+
       if (newLocale === "en") {
         // Switch to English: add /en prefix if not already there
-        newPath = pathname.startsWith('/en') ? pathname : `/en${pathname}`;
+        newPath = pathname.startsWith("/en") ? pathname : `/en${pathname}`;
       } else {
         // Switch to Romanian: remove /en prefix if present
-        newPath = pathname.startsWith('/en') 
-          ? pathname.substring(3) || '/'
+        newPath = pathname.startsWith("/en")
+          ? pathname.substring(3) || "/"
           : pathname;
       }
-      
+
       window.location.href = newPath;
     });
   };

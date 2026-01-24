@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Building2, Globe, Share2, FileText, Loader2 } from "lucide-react";
 
@@ -98,8 +104,8 @@ export default function CompanySettingsEditor() {
     try {
       const res = await fetch("/api/admin/site/company-settings");
       const data = await res.json();
-      console.log('[CompanySettingsEditor] Fetched settings:', data);
-      
+      console.log("[CompanySettingsEditor] Fetched settings:", data);
+
       if (data.settings) {
         setSettings(data.settings);
       }
@@ -125,7 +131,7 @@ export default function CompanySettingsEditor() {
         router.refresh();
       } else {
         const data = await res.json();
-        alert(`Failed to save settings: ${data.error || 'Unknown error'}`);
+        alert(`Failed to save settings: ${data.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Save error:", error);
@@ -179,7 +185,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        ro: { ...settings.localeData.ro, companyName: e.target.value },
+                        ro: {
+                          ...settings.localeData.ro,
+                          companyName: e.target.value,
+                        },
                       },
                     })
                   }
@@ -196,7 +205,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        ro: { ...settings.localeData.ro, tagline: e.target.value },
+                        ro: {
+                          ...settings.localeData.ro,
+                          tagline: e.target.value,
+                        },
                       },
                     })
                   }
@@ -213,7 +225,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        ro: { ...settings.localeData.ro, description: e.target.value },
+                        ro: {
+                          ...settings.localeData.ro,
+                          description: e.target.value,
+                        },
                       },
                     })
                   }
@@ -231,7 +246,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        ro: { ...settings.localeData.ro, address: e.target.value },
+                        ro: {
+                          ...settings.localeData.ro,
+                          address: e.target.value,
+                        },
                       },
                     })
                   }
@@ -248,7 +266,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        ro: { ...settings.localeData.ro, phone: e.target.value },
+                        ro: {
+                          ...settings.localeData.ro,
+                          phone: e.target.value,
+                        },
                       },
                     })
                   }
@@ -266,7 +287,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        ro: { ...settings.localeData.ro, email: e.target.value },
+                        ro: {
+                          ...settings.localeData.ro,
+                          email: e.target.value,
+                        },
                       },
                     })
                   }
@@ -283,7 +307,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        ro: { ...settings.localeData.ro, businessHours: e.target.value },
+                        ro: {
+                          ...settings.localeData.ro,
+                          businessHours: e.target.value,
+                        },
                       },
                     })
                   }
@@ -316,7 +343,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        en: { ...settings.localeData.en, companyName: e.target.value },
+                        en: {
+                          ...settings.localeData.en,
+                          companyName: e.target.value,
+                        },
                       },
                     })
                   }
@@ -333,7 +363,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        en: { ...settings.localeData.en, tagline: e.target.value },
+                        en: {
+                          ...settings.localeData.en,
+                          tagline: e.target.value,
+                        },
                       },
                     })
                   }
@@ -350,7 +383,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        en: { ...settings.localeData.en, description: e.target.value },
+                        en: {
+                          ...settings.localeData.en,
+                          description: e.target.value,
+                        },
                       },
                     })
                   }
@@ -368,7 +404,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        en: { ...settings.localeData.en, address: e.target.value },
+                        en: {
+                          ...settings.localeData.en,
+                          address: e.target.value,
+                        },
                       },
                     })
                   }
@@ -385,7 +424,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        en: { ...settings.localeData.en, phone: e.target.value },
+                        en: {
+                          ...settings.localeData.en,
+                          phone: e.target.value,
+                        },
                       },
                     })
                   }
@@ -403,7 +445,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        en: { ...settings.localeData.en, email: e.target.value },
+                        en: {
+                          ...settings.localeData.en,
+                          email: e.target.value,
+                        },
                       },
                     })
                   }
@@ -420,7 +465,10 @@ export default function CompanySettingsEditor() {
                       ...settings,
                       localeData: {
                         ...settings.localeData,
-                        en: { ...settings.localeData.en, businessHours: e.target.value },
+                        en: {
+                          ...settings.localeData.en,
+                          businessHours: e.target.value,
+                        },
                       },
                     })
                   }
@@ -452,7 +500,10 @@ export default function CompanySettingsEditor() {
               onChange={(e) =>
                 setSettings({
                   ...settings,
-                  socialNetworks: { ...settings.socialNetworks, facebook: e.target.value },
+                  socialNetworks: {
+                    ...settings.socialNetworks,
+                    facebook: e.target.value,
+                  },
                 })
               }
               placeholder="https://facebook.com/yourpage"
@@ -466,7 +517,10 @@ export default function CompanySettingsEditor() {
               onChange={(e) =>
                 setSettings({
                   ...settings,
-                  socialNetworks: { ...settings.socialNetworks, instagram: e.target.value },
+                  socialNetworks: {
+                    ...settings.socialNetworks,
+                    instagram: e.target.value,
+                  },
                 })
               }
               placeholder="https://instagram.com/yourpage"
@@ -480,7 +534,10 @@ export default function CompanySettingsEditor() {
               onChange={(e) =>
                 setSettings({
                   ...settings,
-                  socialNetworks: { ...settings.socialNetworks, linkedin: e.target.value },
+                  socialNetworks: {
+                    ...settings.socialNetworks,
+                    linkedin: e.target.value,
+                  },
                 })
               }
               placeholder="https://linkedin.com/company/yourcompany"
@@ -494,7 +551,10 @@ export default function CompanySettingsEditor() {
               onChange={(e) =>
                 setSettings({
                   ...settings,
-                  socialNetworks: { ...settings.socialNetworks, twitter: e.target.value },
+                  socialNetworks: {
+                    ...settings.socialNetworks,
+                    twitter: e.target.value,
+                  },
                 })
               }
               placeholder="https://twitter.com/yourpage"
@@ -508,7 +568,10 @@ export default function CompanySettingsEditor() {
               onChange={(e) =>
                 setSettings({
                   ...settings,
-                  socialNetworks: { ...settings.socialNetworks, youtube: e.target.value },
+                  socialNetworks: {
+                    ...settings.socialNetworks,
+                    youtube: e.target.value,
+                  },
                 })
               }
               placeholder="https://youtube.com/@yourchannel"
@@ -522,7 +585,10 @@ export default function CompanySettingsEditor() {
               onChange={(e) =>
                 setSettings({
                   ...settings,
-                  socialNetworks: { ...settings.socialNetworks, tiktok: e.target.value },
+                  socialNetworks: {
+                    ...settings.socialNetworks,
+                    tiktok: e.target.value,
+                  },
                 })
               }
               placeholder="https://tiktok.com/@yourpage"
@@ -579,7 +645,10 @@ export default function CompanySettingsEditor() {
               onChange={(e) =>
                 setSettings({
                   ...settings,
-                  legalInfo: { ...settings.legalInfo, bankName: e.target.value },
+                  legalInfo: {
+                    ...settings.legalInfo,
+                    bankName: e.target.value,
+                  },
                 })
               }
               placeholder="BCR"

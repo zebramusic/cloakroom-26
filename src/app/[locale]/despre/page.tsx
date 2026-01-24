@@ -20,17 +20,21 @@ export default async function AboutPage({
 
   unstable_setRequestLocale(locale);
 
-  const heroSettings = await getHeroSettings('about', locale as 'ro' | 'en');
+  const heroSettings = await getHeroSettings("about", locale as "ro" | "en");
 
   return (
     <>
       <Hero
-        title={heroSettings?.title || (locale === "ro" ? "Despre Garderobă Pro" : "About Garderobă Pro")}
-        subtitle={heroSettings?.subtitle || (
-          locale === "ro"
+        title={
+          heroSettings?.title ||
+          (locale === "ro" ? "Despre Garderobă Pro" : "About Garderobă Pro")
+        }
+        subtitle={
+          heroSettings?.subtitle ||
+          (locale === "ro"
             ? "Pasiune pentru evenimente și atenție la detalii. De peste 10 ani aducem ordine și siguranță la cele mai mari evenimente din România."
-            : "Passion for events and attention to detail. For over 10 years bringing order and safety to Romania's largest events."
-        )}
+            : "Passion for events and attention to detail. For over 10 years bringing order and safety to Romania's largest events.")
+        }
         primaryCTA={heroSettings?.primaryCTA}
         secondaryCTA={heroSettings?.secondaryCTA}
         backgroundImage={heroSettings?.backgroundImage}

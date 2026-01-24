@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -11,31 +12,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  Settings as SettingsIcon,
   Mail,
   CreditCard,
   Building2,
   Bell,
   Shield,
-  CheckCircle2,
+  ArrowRight,
+  Info,
 } from "lucide-react";
 
 export default function SettingsPage() {
-  const [saved, setSaved] = useState(false);
   const [settings, setSettings] = useState({
-    // Company Information
-    companyName: process.env.NEXT_PUBLIC_COMPANY_NAME || "Garderobă Pro",
-    companyEmail: process.env.EMAIL_FROM || "",
-    companyPhone: process.env.COMPANY_PHONE || "",
-    companyAddress: process.env.COMPANY_ADDRESS || "",
-    companyCUI: process.env.COMPANY_CUI || "",
-    companyRegCom: process.env.COMPANY_REG_COM || "",
-
     // Email Settings
     smtpHost: process.env.SMTP_HOST || "",
     smtpPort: process.env.SMTP_PORT || "587",
@@ -48,11 +39,6 @@ export default function SettingsPage() {
     stripeCurrency: "RON",
     vatRate: "19",
 
-    // Bank Transfer
-    bankName: process.env.BANK_NAME || "",
-    bankIBAN: process.env.BANK_IBAN || "",
-    bankSwift: process.env.BANK_SWIFT || "",
-
     // Notifications
     emailOnNewOrder: true,
     emailOnNewQuote: true,
@@ -63,13 +49,6 @@ export default function SettingsPage() {
     requireEmailVerification: true,
     enableRateLimiting: true,
   });
-
-  const handleSave = () => {
-    // Note: These settings are read from .env.local
-    // This page is for viewing/documentation only
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-  };
 
   return (
     <div className="p-6 lg:p-8 space-y-6">
@@ -95,97 +74,45 @@ export default function SettingsPage() {
       )}
 
       {/* Company Information */}
-      <Card>
+      <Car>
+        <h1 className="text-3xl font-bold">Technical Settings</h1>
+        <p className="text-gray-600 mt-1">
+          View technical configuration (environment variables)
+        </p>
+      </div>
+
+      {/* Info Alert */}
+      <Alert className="bg-blue-50 border-blue-200">
+        <Info className="h-4 w-4 text-blue-600" />
+        <AlertDescription className="text-blue-800">
+          These settings are configured via environment variables in{" "}
+          <code className="bg-blue-100 px-1 py-0.5 rounded">.env.local</code>.
+          This page is read-only for reference. Update .env.local and restart the server to apply changes.
+        </AlertDescription>
+      </Alert>
+
+      {/* Company Settings Link */}
+      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Building2 className="w-5 h-5" />
+            <Building2 className="w-5 h-5 text-primary" />
             Company Information
           </CardTitle>
           <CardDescription>
-            Basic company details displayed on invoices and emails
+            Manage company details, contact info, social networks, and legal information
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="companyName">Company Name</Label>
-              <Input
-                id="companyName"
-                value={settings.companyName}
-                onChange={(e) =>
-                  setSettings({ ...settings, companyName: e.target.value })
-                }
-                placeholder="Your Company Name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="companyEmail">Company Email</Label>
-              <Input
-                id="companyEmail"
-                type="email"
-                value={settings.companyEmail}
-                onChange={(e) =>
-                  setSettings({ ...settings, companyEmail: e.target.value })
-                }
-                placeholder="contact@company.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="companyPhone">Phone Number</Label>
-              <Input
-                id="companyPhone"
-                value={settings.companyPhone}
-                onChange={(e) =>
-                  setSettings({ ...settings, companyPhone: e.target.value })
-                }
-                placeholder="+40 XXX XXX XXX"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="companyCUI">CUI (Tax ID)</Label>
-              <Input
-                id="companyCUI"
-                value={settings.companyCUI}
-                onChange={(e) =>
-                  setSettings({ ...settings, companyCUI: e.target.value })
-                }
-                placeholder="ROXXXXXXXX"
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="companyAddress">Company Address</Label>
-            <Textarea
-              id="companyAddress"
-              value={settings.companyAddress}
-              onChange={(e) =>
-                setSettings({ ...settings, companyAddress: e.target.value })
-              }
-              placeholder="Street, City, County, Postal Code"
-              rows={3}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Email Configuration */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Mail className="w-5 h-5" />
-            Email Configuration
-          </CardTitle>
-          <CardDescription>
-            SMTP settings for sending emails. Configured in .env.local
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="smtpHost">SMTP Host</Label>
-              <Input
-                id="smtpHost"
-                value={settings.smtpHost}
+        <CardContent>
+          <p className="text-sm text-gray-600 mb-4">
+            Company information is now managed through the new Company Settings system, 
+            which serves as the single source of truth for all company data displayed throughout the website.
+          </p>
+          <Link href="/admin/site/company-settings">
+            <Button className="group">
+              Go to Company Settings
+              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </Link value={settings.smtpHost}
                 onChange={(e) =>
                   setSettings({ ...settings, smtpHost: e.target.value })
                 }
@@ -376,49 +303,12 @@ export default function SettingsPage() {
             />
           </div>
           <Separator />
-          <div className="flex items-center justify-between py-2">
-            <div className="space-y-0.5">
-              <Label>New Quote Requests</Label>
-              <p className="text-sm text-gray-500">
-                Get notified when a customer requests a quote
-              </p>
-            </div>
-            <Switch
-              checked={settings.emailOnNewQuote}
-              onCheckedChange={(checked: boolean) =>
-                setSettings({ ...settings, emailOnNewQuote: checked })
-              }
-            />
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between py-2">
-            <div className="space-y-0.5">
-              <Label>New Support Messages</Label>
-              <p className="text-sm text-gray-500">
-                Get notified when customers send support messages
-              </p>
-            </div>
-            <Switch
-              checked={settings.emailOnNewMessage}
-              onCheckedChange={(checked: boolean) =>
-                setSettings({ ...settings, emailOnNewMessage: checked })
-              }
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Security Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5" />
-            Security Settings
-          </CardTitle>
-          <CardDescription>
-            Configure security and authentication options
-          </CardDescription>
-        </CardHeader>
+          <Alert>
+            <AlertDescription className="text-sm">
+              Stripe keys are configured via NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY.
+              Bank transfer details are managed in Company Settings.
+            </AlertDescription>
+          </Alerteader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
