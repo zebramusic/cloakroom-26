@@ -323,4 +323,4 @@ const product = await Product.findByIdAndUpdate(
 - Any request in copilot chat must strictly follow these instructions and the architectural patterns described above and must be written down here to complete this file.
 
 ## Any request must generate a TODO list and questions to clarify requirements before proceeding to code generation.
-
+  - Any request must generate a TODO list and questions to clarify requirements before proceeding to code generation.
