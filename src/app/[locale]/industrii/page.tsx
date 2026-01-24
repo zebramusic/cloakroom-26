@@ -16,6 +16,7 @@ import {
   Presentation,
   PartyPopper,
 } from "lucide-react";
+import { getHeroSettings } from "@/lib/utils/hero-settings";
 
 const industries = [
   {
@@ -80,18 +81,22 @@ export default async function IndustriesPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const heroSettings = await getHeroSettings('industries', locale as 'ro' | 'en');
 
   unstable_setRequestLocale(locale);
 
   return (
     <>
       <Hero
-        title={locale === "ro" ? "Cui ne adresăm" : "Who We Serve"}
-        subtitle={
+        title={heroSettings?.title || (locale === "ro" ? "Cui ne adresăm" : "Who We Serve")}
+        subtitle={heroSettings?.subtitle || (
           locale === "ro"
             ? "Experiență vastă în diverse tipuri de evenimente. Adaptăm soluțiile la specificul fiecărei industrii."
             : "Vast experience across diverse event types. We adapt solutions to each industry's specifics."
-        }
+        )}
+        primaryCTA={heroSettings?.primaryCTA}
+        secondaryCTA={heroSettings?.secondaryCTA}
+        backgroundImage={heroSettings?.backgroundImage}
         variant="page"
       />
 

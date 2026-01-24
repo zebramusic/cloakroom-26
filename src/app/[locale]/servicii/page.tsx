@@ -1,6 +1,7 @@
 import { unstable_setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/sections/Hero";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getHeroSettings } from "@/lib/utils/hero-settings";
 import {
   Card,
   CardContent,
@@ -20,19 +21,24 @@ export default async function ServicesPage({
 
   unstable_setRequestLocale(locale);
 
+  const heroSettings = await getHeroSettings('services', locale as 'ro' | 'en');
+
   return (
     <>
       <Hero
-        title={
+        title={heroSettings?.title || (
           locale === "ro"
             ? "Servicii Complete pentru Evenimente"
             : "Complete Event Services"
-        }
-        subtitle={
+        )}
+        subtitle={heroSettings?.subtitle || (
           locale === "ro"
             ? "De la garderobă cu personal la infrastructură completă. Personalizăm soluția pentru evenimentul tău."
             : "From staffed cloakroom to complete infrastructure. We customize the solution for your event."
-        }
+        )}
+        primaryCTA={heroSettings?.primaryCTA}
+        secondaryCTA={heroSettings?.secondaryCTA}
+        backgroundImage={heroSettings?.backgroundImage}
         variant="page"
       />
 

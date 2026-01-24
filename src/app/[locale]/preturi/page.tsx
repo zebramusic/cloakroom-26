@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/accordion";
 import { QuoteCTA } from "@/components/sections/QuoteCTA";
 import { Users, Calendar, MapPin, Package, Clock, Shield } from "lucide-react";
+import { getHeroSettings } from "@/lib/utils/hero-settings";
 
 const pricingFactors = [
   {
@@ -113,18 +114,22 @@ export default async function PricingPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const heroSettings = await getHeroSettings('pricing', locale as 'ro' | 'en');
 
   unstable_setRequestLocale(locale);
 
   return (
     <>
       <Hero
-        title={locale === "ro" ? "Prețuri Transparente" : "Transparent Pricing"}
-        subtitle={
+        title={heroSettings?.title || (locale === "ro" ? "Prețuri Transparente" : "Transparent Pricing")}
+        subtitle={heroSettings?.subtitle || (
           locale === "ro"
             ? "Fiecare eveniment este unic. Creăm oferte personalizate bazate pe nevoile tale specifice."
             : "Every event is unique. We create customized quotes based on your specific needs."
-        }
+        )}
+        primaryCTA={heroSettings?.primaryCTA}
+        secondaryCTA={heroSettings?.secondaryCTA}
+        backgroundImage={heroSettings?.backgroundImage}
         variant="page"
       />
 

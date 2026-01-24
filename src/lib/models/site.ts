@@ -420,3 +420,65 @@ AuditLogSchema.index({ createdAt: -1 });
 
 export const AuditLog: Model<IAuditLog> = 
   mongoose.models.AuditLog || mongoose.model<IAuditLog>('AuditLog', AuditLogSchema);
+
+// ==================== HERO SETTINGS ====================
+
+export interface IHeroSettings extends Document {
+  pageKey: string; // 'home' | 'services' | 'about' | 'contact' | 'pricing' | 'industries'
+  localeData: {
+    ro: {
+      title: string;
+      subtitle?: string;
+      primaryCtaText?: string;
+      primaryCtaLink?: string;
+      secondaryCtaText?: string;
+      secondaryCtaLink?: string;
+    };
+    en: {
+      title: string;
+      subtitle?: string;
+      primaryCtaText?: string;
+      primaryCtaLink?: string;
+      secondaryCtaText?: string;
+      secondaryCtaLink?: string;
+    };
+  };
+  backgroundImage?: string;
+  updatedBy: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const HeroSettingsSchema = new Schema<IHeroSettings>({
+  pageKey: { 
+    type: String, 
+    required: true, 
+    unique: true,
+    enum: ['home', 'services', 'about', 'contact', 'pricing', 'industries']
+  },
+  localeData: {
+    ro: {
+      title: { type: String, required: true },
+      subtitle: String,
+      primaryCtaText: String,
+      primaryCtaLink: String,
+      secondaryCtaText: String,
+      secondaryCtaLink: String,
+    },
+    en: {
+      title: { type: String, required: true },
+      subtitle: String,
+      primaryCtaText: String,
+      primaryCtaLink: String,
+      secondaryCtaText: String,
+      secondaryCtaLink: String,
+    },
+  },
+  backgroundImage: String,
+  updatedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+}, { timestamps: true });
+
+HeroSettingsSchema.index({ pageKey: 1 });
+
+export const HeroSettings: Model<IHeroSettings> = 
+  mongoose.models.HeroSettings || mongoose.model<IHeroSettings>('HeroSettings', HeroSettingsSchema);

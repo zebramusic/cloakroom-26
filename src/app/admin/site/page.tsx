@@ -16,6 +16,13 @@ export default async function SiteDashboardPage() {
 
   const modules = [
     {
+      title: "Hero Settings",
+      description: "Edit hero text and background images",
+      icon: Settings,
+      href: "/admin/site/settings",
+      permission: "site.write" as const,
+    },
+    {
       title: "Navigation",
       description: "Manage header and footer navigation",
       icon: Navigation,

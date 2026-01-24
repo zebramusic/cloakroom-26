@@ -1,5 +1,3 @@
-"use client";
-
 import { Hero } from "@/components/sections/Hero";
 import {
   Card,
@@ -8,33 +6,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { use } from "react";
+import { getHeroSettings } from "@/lib/utils/hero-settings";
+import { ContactForm } from "@/components/forms/ContactForm";
 
-export default function ContactPage({
+export default async function ContactPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  const { locale } = use(params);
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // TODO: Implement form submission
-    console.log("Form submitted");
-  };
+  const { locale } = await params;
+  const heroSettings = await getHeroSettings('contact', locale as 'ro' | 'en');
 
   return (
     <>
       <Hero
-        title={locale === "ro" ? "Contactează-ne" : "Contact Us"}
-        subtitle={
+        title={heroSettings?.title || (locale === "ro" ? "Contactează-ne" : "Contact Us")}
+        subtitle={heroSettings?.subtitle || (
           locale === "ro"
             ? "Suntem aici să răspundem la toate întrebările tale"
             : "We're here to answer all your questions"
-        }
+        )}
+        primaryCTA={heroSettings?.primaryCTA}
+        secondaryCTA={heroSettings?.secondaryCTA}
+        backgroundImage={heroSettings?.backgroundImage}
         variant="page"
       />
 
@@ -43,114 +38,7 @@ export default function ContactPage({
           <div className="grid gap-8 lg:grid-cols-2">
             {/* Contact Form */}
             <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl">
-                    {locale === "ro"
-                      ? "Trimite-ne un Mesaj"
-                      : "Send Us a Message"}
-                  </CardTitle>
-                  <CardDescription>
-                    {locale === "ro"
-                      ? "Completează formularul și îți răspundem în maximum 24 de ore"
-                      : "Fill the form and we'll respond within 24 hours"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                      <label
-                        htmlFor="name"
-                        className="mb-2 block text-sm font-medium"
-                      >
-                        {locale === "ro" ? "Nume *" : "Name *"}
-                      </label>
-                      <Input
-                        id="name"
-                        name="name"
-                        required
-                        placeholder={
-                          locale === "ro" ? "Numele tău" : "Your name"
-                        }
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="email"
-                        className="mb-2 block text-sm font-medium"
-                      >
-                        Email *
-                      </label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        placeholder="exemplu@email.com"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="phone"
-                        className="mb-2 block text-sm font-medium"
-                      >
-                        {locale === "ro" ? "Telefon" : "Phone"}
-                      </label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        placeholder="+40 123 456 789"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="subject"
-                        className="mb-2 block text-sm font-medium"
-                      >
-                        {locale === "ro" ? "Subiect *" : "Subject *"}
-                      </label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        required
-                        placeholder={
-                          locale === "ro"
-                            ? "Despre ce vrei să vorbim?"
-                            : "What do you want to talk about?"
-                        }
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="message"
-                        className="mb-2 block text-sm font-medium"
-                      >
-                        {locale === "ro" ? "Mesaj *" : "Message *"}
-                      </label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        required
-                        rows={6}
-                        placeholder={
-                          locale === "ro"
-                            ? "Descrie-ne evenimentul tău sau pune-ne orice întrebare..."
-                            : "Describe your event or ask us anything..."
-                        }
-                      />
-                    </div>
-
-                    <Button type="submit" className="w-full" size="lg">
-                      {locale === "ro" ? "Trimite Mesaj" : "Send Message"}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+              <ContactForm locale={locale} />
             </div>
 
             {/* Contact Info */}

@@ -4,6 +4,7 @@ import connectDB from "@/lib/mongodb";
 import { SitePage } from "@/lib/models/site";
 import { BlockRenderer } from "@/components/site/BlockRenderer";
 import { PortfolioSection } from "@/components/portfolio/PortfolioSection";
+import { getHeroSettings } from "@/lib/utils/hero-settings";
 
 // Fallback sections if no site builder content exists
 import { Hero } from "@/components/sections/Hero";
@@ -64,6 +65,9 @@ export default async function HomePage({
   // Otherwise, use fallback static content
   const t = await getTranslations("home");
 
+  // Check for custom hero settings
+  const heroSettings = await getHeroSettings('home', locale as 'ro' | 'en');
+
   const features = [
     {
       icon: Box,
@@ -85,18 +89,18 @@ export default async function HomePage({
   return (
     <>
       <Hero
-        title={t("hero.title")}
-        subtitle={t("hero.subtitle")}
-        primaryCTA={{
+        title={heroSettings?.title || t("hero.title")}
+        subtitle={heroSettings?.subtitle || t("hero.subtitle")}
+        primaryCTA={heroSettings?.primaryCTA || {
           label: t("hero.cta"),
           href: `/${locale}/cere-oferta`,
         }}
-        secondaryCTA={{
+        secondaryCTA={heroSettings?.secondaryCTA || {
           label: t("hero.ctaSecondary"),
           href: `/${locale}/shop`,
         }}
         variant="home"
-        backgroundImage="/images/hero-cloakroom.jpg"
+        backgroundImage={heroSettings?.backgroundImage || "/images/hero-cloakroom.jpg"}
       />
 
       {/* Features Section */}
