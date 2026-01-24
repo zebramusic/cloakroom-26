@@ -318,3 +318,9 @@ const product = await Product.findByIdAndUpdate(
 - File uploads moved from Supabase Storage to local filesystem
 - All API routes updated to use Mongoose instead of Supabase client
 - Docker compose updated to include MongoDB container
+
+## Any request in copilot chat must strictly follow these instructions and the architectural patterns described above and must be written down here to complete this file.
+- Any request in copilot chat must strictly follow these instructions and the architectural patterns described above and must be written down here to complete this file.
+
+## Any request must generate a TODO list and questions to clarify requirements before proceeding to code generation.
+

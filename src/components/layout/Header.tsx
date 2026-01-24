@@ -3,8 +3,14 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Menu, ShoppingCart, Shield } from "lucide-react";
+import { Menu, ShoppingCart, Shield, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -61,11 +67,15 @@ export function Header({ locale, transparent = false }: HeaderProps) {
     { href: `/${locale}/servicii`, label: t("services") },
     { href: `/${locale}/industrii`, label: t("industries") },
     { href: `/${locale}/preturi`, label: t("pricing") },
-    { href: `/${locale}/despre`, label: t("about") },
-    { href: `/${locale}/parteneri`, label: t("partners") },
     { href: `/${locale}/shop`, label: t("shop") },
     { href: `/${locale}/intrebari`, label: t("faq") },
     { href: `/${locale}/contact`, label: t("contact") },
+  ];
+
+  const aboutDropdownItems = [
+    { href: `/${locale}/despre`, label: t("about") },
+    { href: `/${locale}/portfolio`, label: t("portfolio") },
+    { href: `/${locale}/parteneri`, label: t("partners") },
   ];
 
   return (
@@ -90,7 +100,34 @@ export function Header({ locale, transparent = false }: HeaderProps) {
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center space-x-6 text-sm font-medium lg:flex">
-          {navItems.slice(1, 7).map((item) => (
+          {navItems.slice(1, 4).map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="transition-colors hover:text-primary"
+            >
+              {item.label}
+            </Link>
+          ))}
+          
+          {/* About Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 transition-colors hover:text-primary focus:outline-none">
+              {t("about")}
+              <ChevronDown className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              {aboutDropdownItems.map((item) => (
+                <DropdownMenuItem key={item.href} asChild>
+                  <Link href={item.href} className="w-full cursor-pointer">
+                    {item.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {navItems.slice(4).map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -154,7 +191,33 @@ export function Header({ locale, transparent = false }: HeaderProps) {
                 <SheetTitle>Meniu</SheetTitle>
               </SheetHeader>
               <nav className="mt-6 flex flex-col space-y-4">
-                {navItems.map((item) => (
+                {navItems.slice(0, 4).map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="text-lg font-medium transition-colors hover:text-primary"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                
+                {/* About Section */}
+                <div className="space-y-2">
+                  <div className="text-lg font-semibold text-muted-foreground">
+                    {t("about")}
+                  </div>
+                  {aboutDropdownItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="block pl-4 text-base font-medium transition-colors hover:text-primary"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+
+                {navItems.slice(4).map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
