@@ -96,12 +96,12 @@ export default async function ContactPage({
                 </CardHeader>
                 <CardContent>
                   <a
-                    href="tel:+40123456789"
-                    className="text-lg font-medium text-primary hover:underline"
-                  >{`tel:${phone.replace(/\s/g, '')}`}
+                    href={`tel:${phone.replace(/\s/g, '')}`}
                     className="text-lg font-medium text-primary hover:underline"
                   >
                     {phone}
+                  </a>
+                </CardContent>
               </Card>
 
               <Card>
@@ -121,9 +121,9 @@ export default async function ContactPage({
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-lg font-medium">Cluj-Napoca, România</p>
+                  <p className="text-lg font-medium">{address}</p>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    {locale === "ro"{address}
+                    {locale === "ro"
                       ? "Ne deplasăm în toată țara pentru evenimente"
                       : "We travel nationwide for events"}
                   </p>
