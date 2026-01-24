@@ -21,9 +21,9 @@ export default async function PortfolioDetailPage({
   // Fetch portfolio item directly from database
   const connectDB = (await import("@/lib/mongodb")).default;
   const { PortfolioItem, PortfolioImage } = await import("@/lib/models");
-  
+
   await connectDB();
-  
+
   const item = await PortfolioItem.findOne({
     slug,
     isPublished: true,
@@ -32,11 +32,6 @@ export default async function PortfolioDetailPage({
   if (!item) {
     notFound();
   }
-
-  // Get all images for this item
-  const images = await PortfolioImage.find({ portfolioItemId: item._id })
-    .sort({ orderIndex: 1 })
-    .lean();
 
   // Get all images for this item
   const images = await PortfolioImage.find({ portfolioItemId: item._id })
