@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { unstable_setRequestLocale } from "next-intl/server";
 import { PortfolioGrid } from "@/components/portfolio/PortfolioGrid";
+import connectDB from "@/lib/mongodb";
+import { PortfolioItem, PortfolioImage } from "@/lib/models";
 
 export default async function PortfolioPage({
   params,
@@ -11,26 +13,40 @@ export default async function PortfolioPage({
   unstable_setRequestLocale(locale);
   const t = await getTranslations("portfolio");
 
-  // Fetch portfolio items
+  // Fetch portfolio items directly from database
   let items = [];
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL 
-      || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
-      || "http://localhost:3000";
+    await connectDB();
     
-    const res = await fetch(
-      `${baseUrl}/api/portfolio?limit=100`,
-      {
-        cache: "no-store",
-      },
+    const portfolioItems = await PortfolioItem.find({ isPublished: true })
+      .sort({ isFeatured: -1, orderIndex: 1, publishedAt: -1 })
+      .limit(100)
+      .lean();
+
+    // Get cover images for each item and serialize for client component
+    items = await Promise.all(
+      portfolioItems.map(async (item: any) => {
+        let serializedItem = {
+          ...item,
+          _id: item._id.toString(),
+          coverImageId: item.coverImageId?.toString(),
+        };
+
+        if (item.coverImageId) {
+          const coverImage = await PortfolioImage.findById(item.coverImageId)
+            .select('variants altText')
+            .lean();
+          
+          if (coverImage) {
+            serializedItem.coverImage = {
+              ...coverImage,
+              _id: (coverImage as any)._id.toString(),
+            };
+          }
+        }
+        return serializedItem;
+      })
     );
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch portfolio: ${res.status}`);
-    }
-
-    const data = await res.json();
-    items = data.items || [];
   } catch (error) {
     console.error("Error fetching portfolio items:", error);
     // Continue with empty items array
