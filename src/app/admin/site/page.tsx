@@ -3,7 +3,7 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Navigation, FileText, Image, Settings } from "lucide-react";
+import { Navigation, FileText, Image, Settings, Building2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +20,13 @@ export default async function SiteDashboardPage() {
       description: "Edit hero text and background images",
       icon: Settings,
       href: "/admin/site/settings",
+      permission: "site.write" as const,
+    },
+    {
+      title: "Company Settings",
+      description: "Manage company info, contact details & social networks",
+      icon: Building2,
+      href: "/admin/site/company-settings",
       permission: "site.write" as const,
     },
     {

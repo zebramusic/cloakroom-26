@@ -3,15 +3,51 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
-import { Facebook, Instagram, Linkedin } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
+
+interface CompanySettings {
+  companyName: string;
+  tagline?: string;
+  description?: string;
+  address: string;
+  phone: string;
+  email: string;
+  businessHours: string;
+  socialNetworks: {
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+    twitter?: string;
+    youtube?: string;
+    tiktok?: string;
+  };
+  legalInfo: {
+    cui: string;
+    regCom: string;
+    bankName: string;
+    iban: string;
+    swift?: string;
+  };
+  logo?: string;
+}
 
 interface FooterProps {
   locale: string;
+  companySettings: CompanySettings | null;
 }
 
-export function Footer({ locale }: FooterProps) {
+export function Footer({ locale, companySettings }: FooterProps) {
   const t = useTranslations("nav");
   const currentYear = new Date().getFullYear();
+
+  // Fallback values if no settings
+  const companyName = companySettings?.companyName || "Garderobă Pro";
+  const description = companySettings?.description || (locale === "ro"
+    ? "Soluții profesionale de garderobă pentru evenimente de orice dimensiune."
+    : "Professional cloakroom solutions for events of any size.");
+
+  const socialNetworks = companySettings?.socialNetworks || {};
+  const hasSocialNetworks = Object.values(socialNetworks).some(url => !!url);
 
   return (
     <footer className="border-t bg-background">
@@ -25,42 +61,70 @@ export function Footer({ locale }: FooterProps) {
                   G
                 </span>
               </div>
-              <span className="font-bold">Garderobă Pro</span>
+              <span className="font-bold">{companyName}</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              {locale === "ro"
-                ? "Soluții profesionale de garderobă pentru evenimente de orice dimensiune."
-                : "Professional cloakroom solutions for events of any size."}
+              {description}
             </p>
-            <div className="flex space-x-4">
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary"
-              >
-                <Facebook className="h-5 w-5" />
-                <span className="sr-only">Facebook</span>
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary"
-              >
-                <Instagram className="h-5 w-5" />
-                <span className="sr-only">Instagram</span>
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary"
-              >
-                <Linkedin className="h-5 w-5" />
-                <span className="sr-only">LinkedIn</span>
-              </a>
-            </div>
+            {hasSocialNetworks && (
+              <div className="flex space-x-4">
+                {socialNetworks.facebook && (
+                  <a
+                    href={socialNetworks.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    <Facebook className="h-5 w-5" />
+                    <span className="sr-only">Facebook</span>
+                  </a>
+                )}
+                {socialNetworks.instagram && (
+                  <a
+                    href={socialNetworks.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    <Instagram className="h-5 w-5" />
+                    <span className="sr-only">Instagram</span>
+                  </a>
+                )}
+                {socialNetworks.linkedin && (
+                  <a
+                    href={socialNetworks.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    <Linkedin className="h-5 w-5" />
+                    <span className="sr-only">LinkedIn</span>
+                  </a>
+                )}
+                {socialNetworks.twitter && (
+                  <a
+                    href={socialNetworks.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    <Twitter className="h-5 w-5" />
+                    <span className="sr-only">Twitter</span>
+                  </a>
+                )}
+                {socialNetworks.youtube && (
+                  <a
+                    href={socialNetworks.youtube}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    <Youtube className="h-5 w-5" />
+                    <span className="sr-only">YouTube</span>
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Services Column */}

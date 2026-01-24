@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { CartStoreHydration } from "@/components/shared/CartStoreHydration";
+import { getCompanySettings } from "@/lib/utils/company-settings";
 
 export default async function LocaleLayout({
   children,
@@ -14,6 +15,7 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
   const messages = await getMessages();
+  const companySettings = await getCompanySettings(locale as 'ro' | 'en');
 
   return (
     <AuthProvider>
@@ -21,7 +23,7 @@ export default async function LocaleLayout({
         <CartStoreHydration />
         <Header locale={locale} />
         <main>{children}</main>
-        <Footer locale={locale} />
+        <Footer locale={locale} companySettings={companySettings} />
       </NextIntlClientProvider>
     </AuthProvider>
   );

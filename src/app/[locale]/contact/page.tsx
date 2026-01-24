@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { getHeroSettings } from "@/lib/utils/hero-settings";
+import { getCompanySettings } from "@/lib/utils/company-settings";
 import { ContactForm } from "@/components/forms/ContactForm";
 
 export default async function ContactPage({
@@ -18,6 +19,13 @@ export default async function ContactPage({
 }) {
   const { locale } = await params;
   const heroSettings = await getHeroSettings('contact', locale as 'ro' | 'en');
+  const companySettings = await getCompanySettings(locale as 'ro' | 'en');
+
+  // Fallback values
+  const email = companySettings?.email || "contact@garderobapro.ro";
+  const phone = companySettings?.phone || "+40 123 456 789";
+  const address = companySettings?.address || "Cluj-Napoca, România";
+  const businessHours = companySettings?.businessHours || (locale === "ro" ? "Luni - Vineri, 9:00 - 18:00" : "Monday - Friday, 9:00 - 18:00");
 
   return (
     <>
@@ -62,10 +70,10 @@ export default async function ContactPage({
                 </CardHeader>
                 <CardContent>
                   <a
-                    href="mailto:contact@garderobapro.ro"
+                    href={`mailto:${email}`}
                     className="text-lg font-medium text-primary hover:underline"
                   >
-                    contact@garderobapro.ro
+                    {email}
                   </a>
                 </CardContent>
               </Card>
@@ -81,9 +89,7 @@ export default async function ContactPage({
                         {locale === "ro" ? "Telefon" : "Phone"}
                       </CardTitle>
                       <CardDescription>
-                        {locale === "ro"
-                          ? "Luni - Vineri, 9:00 - 18:00"
-                          : "Monday - Friday, 9:00 - 18:00"}
+                        {businessHours}
                       </CardDescription>
                     </div>
                   </div>
@@ -92,10 +98,10 @@ export default async function ContactPage({
                   <a
                     href="tel:+40123456789"
                     className="text-lg font-medium text-primary hover:underline"
+                  >{`tel:${phone.replace(/\s/g, '')}`}
+                    className="text-lg font-medium text-primary hover:underline"
                   >
-                    +40 123 456 789
-                  </a>
-                </CardContent>
+                    {phone}
               </Card>
 
               <Card>
@@ -117,7 +123,7 @@ export default async function ContactPage({
                 <CardContent>
                   <p className="text-lg font-medium">Cluj-Napoca, România</p>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    {locale === "ro"
+                    {locale === "ro"{address}
                       ? "Ne deplasăm în toată țara pentru evenimente"
                       : "We travel nationwide for events"}
                   </p>

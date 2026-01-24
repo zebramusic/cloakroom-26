@@ -480,3 +480,97 @@ const HeroSettingsSchema = new Schema<IHeroSettings>({
 
 export const HeroSettings: Model<IHeroSettings> = 
   mongoose.models.HeroSettings || mongoose.model<IHeroSettings>('HeroSettings', HeroSettingsSchema);
+
+// ==================== COMPANY SETTINGS ====================
+
+export interface ICompanySettings extends Document {
+  key: string; // 'main' - only one document
+  localeData: {
+    ro: {
+      companyName: string;
+      tagline?: string;
+      description?: string;
+      address: string;
+      phone: string;
+      email: string;
+      businessHours: string;
+    };
+    en: {
+      companyName: string;
+      tagline?: string;
+      description?: string;
+      address: string;
+      phone: string;
+      email: string;
+      businessHours: string;
+    };
+  };
+  socialNetworks: {
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+    twitter?: string;
+    youtube?: string;
+    tiktok?: string;
+  };
+  legalInfo: {
+    cui: string; // Company tax ID
+    regCom: string; // Registration number
+    bankName: string;
+    iban: string;
+    swift?: string;
+  };
+  logo?: string; // URL to logo image
+  updatedBy: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const CompanySettingsSchema = new Schema<ICompanySettings>({
+  key: { 
+    type: String, 
+    required: true, 
+    unique: true,
+    default: 'main'
+  },
+  localeData: {
+    ro: {
+      companyName: { type: String, required: true },
+      tagline: String,
+      description: String,
+      address: { type: String, required: true },
+      phone: { type: String, required: true },
+      email: { type: String, required: true },
+      businessHours: { type: String, required: true },
+    },
+    en: {
+      companyName: { type: String, required: true },
+      tagline: String,
+      description: String,
+      address: { type: String, required: true },
+      phone: { type: String, required: true },
+      email: { type: String, required: true },
+      businessHours: { type: String, required: true },
+    },
+  },
+  socialNetworks: {
+    facebook: String,
+    instagram: String,
+    linkedin: String,
+    twitter: String,
+    youtube: String,
+    tiktok: String,
+  },
+  legalInfo: {
+    cui: { type: String, required: true },
+    regCom: { type: String, required: true },
+    bankName: { type: String, required: true },
+    iban: { type: String, required: true },
+    swift: String,
+  },
+  logo: String,
+  updatedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+}, { timestamps: true });
+
+export const CompanySettings: Model<ICompanySettings> = 
+  mongoose.models.CompanySettings || mongoose.model<ICompanySettings>('CompanySettings', CompanySettingsSchema);
