@@ -78,6 +78,7 @@ export function ImageManager({ itemId }: ImageManagerProps) {
           {images.length} image{images.length !== 1 ? "s" : ""} (max 20)
         </p>
         <Button
+          type="button"
           onClick={() => setUploadDialogOpen(true)}
           disabled={images.length >= 20}
         >
@@ -90,7 +91,7 @@ export function ImageManager({ itemId }: ImageManagerProps) {
         <div className="border-2 border-dashed rounded-lg p-12 text-center">
           <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <p className="text-muted-foreground mb-4">No images yet</p>
-          <Button onClick={() => setUploadDialogOpen(true)}>
+          <Button type="button" onClick={() => setUploadDialogOpen(true)}>
             Upload Your First Image
           </Button>
         </div>

@@ -74,7 +74,16 @@ export default async function ProductDetailPage({
       <div className="container mx-auto px-4">
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Image Gallery */}
-          <ProductGallery images={product.images || []} productName={name} />
+          <ProductGallery
+            images={
+              product.images?.map((img: any) => ({
+                url: img.url,
+                alt: img.alt,
+                is_primary: img.is_primary,
+              })) || []
+            }
+            productName={name}
+          />
 
           {/* Product Info */}
           <div className="space-y-6">
