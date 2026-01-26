@@ -38,6 +38,7 @@ export function ImageUploadDialog({
   const [captionEn, setCaptionEn] = useState("");
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     if (e.target.files) {
       const files = Array.from(e.target.files);
       setSelectedFiles(files);
@@ -109,17 +110,6 @@ export function ImageUploadDialog({
         <div className="space-y-6">
           {/* File Selection */}
           <div>
-            <Label htmlFor="file-upload" className="cursor-pointer">
-              <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors">
-                <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  Click to select images or drag and drop
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  JPEG, PNG, or WebP (max 8MB each)
-                </p>
-              </div>
-            </Label>
             <Input
               id="file-upload"
               type="file"
@@ -128,6 +118,22 @@ export function ImageUploadDialog({
               onChange={handleFileSelect}
               className="hidden"
             />
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-auto p-0 border-2 border-dashed hover:border-primary"
+              onClick={() => document.getElementById('file-upload')?.click()}
+            >
+              <div className="w-full rounded-lg p-8 text-center transition-colors">
+                <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-sm text-muted-foreground mb-2">
+                  Click to select images or drag and drop
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  JPEG, PNG, or WebP (max 8MB each)
+                </p>
+              </div>
+            </Button>
           </div>
 
           {/* Selected Files */}
