@@ -122,7 +122,7 @@ export function ImageUploadDialog({
               type="button"
               variant="outline"
               className="w-full h-auto p-0 border-2 border-dashed hover:border-primary"
-              onClick={() => document.getElementById('file-upload')?.click()}
+              onClick={() => document.getElementById("file-upload")?.click()}
             >
               <div className="w-full rounded-lg p-8 text-center transition-colors">
                 <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
