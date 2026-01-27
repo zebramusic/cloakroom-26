@@ -37,10 +37,27 @@ export default async function AdminDashboardPage() {
 
   await connectDB();
 
+  // Calculate date ranges for comparison
+  const now = new Date();
+  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+
   // Fetch stats
   const totalOrders = await Order.countDocuments();
   const totalQuotes = await Quote.countDocuments();
   const totalProducts = await Product.countDocuments();
+
+  // Calculate last month's orders for trend
+  const lastMonthOrders = await Order.countDocuments({
+    createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth },
+  });
+  const thisMonthOrders = await Order.countDocuments({
+    createdAt: { $gte: startOfThisMonth },
+  });
+  const ordersTrend = lastMonthOrders > 0 
+    ? Math.round(((thisMonthOrders - lastMonthOrders) / lastMonthOrders) * 100)
+    : thisMonthOrders > 0 ? 100 : 0;
 
   // Calculate total revenue
   const revenueData = await Order.aggregate([
@@ -48,6 +65,43 @@ export default async function AdminDashboardPage() {
     { $group: { _id: null, total: { $sum: "$total" } } },
   ]);
   const totalRevenue = revenueData[0]?.total || 0;
+
+  // Calculate last month's revenue for trend
+  const lastMonthRevenueData = await Order.aggregate([
+    { 
+      $match: { 
+        paymentStatus: "paid",
+        createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
+      } 
+    },
+    { $group: { _id: null, total: { $sum: "$total" } } },
+  ]);
+  const lastMonthRevenue = lastMonthRevenueData[0]?.total || 0;
+  
+  const thisMonthRevenueData = await Order.aggregate([
+    { 
+      $match: { 
+        paymentStatus: "paid",
+        createdAt: { $gte: startOfThisMonth }
+      } 
+    },
+    { $group: { _id: null, total: { $sum: "$total" } } },
+  ]);
+  const thisMonthRevenue = thisMonthRevenueData[0]?.total || 0;
+  const revenueTrend = lastMonthRevenue > 0
+    ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
+    : thisMonthRevenue > 0 ? 100 : 0;
+
+  // Calculate last month's quotes for trend
+  const lastMonthQuotes = await Quote.countDocuments({
+    createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth },
+  });
+  const thisMonthQuotes = await Quote.countDocuments({
+    createdAt: { $gte: startOfThisMonth },
+  });
+  const quotesTrend = lastMonthQuotes > 0
+    ? Math.round(((thisMonthQuotes - lastMonthQuotes) / lastMonthQuotes) * 100)
+    : thisMonthQuotes > 0 ? 100 : 0;
 
   // Fetch recent orders
   const recentOrders = await Order.find()
@@ -87,6 +141,9 @@ export default async function AdminDashboardPage() {
         totalRevenue,
         totalQuotes,
         totalProducts,
+        ordersTrend,
+        revenueTrend,
+        quotesTrend,
       }}
       ordersData={ordersData}
       quotesData={quotesData}

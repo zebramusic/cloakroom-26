@@ -38,6 +38,9 @@ interface DashboardContentProps {
     totalRevenue: number;
     totalQuotes: number;
     totalProducts: number;
+    ordersTrend?: number;
+    revenueTrend?: number;
+    quotesTrend?: number;
   };
   ordersData: OrderData[];
   quotesData: QuoteData[];
@@ -150,30 +153,42 @@ export function DashboardContent({
             value={stats.totalOrders}
             icon={ShoppingCart}
             iconColor="purple"
-            trend={{
-              value: 12,
-              label: "from last month",
-            }}
+            trend={
+              stats.totalOrders > 0 && stats.ordersTrend !== undefined
+                ? {
+                    value: stats.ordersTrend,
+                    label: "from last month",
+                  }
+                : undefined
+            }
           />
           <StatsCard
             title="Total Revenue"
             value={`${stats.totalRevenue.toLocaleString()} RON`}
             icon={DollarSign}
             iconColor="green"
-            trend={{
-              value: 8,
-              label: "from last month",
-            }}
+            trend={
+              stats.totalRevenue > 0 && stats.revenueTrend !== undefined
+                ? {
+                    value: stats.revenueTrend,
+                    label: "from last month",
+                  }
+                : undefined
+            }
           />
           <StatsCard
             title="Quote Requests"
             value={stats.totalQuotes}
             icon={FileText}
             iconColor="blue"
-            trend={{
-              value: 23,
-              label: "from last month",
-            }}
+            trend={
+              stats.totalQuotes > 0 && stats.quotesTrend !== undefined
+                ? {
+                    value: stats.quotesTrend,
+                    label: "from last month",
+                  }
+                : undefined
+            }
           />
           <StatsCard
             title="Active Products"
