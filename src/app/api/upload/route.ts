@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { put } from "@vercel/blob";
 
 /**
- * POST /api/upload - Upload file to local filesystem
+ * POST /api/upload - Upload file to Vercel Blob Storage
+ * Uses Vercel Blob for serverless-compatible file storage
  */
 export async function POST(request: Request) {
   try {
@@ -16,35 +15,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Generate unique filename
+    // Generate unique filename with folder prefix
     const fileExt = file.name.split(".").pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-    
-    // Create uploads directory structure
-    const uploadsDir = join(process.cwd(), "public", "uploads", folder);
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true });
-    }
+    const blobPath = `${folder}/${fileName}`;
 
-    // Convert File to Buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    console.log("📤 Uploading to Vercel Blob:", blobPath);
 
-    // Save file to local filesystem
-    const filePath = join(uploadsDir, fileName);
-    await writeFile(filePath, buffer);
+    // Upload to Vercel Blob Storage
+    const blob = await put(blobPath, file, {
+      access: "public",
+      addRandomSuffix: false, // We already have unique filename
+    });
 
-    // Generate public URL
-    const publicUrl = `/uploads/${folder}/${fileName}`;
+    console.log("✅ Blob uploaded successfully:", blob.url);
 
-    return NextResponse.json({ 
-      url: publicUrl, 
-      path: `/uploads/${folder}/${fileName}` 
+    // Return the public URL
+    return NextResponse.json({
+      url: blob.url,
+      path: blobPath,
     });
   } catch (error: any) {
-    console.error("Upload error:", error);
+    console.error("❌ Upload error:", error);
     return NextResponse.json(
-      { error: "Upload failed" },
+      { error: "Upload failed", details: error.message },
       { status: 500 }
     );
   }
