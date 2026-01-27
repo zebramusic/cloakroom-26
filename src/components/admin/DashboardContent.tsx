@@ -25,9 +25,9 @@ interface OrderData {
 
 interface QuoteData {
   id: string;
-  customerName: string;
-  companyName: string;
-  quantity: number;
+  clientName: string;
+  clientCompany: string;
+  estimatedParticipants: number;
   status: string;
   createdAt: string;
 }
@@ -94,19 +94,20 @@ export function DashboardContent({
 
   const quoteColumns: Column<QuoteData>[] = [
     {
-      key: "customerName",
-      label: "Customer",
+      key: "clientName",
+      label: "Client",
       sortable: true,
     },
     {
-      key: "companyName",
+      key: "clientCompany",
       label: "Company",
       sortable: true,
     },
     {
-      key: "quantity",
-      label: "Quantity",
+      key: "estimatedParticipants",
+      label: "Participants",
       sortable: true,
+      render: (value) => value.toLocaleString(),
     },
     {
       key: "status",
@@ -114,9 +115,12 @@ export function DashboardContent({
       render: (value) => {
         const colors: Record<string, string> = {
           new: "bg-blue-100 text-blue-700 border-blue-200",
-          reviewed: "bg-yellow-100 text-yellow-700 border-yellow-200",
-          approved: "bg-green-100 text-green-700 border-green-200",
-          rejected: "bg-red-100 text-red-700 border-red-200",
+          "in-review": "bg-yellow-100 text-yellow-700 border-yellow-200",
+          "offer-sent": "bg-purple-100 text-purple-700 border-purple-200",
+          negotiation: "bg-orange-100 text-orange-700 border-orange-200",
+          booked: "bg-green-100 text-green-700 border-green-200",
+          completed: "bg-gray-100 text-gray-700 border-gray-200",
+          cancelled: "bg-red-100 text-red-700 border-red-200",
         };
         return (
           <Badge variant="secondary" className={colors[value] || ""}>

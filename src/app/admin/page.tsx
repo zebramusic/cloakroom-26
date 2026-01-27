@@ -17,9 +17,9 @@ interface OrderData {
 
 interface QuoteData {
   id: string;
-  customerName: string;
-  companyName: string;
-  quantity: number;
+  clientName: string;
+  clientCompany: string;
+  estimatedParticipants: number;
   status: string;
   createdAt: string;
 }
@@ -127,9 +127,9 @@ export default async function AdminDashboardPage() {
 
   const quotesData: QuoteData[] = recentQuotes.map((quote: any) => ({
     id: quote._id.toString(),
-    customerName: quote.customerName,
-    companyName: quote.companyName || "N/A",
-    quantity: quote.quantity,
+    clientName: quote.clientName,
+    clientCompany: quote.clientCompany || "N/A",
+    estimatedParticipants: quote.estimatedParticipants,
     status: quote.status,
     createdAt: quote.createdAt.toISOString(),
   }));
