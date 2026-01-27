@@ -468,9 +468,9 @@ export default function ProductForm({ productId }: ProductFormProps) {
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
                       <Label>Upload Images (max 5)</Label>
-                      <divref={fileInputRef}
-                           className="flex items-center gap-4">
+                      <div className="flex items-center gap-4">
                         <Input
+                          ref={fileInputRef}
                           type="file"
                           accept="image/*"
                           multiple
