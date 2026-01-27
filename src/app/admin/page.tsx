@@ -41,7 +41,14 @@ export default async function AdminDashboardPage() {
   const now = new Date();
   const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+  const endOfLastMonth = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    0,
+    23,
+    59,
+    59,
+  );
 
   // Fetch stats
   const totalOrders = await Order.countDocuments();
@@ -55,9 +62,14 @@ export default async function AdminDashboardPage() {
   const thisMonthOrders = await Order.countDocuments({
     createdAt: { $gte: startOfThisMonth },
   });
-  const ordersTrend = lastMonthOrders > 0 
-    ? Math.round(((thisMonthOrders - lastMonthOrders) / lastMonthOrders) * 100)
-    : thisMonthOrders > 0 ? 100 : 0;
+  const ordersTrend =
+    lastMonthOrders > 0
+      ? Math.round(
+          ((thisMonthOrders - lastMonthOrders) / lastMonthOrders) * 100,
+        )
+      : thisMonthOrders > 0
+        ? 100
+        : 0;
 
   // Calculate total revenue
   const revenueData = await Order.aggregate([
@@ -68,29 +80,34 @@ export default async function AdminDashboardPage() {
 
   // Calculate last month's revenue for trend
   const lastMonthRevenueData = await Order.aggregate([
-    { 
-      $match: { 
+    {
+      $match: {
         paymentStatus: "paid",
-        createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
-      } 
+        createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth },
+      },
     },
     { $group: { _id: null, total: { $sum: "$total" } } },
   ]);
   const lastMonthRevenue = lastMonthRevenueData[0]?.total || 0;
-  
+
   const thisMonthRevenueData = await Order.aggregate([
-    { 
-      $match: { 
+    {
+      $match: {
         paymentStatus: "paid",
-        createdAt: { $gte: startOfThisMonth }
-      } 
+        createdAt: { $gte: startOfThisMonth },
+      },
     },
     { $group: { _id: null, total: { $sum: "$total" } } },
   ]);
   const thisMonthRevenue = thisMonthRevenueData[0]?.total || 0;
-  const revenueTrend = lastMonthRevenue > 0
-    ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
-    : thisMonthRevenue > 0 ? 100 : 0;
+  const revenueTrend =
+    lastMonthRevenue > 0
+      ? Math.round(
+          ((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100,
+        )
+      : thisMonthRevenue > 0
+        ? 100
+        : 0;
 
   // Calculate last month's quotes for trend
   const lastMonthQuotes = await Quote.countDocuments({
@@ -99,9 +116,14 @@ export default async function AdminDashboardPage() {
   const thisMonthQuotes = await Quote.countDocuments({
     createdAt: { $gte: startOfThisMonth },
   });
-  const quotesTrend = lastMonthQuotes > 0
-    ? Math.round(((thisMonthQuotes - lastMonthQuotes) / lastMonthQuotes) * 100)
-    : thisMonthQuotes > 0 ? 100 : 0;
+  const quotesTrend =
+    lastMonthQuotes > 0
+      ? Math.round(
+          ((thisMonthQuotes - lastMonthQuotes) / lastMonthQuotes) * 100,
+        )
+      : thisMonthQuotes > 0
+        ? 100
+        : 0;
 
   // Fetch recent orders
   const recentOrders = await Order.find()
