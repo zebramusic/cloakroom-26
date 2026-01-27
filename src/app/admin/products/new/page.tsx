@@ -184,6 +184,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    console.log('📁 Files selected:', files.length);
+
     // Check if adding these files would exceed 5 images
     if (images.length + files.length > 5) {
       alert(
@@ -202,6 +204,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+        console.log(`⬆️ Uploading file ${i + 1}/${files.length}:`, file.name);
+        
         const formData = new FormData();
         formData.append("file", file);
         formData.append("folder", "products");
@@ -211,22 +215,35 @@ export default function ProductForm({ productId }: ProductFormProps) {
           body: formData,
         });
 
+        console.log(`📡 Upload response status:`, res.status);
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error('❌ Upload failed:', errorText);
+          throw new Error(`Upload failed: ${res.status}`);
+        }
+
         const data = await res.json();
+        console.log('✅ Upload successful:', data.url);
+        
         if (data.url) {
           uploadedUrls.push(data.url);
         }
       }
 
+      console.log('🎉 All uploads complete, setting images');
       setImages([...images, ...uploadedUrls]);
+      
       // Clear input after successful upload to allow selecting same files again
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     } catch (error) {
-      console.error("Error uploading images:", error);
-      alert("Failed to upload some images");
+      console.error("❌ Error uploading images:", error);
+      alert("Failed to upload images. Check console for details.");
     } finally {
       setIsUploading(false);
+      console.log('🏁 Upload process finished');
     }
   };
 
