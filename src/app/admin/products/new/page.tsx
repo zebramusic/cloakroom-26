@@ -180,7 +180,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
     const files = e.target.files;
     if (!files || files.length === 0) return;
 

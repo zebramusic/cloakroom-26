@@ -38,7 +38,6 @@ export function ImageUploadDialog({
   const [captionEn, setCaptionEn] = useState("");
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
     if (e.target.files) {
       const files = Array.from(e.target.files);
       setSelectedFiles(files);

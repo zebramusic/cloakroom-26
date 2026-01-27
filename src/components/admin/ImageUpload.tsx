@@ -75,7 +75,6 @@ export default function ImageUpload({
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
     const file = e.target.files?.[0];
     if (file) {
       handleFileSelect(file);
