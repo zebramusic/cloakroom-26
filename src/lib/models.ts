@@ -147,10 +147,22 @@ export interface IProductVariant {
 }
 
 export interface IProduct extends Document {
-  name: string;
+  name: string; // Kept for backwards compatibility, will use localeContent.ro.name
   slug: string;
-  description?: string;
-  shortDescription?: string;
+  description?: string; // Kept for backwards compatibility
+  shortDescription?: string; // Kept for backwards compatibility
+  localeContent: {
+    ro: {
+      name: string;
+      description?: string;
+      shortDescription?: string;
+    };
+    en: {
+      name: string;
+      description?: string;
+      shortDescription?: string;
+    };
+  };
   category: string;
   subcategory?: string;
   basePrice: number;
@@ -180,10 +192,22 @@ export interface IProduct extends Document {
 }
 
 const ProductSchema = new Schema<IProduct>({
-  name: { type: String, required: true },
+  name: { type: String, required: true }, // Backwards compatibility
   slug: { type: String, required: true, unique: true },
-  description: String,
-  shortDescription: String,
+  description: String, // Backwards compatibility
+  shortDescription: String, // Backwards compatibility
+  localeContent: {
+    ro: {
+      name: { type: String, required: true },
+      description: String,
+      shortDescription: String,
+    },
+    en: {
+      name: { type: String, default: '' },
+      description: String,
+      shortDescription: String,
+    },
+  },
   category: { type: String, required: true },
   subcategory: String,
   basePrice: { type: Number, required: true },

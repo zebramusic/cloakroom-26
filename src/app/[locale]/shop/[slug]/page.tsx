@@ -42,9 +42,10 @@ export default async function ProductDetailPage({
     notFound();
   }
 
-  const name = product.name;
-  const description = product.description;
-  const features = product.shortDescription;
+  // Get localized content or fallback to default fields
+  const name = product.localeContent?.[locale as 'ro' | 'en']?.name || product.name;
+  const description = product.localeContent?.[locale as 'ro' | 'en']?.description || product.description;
+  const features = product.localeContent?.[locale as 'ro' | 'en']?.shortDescription || product.shortDescription;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat(locale === "ro" ? "ro-RO" : "en-US", {

@@ -82,14 +82,14 @@ export default function ProductForm({ productId }: ProductFormProps) {
         const p = data.product;
         setFormData({
           category_id: p.category || p.category_id || "",
-          name_ro: p.name || p.name_ro || "",
-          name_en: p.name || p.name_en || "",
+          name_ro: p.localeContent?.ro?.name || p.name || p.name_ro || "",
+          name_en: p.localeContent?.en?.name || p.name_en || "",
           slug: p.slug || "",
           sku: p.sku || "",
-          description_ro: p.description || p.description_ro || "",
-          description_en: p.description || p.description_en || "",
-          features_ro: p.features_ro || "",
-          features_en: p.features_en || "",
+          description_ro: p.localeContent?.ro?.description || p.description || p.description_ro || "",
+          description_en: p.localeContent?.en?.description || p.description_en || "",
+          features_ro: p.localeContent?.ro?.shortDescription || p.features_ro || "",
+          features_en: p.localeContent?.en?.shortDescription || p.features_en || "",
           base_price: p.basePrice || p.base_price || 0,
           tax_rate: p.taxRate ? p.taxRate * 100 : p.tax_rate || 21.0,
           has_variants:

@@ -50,11 +50,23 @@ export async function POST(request: Request) {
 
     // Create product with variants
     const productData: any = {
-      name: body.name || body.name_ro,
+      name: body.name || body.name_ro, // Backwards compatibility
       slug: body.slug,
       sku: body.sku,
-      description: body.description || body.description_ro,
+      description: body.description || body.description_ro, // Backwards compatibility
       shortDescription: body.shortDescription,
+      localeContent: {
+        ro: {
+          name: body.name_ro || body.name,
+          description: body.description_ro || body.description,
+          shortDescription: body.features_ro,
+        },
+        en: {
+          name: body.name_en || body.name,
+          description: body.description_en || body.description,
+          shortDescription: body.features_en,
+        },
+      },
       category: body.category || body.category_id,
       subcategory: body.subcategory,
       basePrice: body.base_price || body.basePrice,

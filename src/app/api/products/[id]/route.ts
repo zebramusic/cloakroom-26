@@ -64,6 +64,22 @@ export async function PATCH(
     if (body.description !== undefined) updateData.description = body.description;
     if (body.description_ro !== undefined) updateData.description = body.description_ro;
     if (body.shortDescription !== undefined) updateData.shortDescription = body.shortDescription;
+    
+    // Update localeContent for both languages
+    if (body.name_ro || body.name_en || body.description_ro || body.description_en || body.features_ro || body.features_en) {
+      updateData.localeContent = {
+        ro: {
+          name: body.name_ro || body.name,
+          description: body.description_ro || body.description,
+          shortDescription: body.features_ro,
+        },
+        en: {
+          name: body.name_en || body.name,
+          description: body.description_en || body.description,
+          shortDescription: body.features_en,
+        },
+      };
+    }
     if (body.base_price !== undefined) updateData.basePrice = body.base_price;
     if (body.basePrice !== undefined) updateData.basePrice = body.basePrice;
     if (body.compareAtPrice !== undefined) updateData.compareAtPrice = body.compareAtPrice;
