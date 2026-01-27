@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ interface Category {
 
 export default function ProductForm({ productId }: ProductFormProps) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -218,8 +219,10 @@ export default function ProductForm({ productId }: ProductFormProps) {
       alert("Failed to upload some images");
     } finally {
       setIsUploading(false);
-      // Reset file input
-      e.target.value = "";
+      // Reset file input to allow selecting same file again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -465,7 +468,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
                       <Label>Upload Images (max 5)</Label>
-                      <div className="flex items-center gap-4">
+                      <divref={fileInputRef}
+                           className="flex items-center gap-4">
                         <Input
                           type="file"
                           accept="image/*"
