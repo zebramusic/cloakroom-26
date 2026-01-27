@@ -189,6 +189,10 @@ export default function ProductForm({ productId }: ProductFormProps) {
       alert(
         `You can only upload up to 5 images. Currently you have ${images.length} image(s).`,
       );
+      // Clear the input so user can try again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       return;
     }
 
@@ -214,15 +218,15 @@ export default function ProductForm({ productId }: ProductFormProps) {
       }
 
       setImages([...images, ...uploadedUrls]);
+      // Clear input after successful upload to allow selecting same files again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (error) {
       console.error("Error uploading images:", error);
       alert("Failed to upload some images");
     } finally {
       setIsUploading(false);
-      // Reset file input to allow selecting same file again
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
     }
   };
 
