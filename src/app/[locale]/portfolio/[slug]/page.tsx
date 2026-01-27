@@ -14,9 +14,12 @@ export default async function PortfolioDetailPage({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { locale, slug } = await params;
+  const { locale, slug: rawSlug } = await params;
   unstable_setRequestLocale(locale);
   const t = await getTranslations("portfolio");
+
+  // Decode the slug (handles URL-encoded characters like %20 for spaces)
+  const slug = decodeURIComponent(rawSlug);
 
   // Fetch portfolio item directly from database
   const connectDB = (await import("@/lib/mongodb")).default;
