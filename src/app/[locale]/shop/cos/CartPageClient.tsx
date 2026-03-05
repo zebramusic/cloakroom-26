@@ -45,7 +45,11 @@ export function CartPageClient({ locale }: { locale: string }) {
 
               {items.map((item) => (
                 <CartItemComponent
-                  key={item.variant_id || item.product_id}
+                  key={
+                    item.variant_id
+                      ? `variant:${item.variant_id}`
+                      : `product:${item.product_id}`
+                  }
                   item={item}
                   locale={locale}
                 />

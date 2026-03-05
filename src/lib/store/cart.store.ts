@@ -15,8 +15,8 @@ export interface CartItem {
 interface CartStore {
   items: CartItem[]
   addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void
-  updateQuantity: (variantId: string, quantity: number) => void
-  removeItem: (variantId: string) => void
+  updateQuantity: (itemId: string, quantity: number) => void
+  removeItem: (itemId: string) => void
   clearCart: () => void
   getItemCount: () => number
   getSubtotal: () => number
@@ -51,6 +51,9 @@ const setStoredItems = (items: CartItem[]) => {
   }
 }
 
+const getCartItemKey = (item: Pick<CartItem, "product_id" | "variant_id">) =>
+  item.variant_id ? `variant:${item.variant_id}` : `product:${item.product_id}`
+
 export const useCartStore = create<CartStore>()((set, get) => ({
   items: [],
 
@@ -61,9 +64,8 @@ export const useCartStore = create<CartStore>()((set, get) => ({
 
   addItem: (item) => {
     const items = get().items
-    const existingIndex = items.findIndex(
-      (i) => i.variant_id === item.variant_id || i.product_id === item.product_id
-    )
+    const incomingKey = getCartItemKey(item)
+    const existingIndex = items.findIndex((existingItem) => getCartItemKey(existingItem) === incomingKey)
 
     let newItems: CartItem[]
     if (existingIndex > -1) {
@@ -77,15 +79,15 @@ export const useCartStore = create<CartStore>()((set, get) => ({
     setStoredItems(newItems)
   },
 
-  updateQuantity: (variantId, quantity) => {
+  updateQuantity: (itemId, quantity) => {
     if (quantity <= 0) {
-      get().removeItem(variantId)
+      get().removeItem(itemId)
       return
     }
 
     const items = get().items
     const newItems = items.map((item) =>
-      item.variant_id === variantId || item.product_id === variantId
+      getCartItemKey(item) === itemId || item.product_id === itemId || item.variant_id === itemId
         ? { ...item, quantity }
         : item
     )
@@ -94,10 +96,13 @@ export const useCartStore = create<CartStore>()((set, get) => ({
     setStoredItems(newItems)
   },
 
-  removeItem: (variantId) => {
+  removeItem: (itemId) => {
     const items = get().items
     const newItems = items.filter(
-      (item) => item.variant_id !== variantId && item.product_id !== variantId
+      (item) =>
+        getCartItemKey(item) !== itemId &&
+        item.product_id !== itemId &&
+        item.variant_id !== itemId
     )
     
     set({ items: newItems })

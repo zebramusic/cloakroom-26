@@ -14,6 +14,9 @@ interface CartItemProps {
 export function CartItemComponent({ item, locale }: CartItemProps) {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
+  const itemId = item.variant_id
+    ? `variant:${item.variant_id}`
+    : `product:${item.product_id}`;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat(locale === "ro" ? "ro-RO" : "en-US", {
@@ -24,12 +27,12 @@ export function CartItemComponent({ item, locale }: CartItemProps) {
 
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity >= 1 && newQuantity <= 999) {
-      updateQuantity(item.variant_id || item.product_id, newQuantity);
+      updateQuantity(itemId, newQuantity);
     }
   };
 
   const handleRemove = () => {
-    removeItem(item.variant_id || item.product_id);
+    removeItem(itemId);
   };
 
   return (
