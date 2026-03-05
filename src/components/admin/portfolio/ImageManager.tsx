@@ -14,6 +14,9 @@ interface ImageManagerProps {
 export function ImageManager({ itemId }: ImageManagerProps) {
   const [images, setImages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isReordering, setIsReordering] = useState(false);
+  const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
+  const [dragOverImageId, setDragOverImageId] = useState<string | null>(null);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [editingImage, setEditingImage] = useState<any>(null);
 
@@ -67,6 +70,61 @@ export function ImageManager({ itemId }: ImageManagerProps) {
     setEditingImage(null);
   };
 
+  const persistImageOrder = async (reorderedImages: any[]) => {
+    try {
+      setIsReordering(true);
+
+      await Promise.all(
+        reorderedImages.map(async (image, index) => {
+          const response = await fetch(
+            `/api/admin/portfolio/${itemId}/images/${image._id}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orderIndex: index }),
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to persist image order");
+          }
+        }),
+      );
+    } catch (error) {
+      console.error("Failed to reorder images:", error);
+      alert("Failed to reorder images");
+      fetchImages();
+    } finally {
+      setIsReordering(false);
+    }
+  };
+
+  const handleDropImage = (targetImageId: string) => {
+    if (!draggedImageId || draggedImageId === targetImageId) {
+      setDraggedImageId(null);
+      setDragOverImageId(null);
+      return;
+    }
+
+    const sourceIndex = images.findIndex((img) => img._id === draggedImageId);
+    const targetIndex = images.findIndex((img) => img._id === targetImageId);
+
+    if (sourceIndex === -1 || targetIndex === -1) {
+      setDraggedImageId(null);
+      setDragOverImageId(null);
+      return;
+    }
+
+    const reorderedImages = [...images];
+    const [movedImage] = reorderedImages.splice(sourceIndex, 1);
+    reorderedImages.splice(targetIndex, 0, movedImage);
+
+    setImages(reorderedImages);
+    setDraggedImageId(null);
+    setDragOverImageId(null);
+    persistImageOrder(reorderedImages);
+  };
+
   if (loading) {
     return <div className="text-muted-foreground">Loading images...</div>;
   }
@@ -76,16 +134,21 @@ export function ImageManager({ itemId }: ImageManagerProps) {
       <div className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground">
           {images.length} image{images.length !== 1 ? "s" : ""} (max 20)
+          {images.length > 1 ? " • Drag to reorder" : ""}
         </p>
         <Button
           type="button"
           onClick={() => setUploadDialogOpen(true)}
-          disabled={images.length >= 20}
+          disabled={images.length >= 20 || isReordering}
         >
           <Upload className="h-4 w-4 mr-2" />
           Upload Images
         </Button>
       </div>
+
+      {isReordering && (
+        <p className="text-xs text-muted-foreground">Saving image order...</p>
+      )}
 
       {images.length === 0 ? (
         <div className="border-2 border-dashed rounded-lg p-12 text-center">
@@ -101,8 +164,34 @@ export function ImageManager({ itemId }: ImageManagerProps) {
             <div
               key={image._id}
               className="relative group border rounded-lg overflow-hidden bg-muted"
+              draggable
+              onDragStart={() => setDraggedImageId(image._id)}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (dragOverImageId !== image._id) {
+                  setDragOverImageId(image._id);
+                }
+              }}
+              onDragLeave={() => {
+                if (dragOverImageId === image._id) {
+                  setDragOverImageId(null);
+                }
+              }}
+              onDrop={() => handleDropImage(image._id)}
+              onDragEnd={() => {
+                setDraggedImageId(null);
+                setDragOverImageId(null);
+              }}
             >
-              <div className="aspect-square relative">
+              <div
+                className={`aspect-square relative transition-all ${
+                  draggedImageId === image._id ? "opacity-60" : ""
+                } ${
+                  dragOverImageId === image._id
+                    ? "ring-2 ring-primary ring-offset-2"
+                    : ""
+                }`}
+              >
                 <Image
                   src={image.variants.thumbUrl}
                   alt={image.altText.ro || "Portfolio image"}
