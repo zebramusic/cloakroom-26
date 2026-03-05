@@ -147,7 +147,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
             (p.variants && p.variants.length > 0) || p.has_variants || false,
           track_inventory: p.trackInventory ?? p.track_inventory ?? true,
           stock_quantity: p.stock || p.stock_quantity || 0,
-          low_stock_threshold: p.lowStockThreshold ?? p.low_stock_threshold ?? 5,
+          low_stock_threshold:
+            p.lowStockThreshold ?? p.low_stock_threshold ?? 5,
           is_active: p.isActive ?? p.is_active ?? true,
           is_featured: p.isFeatured ?? p.is_featured ?? false,
           is_returnable: p.isReturnable ?? p.is_returnable ?? true,
@@ -619,7 +620,9 @@ export default function ProductForm({ productId }: ProductFormProps) {
                                 src={imageUrl}
                                 alt={`Product ${index + 1}`}
                                 className={`w-full h-full object-cover transition-opacity ${
-                                  draggedImageIndex === index ? "opacity-60" : ""
+                                  draggedImageIndex === index
+                                    ? "opacity-60"
+                                    : ""
                                 } ${
                                   dragOverImageIndex === index
                                     ? "ring-2 ring-primary ring-offset-2"
