@@ -6,7 +6,32 @@ import { Partner } from "@/lib/models";
 
 function isValidUploadedPartnerLogo(logo?: string) {
   if (!logo) return true;
-  return logo.startsWith("/uploads/partners/");
+  if (logo.startsWith("http://") || logo.startsWith("https://")) {
+    try {
+      const url = new URL(logo);
+      return (
+        url.pathname.startsWith("/uploads/partners/") ||
+        url.pathname.startsWith("/partners/")
+      );
+    } catch {
+      return false;
+    }
+  }
+  return (
+    logo.startsWith("/uploads/partners/") ||
+    logo.startsWith("/partners/")
+  );
+}
+
+function normalizeLogoValue(logo?: string | null) {
+  if (!logo) return undefined;
+  return logo;
+}
+
+function getOrderNumberValue(body: any) {
+  const raw = body.orderNumber ?? body.display_order ?? body.order ?? 0;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 /**
@@ -24,9 +49,19 @@ export async function GET(request: Request) {
       query.isActive = true;
     }
 
-    const partners = await Partner.find(query).sort({ order: 1 }).lean();
+    const partners = await Partner.find(query).lean();
+    const normalizedPartners = partners
+      .map((partner) => {
+        const effectiveOrder = partner.orderNumber ?? partner.order ?? 0;
+        return {
+          ...partner,
+          orderNumber: effectiveOrder,
+          order: effectiveOrder,
+        };
+      })
+      .sort((a, b) => a.orderNumber - b.orderNumber);
 
-    return NextResponse.json({ partners });
+    return NextResponse.json({ partners: normalizedPartners });
   } catch (error: any) {
     console.error("Error in GET /api/partners:", error);
     return NextResponse.json(
@@ -53,7 +88,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     await connectDB();
 
-    const logoValue = body.logo_url || body.logo;
+    const logoValue = normalizeLogoValue(body.logo_url || body.logo);
     if (!isValidUploadedPartnerLogo(logoValue)) {
       return NextResponse.json(
         { error: "Logo must be uploaded via the platform" },
@@ -61,13 +96,16 @@ export async function POST(request: Request) {
       );
     }
 
+    const orderNumber = getOrderNumberValue(body);
+
     const partner = await Partner.create({
       name: body.name,
       slug: body.slug,
       logo: logoValue || undefined,
       website: body.website_url || body.website || undefined,
       description: body.description || undefined,
-      order: body.display_order || body.order || 0,
+      orderNumber,
+      order: orderNumber,
       isActive: body.is_published ?? body.isActive ?? true,
       contactEmail: body.contactEmail,
       contactPhone: body.contactPhone,

@@ -8,20 +8,24 @@ import { Partner } from "@/lib/models";
 async function getPartners() {
   try {
     await connectDB();
-    const partners = await Partner.find({ isActive: true })
-      .sort({ order: 1 })
-      .lean();
+    const partners = await Partner.find({ isActive: true }).lean();
 
     // Convert MongoDB documents to plain objects with string IDs
-    return partners.map((partner) => ({
-      _id: partner._id.toString(),
-      name: partner.name,
-      slug: partner.slug,
-      logo: partner.logo,
-      website: partner.website,
-      description: partner.description,
-      order: partner.order,
-    }));
+    return partners
+      .map((partner) => {
+        const effectiveOrder = partner.orderNumber ?? partner.order ?? 0;
+        return {
+          _id: partner._id.toString(),
+          name: partner.name,
+          slug: partner.slug,
+          logo: partner.logo,
+          website: partner.website,
+          description: partner.description,
+          orderNumber: effectiveOrder,
+          order: effectiveOrder,
+        };
+      })
+      .sort((a, b) => a.orderNumber - b.orderNumber);
   } catch (error) {
     console.error("Error fetching partners:", error);
     return [];

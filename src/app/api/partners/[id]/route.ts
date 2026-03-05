@@ -7,7 +7,33 @@ import mongoose from "mongoose";
 
 function isValidUploadedPartnerLogo(logo?: string) {
   if (!logo) return true;
-  return logo.startsWith("/uploads/partners/");
+  if (logo.startsWith("http://") || logo.startsWith("https://")) {
+    try {
+      const url = new URL(logo);
+      return (
+        url.pathname.startsWith("/uploads/partners/") ||
+        url.pathname.startsWith("/partners/")
+      );
+    } catch {
+      return false;
+    }
+  }
+  return (
+    logo.startsWith("/uploads/partners/") ||
+    logo.startsWith("/partners/")
+  );
+}
+
+function normalizeLogoValue(logo?: string | null) {
+  if (!logo) return undefined;
+  return logo;
+}
+
+function getOrderNumberValue(body: any) {
+  const raw = body.orderNumber ?? body.display_order ?? body.order;
+  if (raw === undefined) return undefined;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 /**
@@ -31,7 +57,14 @@ export async function GET(
       return NextResponse.json({ error: "Partner not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ partner });
+    const effectiveOrder = partner.orderNumber ?? partner.order ?? 0;
+    return NextResponse.json({
+      partner: {
+        ...partner,
+        orderNumber: effectiveOrder,
+        order: effectiveOrder,
+      },
+    });
   } catch (error: any) {
     console.error("Error in GET /api/partners/[id]:", error);
     return NextResponse.json(
@@ -62,10 +95,25 @@ export async function PATCH(
     const body = await request.json();
     await connectDB();
 
-    const nextLogoValue =
-      body.logo_url !== undefined ? body.logo_url : body.logo;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid partner ID" }, { status: 400 });
+    }
+
+    const existingPartner = await Partner.findById(id).select("logo").lean();
+
+    if (!existingPartner) {
+      return NextResponse.json({ error: "Partner not found" }, { status: 404 });
+    }
+
+    const nextLogoValue = normalizeLogoValue(
+      body.logo_url !== undefined ? body.logo_url : body.logo,
+    );
+    const existingLogoValue = normalizeLogoValue(existingPartner.logo);
+    const isKeepingExistingLogo =
+      nextLogoValue !== undefined && nextLogoValue === existingLogoValue;
     if (
       nextLogoValue !== undefined &&
+      !isKeepingExistingLogo &&
       !isValidUploadedPartnerLogo(nextLogoValue)
     ) {
       return NextResponse.json(
@@ -74,21 +122,20 @@ export async function PATCH(
       );
     }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return NextResponse.json({ error: "Invalid partner ID" }, { status: 400 });
-    }
-
     // Build update object with only allowed fields
     const updateData: any = {};
     if (body.name !== undefined) updateData.name = body.name;
     if (body.slug !== undefined) updateData.slug = body.slug;
-    if (body.logo_url !== undefined) updateData.logo = body.logo_url;
-    if (body.logo !== undefined) updateData.logo = body.logo;
+    if (body.logo_url !== undefined) updateData.logo = nextLogoValue;
+    if (body.logo !== undefined) updateData.logo = nextLogoValue;
     if (body.website_url !== undefined) updateData.website = body.website_url;
     if (body.website !== undefined) updateData.website = body.website;
     if (body.description !== undefined) updateData.description = body.description;
-    if (body.display_order !== undefined) updateData.order = body.display_order;
-    if (body.order !== undefined) updateData.order = body.order;
+    const orderNumber = getOrderNumberValue(body);
+    if (orderNumber !== undefined) {
+      updateData.orderNumber = orderNumber;
+      updateData.order = orderNumber;
+    }
     if (body.is_published !== undefined) updateData.isActive = body.is_published;
     if (body.isActive !== undefined) updateData.isActive = body.isActive;
     if (body.contactEmail !== undefined) updateData.contactEmail = body.contactEmail;
@@ -111,7 +158,14 @@ export async function PATCH(
       return NextResponse.json({ error: "Partner not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ partner });
+    const effectiveOrder = partner.orderNumber ?? partner.order ?? 0;
+    return NextResponse.json({
+      partner: {
+        ...partner,
+        orderNumber: effectiveOrder,
+        order: effectiveOrder,
+      },
+    });
   } catch (error: any) {
     console.error("Error in PATCH /api/partners/[id]:", error);
     return NextResponse.json(

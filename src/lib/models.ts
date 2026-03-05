@@ -116,7 +116,8 @@ export interface IPartner extends Document {
   contactPhone?: string;
   description?: string;
   isActive: boolean;
-  order: number;
+  orderNumber: number;
+  order?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -130,6 +131,7 @@ const PartnerSchema = new Schema<IPartner>({
   contactPhone: String,
   description: String,
   isActive: { type: Boolean, default: true },
+  orderNumber: { type: Number, default: 0 },
   order: { type: Number, default: 0 },
 }, { timestamps: true });
 

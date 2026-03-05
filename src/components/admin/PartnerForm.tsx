@@ -25,7 +25,7 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
     logo_url: null as string | null,
     website_url: "",
     description: "",
-    display_order: 0,
+    orderNumber: 0,
     is_published: true,
     contactEmail: "",
     contactPhone: "",
@@ -44,7 +44,7 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
           logo_url: partner.logo || null,
           website_url: partner.website || "",
           description: partner.description || "",
-          display_order: partner.order || 0,
+          orderNumber: partner.orderNumber ?? partner.order ?? 0,
           is_published: partner.isActive ?? true,
           contactEmail: partner.contactEmail || "",
           contactPhone: partner.contactPhone || "",
@@ -93,14 +93,17 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to save partner");
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || "Failed to save partner");
       }
 
       router.push("/admin/partners");
       router.refresh();
     } catch (error) {
       console.error("Error saving partner:", error);
-      alert("Failed to save partner");
+      const message =
+        error instanceof Error ? error.message : "Failed to save partner";
+      alert(message);
     } finally {
       setIsSaving(false);
     }
@@ -256,15 +259,15 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="display_order">Display Order</Label>
+                  <Label htmlFor="orderNumber">Order Number</Label>
                   <Input
-                    id="display_order"
+                    id="orderNumber"
                     type="number"
-                    value={formData.display_order}
+                    value={formData.orderNumber}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        display_order: parseInt(e.target.value) || 0,
+                        orderNumber: parseInt(e.target.value, 10) || 0,
                       })
                     }
                     min={0}

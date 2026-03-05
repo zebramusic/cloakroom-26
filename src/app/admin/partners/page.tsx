@@ -15,7 +15,7 @@ interface Partner {
   logo: string | null;
   website: string | null;
   description: string | null;
-  order: number;
+  orderNumber: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -98,8 +98,8 @@ export default function PartnersPage() {
         ),
     },
     {
-      key: "order",
-      label: "Order",
+      key: "orderNumber",
+      label: "Order Number",
       sortable: true,
     },
     {
