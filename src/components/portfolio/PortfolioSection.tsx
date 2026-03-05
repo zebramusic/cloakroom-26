@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PortfolioCard } from "./PortfolioCard";
-import { MagnifierModal } from "./MagnifierModal";
 import { ArrowRight } from "lucide-react";
 
 interface PortfolioSectionProps {
@@ -16,9 +15,6 @@ export function PortfolioSection({ locale }: PortfolioSectionProps) {
   const t = useTranslations("portfolio");
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [modalImages, setModalImages] = useState<any[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/portfolio?featured=true&limit=6")
@@ -32,18 +28,6 @@ export function PortfolioSection({ locale }: PortfolioSectionProps) {
         setLoading(false);
       });
   }, []);
-
-  const handleCardClick = async (item: any) => {
-    try {
-      const res = await fetch(`/api/portfolio/${item.slug}`);
-      const data = await res.json();
-      setSelectedItem(data.item);
-      setModalImages(data.images || []);
-      setIsModalOpen(true);
-    } catch (error) {
-      console.error("Failed to load portfolio details:", error);
-    }
-  };
 
   if (loading) {
     return (
@@ -80,7 +64,7 @@ export function PortfolioSection({ locale }: PortfolioSectionProps) {
                 key={item._id}
                 item={item}
                 locale={locale}
-                onClick={() => handleCardClick(item)}
+                href={`/${locale}/portfolio/${item.slug}`}
               />
             ))}
           </div>
@@ -96,22 +80,6 @@ export function PortfolioSection({ locale }: PortfolioSectionProps) {
         </div>
       </section>
 
-      {selectedItem && modalImages.length > 0 && (
-        <MagnifierModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          images={modalImages}
-          initialIndex={0}
-          itemTitle={
-            locale === "en" && selectedItem.localeContent.en.title
-              ? selectedItem.localeContent.en.title
-              : selectedItem.localeContent.ro.title
-          }
-          itemSlug={selectedItem.slug}
-          itemMeta={selectedItem.eventMeta}
-          locale={locale}
-        />
-      )}
     </>
   );
 }

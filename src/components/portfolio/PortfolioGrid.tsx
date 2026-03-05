@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { PortfolioCard } from "./PortfolioCard";
-import { MagnifierModal } from "./MagnifierModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,10 +25,6 @@ export function PortfolioGrid({
 }: PortfolioGridProps) {
   const t = useTranslations("portfolio");
   const [items, setItems] = useState(initialItems);
-  const [loading, setLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [modalImages, setModalImages] = useState<any[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Filters
   const [search, setSearch] = useState("");
@@ -85,18 +80,6 @@ export function PortfolioGrid({
 
     return matchesSearch && matchesYear && matchesType && matchesTag;
   });
-
-  const handleCardClick = async (item: any) => {
-    try {
-      const res = await fetch(`/api/portfolio/${item.slug}`);
-      const data = await res.json();
-      setSelectedItem(data.item);
-      setModalImages(data.images || []);
-      setIsModalOpen(true);
-    } catch (error) {
-      console.error("Failed to load portfolio details:", error);
-    }
-  };
 
   return (
     <div className="space-y-8">
@@ -172,7 +155,7 @@ export function PortfolioGrid({
               key={item._id}
               item={item}
               locale={locale}
-              onClick={() => handleCardClick(item)}
+              href={`/${locale}/portfolio/${item.slug}`}
             />
           ))}
         </div>
@@ -184,23 +167,6 @@ export function PortfolioGrid({
         </div>
       )}
 
-      {/* Modal */}
-      {selectedItem && modalImages.length > 0 && (
-        <MagnifierModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          images={modalImages}
-          initialIndex={0}
-          itemTitle={
-            locale === "en" && selectedItem.localeContent.en.title
-              ? selectedItem.localeContent.en.title
-              : selectedItem.localeContent.ro.title
-          }
-          itemSlug={selectedItem.slug}
-          itemMeta={selectedItem.eventMeta}
-          locale={locale}
-        />
-      )}
     </div>
   );
 }

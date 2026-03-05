@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Calendar, MapPin, Tag } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -30,9 +31,15 @@ interface PortfolioCardProps {
   };
   locale: string;
   onClick?: () => void;
+  href?: string;
 }
 
-export function PortfolioCard({ item, locale, onClick }: PortfolioCardProps) {
+export function PortfolioCard({
+  item,
+  locale,
+  onClick,
+  href,
+}: PortfolioCardProps) {
   const [imageError, setImageError] = useState(false);
 
   const content =
@@ -46,7 +53,7 @@ export function PortfolioCard({ item, locale, onClick }: PortfolioCardProps) {
       : item.coverImage.altText.ro
     : content.title;
 
-  return (
+  const cardContent = (
     <Card
       className="group cursor-pointer overflow-hidden transition-all hover:shadow-lg"
       onClick={onClick}
@@ -117,5 +124,13 @@ export function PortfolioCard({ item, locale, onClick }: PortfolioCardProps) {
         )}
       </CardContent>
     </Card>
+  );
+
+  return href ? (
+    <Link href={href} aria-label={content.title} className="block">
+      {cardContent}
+    </Link>
+  ) : (
+    cardContent
   );
 }
