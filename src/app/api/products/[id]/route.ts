@@ -137,6 +137,12 @@ export async function PATCH(
     if (body.tax_rate !== undefined) updateData.taxRate = body.tax_rate / 100; // Convert percentage to decimal
     if (body.taxRate !== undefined) updateData.taxRate = body.taxRate;
     if (body.variants !== undefined) updateData.variants = body.variants;
+    if (body.track_inventory !== undefined) updateData.trackInventory = body.track_inventory;
+    if (body.trackInventory !== undefined) updateData.trackInventory = body.trackInventory;
+    if (body.low_stock_threshold !== undefined) updateData.lowStockThreshold = body.low_stock_threshold;
+    if (body.lowStockThreshold !== undefined) updateData.lowStockThreshold = body.lowStockThreshold;
+    if (body.is_returnable !== undefined) updateData.isReturnable = body.is_returnable;
+    if (body.isReturnable !== undefined) updateData.isReturnable = body.isReturnable;
     if (body.stock_quantity !== undefined) updateData.stock = body.stock_quantity;
     if (body.stock !== undefined) updateData.stock = body.stock;
     if (body.is_active !== undefined) updateData.isActive = body.is_active;

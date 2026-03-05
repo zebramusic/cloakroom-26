@@ -176,6 +176,9 @@ export interface IProduct extends Document {
     is_primary?: boolean;
   }[];
   variants: IProductVariant[];
+  trackInventory?: boolean;
+  lowStockThreshold?: number;
+  isReturnable?: boolean;
   stock: number;
   sku: string;
   weight?: number;
@@ -229,6 +232,9 @@ const ProductSchema = new Schema<IProduct>({
     stock: Number,
     attributes: Schema.Types.Mixed,
   }],
+  trackInventory: { type: Boolean, default: true },
+  lowStockThreshold: { type: Number, default: 5 },
+  isReturnable: { type: Boolean, default: true },
   stock: { type: Number, default: 0 },
   sku: { type: String, required: true, unique: true },
   weight: Number,

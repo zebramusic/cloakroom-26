@@ -39,6 +39,12 @@ export default function ProductForm({ productId }: ProductFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(
+    null,
+  );
+  const [dragOverImageIndex, setDragOverImageIndex] = useState<number | null>(
+    null,
+  );
   const [categories, setCategories] = useState<Category[]>([]);
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [images, setImages] = useState<string[]>([]);
@@ -139,12 +145,12 @@ export default function ProductForm({ productId }: ProductFormProps) {
           tax_rate: p.taxRate ? p.taxRate * 100 : p.tax_rate || 21.0,
           has_variants:
             (p.variants && p.variants.length > 0) || p.has_variants || false,
-          track_inventory: p.track_inventory ?? true,
+          track_inventory: p.trackInventory ?? p.track_inventory ?? true,
           stock_quantity: p.stock || p.stock_quantity || 0,
-          low_stock_threshold: p.low_stock_threshold || 5,
+          low_stock_threshold: p.lowStockThreshold ?? p.low_stock_threshold ?? 5,
           is_active: p.isActive ?? p.is_active ?? true,
           is_featured: p.isFeatured ?? p.is_featured ?? false,
-          is_returnable: p.is_returnable ?? true,
+          is_returnable: p.isReturnable ?? p.is_returnable ?? true,
           weight_kg: p.weight || p.weight_kg || 0,
           dimensions: parseDimensions(p.dimensions),
         });
@@ -288,6 +294,31 @@ export default function ProductForm({ productId }: ProductFormProps) {
     setImages(images.filter((_, i) => i !== index));
   };
 
+  const handleImageDragStart = (index: number) => {
+    setDraggedImageIndex(index);
+  };
+
+  const handleImageDrop = (dropIndex: number) => {
+    if (draggedImageIndex === null || draggedImageIndex === dropIndex) {
+      setDraggedImageIndex(null);
+      setDragOverImageIndex(null);
+      return;
+    }
+
+    const reorderedImages = [...images];
+    const [movedImage] = reorderedImages.splice(draggedImageIndex, 1);
+    reorderedImages.splice(dropIndex, 0, movedImage);
+
+    setImages(reorderedImages);
+    setDraggedImageIndex(null);
+    setDragOverImageIndex(null);
+  };
+
+  const handleImageDragEnd = () => {
+    setDraggedImageIndex(null);
+    setDragOverImageIndex(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -314,7 +345,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
           alt: `${formData.name_ro || formData.name_en} - Image ${index + 1}`,
           is_primary: index === 0,
         })),
-        variants: !productId && formData.has_variants ? variants : undefined,
+        variants: formData.has_variants ? variants : [],
       };
 
       const res = await fetch(url, {
@@ -324,14 +355,17 @@ export default function ProductForm({ productId }: ProductFormProps) {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to save product");
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || "Failed to save product");
       }
 
       router.push("/admin/products");
       router.refresh();
     } catch (error) {
       console.error("Error saving product:", error);
-      alert("Failed to save product");
+      const message =
+        error instanceof Error ? error.message : "Failed to save product";
+      alert(message);
     } finally {
       setIsSaving(false);
     }
@@ -553,7 +587,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                       </div>
                       <p className="text-xs text-gray-500">
                         First image will be the main product image. Upload up to
-                        5 images total.
+                        5 images total. Drag images to change display order.
                       </p>
                     </div>
 
@@ -561,12 +595,36 @@ export default function ProductForm({ productId }: ProductFormProps) {
                     {images.length > 0 && (
                       <div className="grid grid-cols-5 gap-4">
                         {images.map((imageUrl, index) => (
-                          <div key={index} className="relative group">
+                          <div
+                            key={`${imageUrl}-${index}`}
+                            className="relative group"
+                            draggable
+                            onDragStart={() => handleImageDragStart(index)}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              if (dragOverImageIndex !== index) {
+                                setDragOverImageIndex(index);
+                              }
+                            }}
+                            onDragLeave={() => {
+                              if (dragOverImageIndex === index) {
+                                setDragOverImageIndex(null);
+                              }
+                            }}
+                            onDrop={() => handleImageDrop(index)}
+                            onDragEnd={handleImageDragEnd}
+                          >
                             <div className="aspect-square rounded-lg border-2 border-gray-200 overflow-hidden">
                               <img
                                 src={imageUrl}
                                 alt={`Product ${index + 1}`}
-                                className="w-full h-full object-cover"
+                                className={`w-full h-full object-cover transition-opacity ${
+                                  draggedImageIndex === index ? "opacity-60" : ""
+                                } ${
+                                  dragOverImageIndex === index
+                                    ? "ring-2 ring-primary ring-offset-2"
+                                    : ""
+                                }`}
                               />
                             </div>
                             {index === 0 && (

@@ -123,6 +123,9 @@ export async function POST(request: Request) {
       taxRate: body.tax_rate !== undefined ? (body.tax_rate / 100) : 0.21, // Convert percentage to decimal, default 21%
       images: body.images || [],
       variants: body.variants || [],
+      trackInventory: body.trackInventory ?? body.track_inventory ?? true,
+      lowStockThreshold: body.lowStockThreshold ?? body.low_stock_threshold ?? 5,
+      isReturnable: body.isReturnable ?? body.is_returnable ?? true,
       stock: body.stock_quantity || body.stock || 0,
       weight: body.weight_kg || body.weight,
       dimensions: normalizeDimensions(body.dimensions),
