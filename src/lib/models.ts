@@ -181,6 +181,7 @@ export interface IProduct extends Document {
     length: number;
     width: number;
     height: number;
+    unit?: string;
   };
   tags: string[];
   isActive: boolean;
@@ -233,6 +234,7 @@ const ProductSchema = new Schema<IProduct>({
     length: Number,
     width: Number,
     height: Number,
+    unit: { type: String, default: "cm" },
   },
   tags: [String],
   isActive: { type: Boolean, default: true },

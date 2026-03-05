@@ -61,8 +61,44 @@ export default function ProductForm({ productId }: ProductFormProps) {
     is_featured: false,
     is_returnable: true,
     weight_kg: 0,
-    dimensions: "",
+    dimensions: {
+      length: 0,
+      width: 0,
+      height: 0,
+      unit: "cm",
+    },
   });
+
+  const parseDimensions = (dimensions: unknown) => {
+    if (
+      dimensions &&
+      typeof dimensions === "object" &&
+      "length" in dimensions &&
+      "width" in dimensions &&
+      "height" in dimensions
+    ) {
+      const dim = dimensions as {
+        length?: number | string;
+        width?: number | string;
+        height?: number | string;
+        unit?: string;
+      };
+
+      return {
+        length: Number(dim.length) || 0,
+        width: Number(dim.width) || 0,
+        height: Number(dim.height) || 0,
+        unit: dim.unit || "cm",
+      };
+    }
+
+    return {
+      length: 0,
+      width: 0,
+      height: 0,
+      unit: "cm",
+    };
+  };
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -109,7 +145,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
           is_featured: p.isFeatured ?? p.is_featured ?? false,
           is_returnable: p.is_returnable ?? true,
           weight_kg: p.weight || p.weight_kg || 0,
-          dimensions: p.dimensions || "",
+          dimensions: parseDimensions(p.dimensions),
         });
         if (p.images) {
           setImages(p.images.map((img: any) => img.url || img));
@@ -261,6 +297,17 @@ export default function ProductForm({ productId }: ProductFormProps) {
 
       const payload = {
         ...formData,
+        dimensions:
+          formData.dimensions.length > 0 ||
+          formData.dimensions.width > 0 ||
+          formData.dimensions.height > 0
+            ? {
+                length: formData.dimensions.length,
+                width: formData.dimensions.width,
+                height: formData.dimensions.height,
+                unit: formData.dimensions.unit || "cm",
+              }
+            : undefined,
         images: images.map((url, index) => ({
           url,
           alt: `${formData.name_ro || formData.name_en} - Image ${index + 1}`,
@@ -642,20 +689,98 @@ export default function ProductForm({ productId }: ProductFormProps) {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="dimensions">Dimensions</Label>
+                        <Label htmlFor="dimensions_length">Length</Label>
                         <Input
-                          id="dimensions"
-                          value={formData.dimensions}
+                          id="dimensions_length"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.dimensions.length}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              dimensions: e.target.value,
+                              dimensions: {
+                                ...formData.dimensions,
+                                length: parseFloat(e.target.value) || 0,
+                              },
                             })
                           }
-                          placeholder="L x W x H cm"
+                          placeholder="0"
                         />
                       </div>
                     </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="dimensions_width">Width</Label>
+                        <Input
+                          id="dimensions_width"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.dimensions.width}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              dimensions: {
+                                ...formData.dimensions,
+                                width: parseFloat(e.target.value) || 0,
+                              },
+                            })
+                          }
+                          placeholder="0"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="dimensions_height">Height</Label>
+                        <Input
+                          id="dimensions_height"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.dimensions.height}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              dimensions: {
+                                ...formData.dimensions,
+                                height: parseFloat(e.target.value) || 0,
+                              },
+                            })
+                          }
+                          placeholder="0"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="dimensions_unit">Unit</Label>
+                        <Select
+                          value={formData.dimensions.unit}
+                          onValueChange={(value) =>
+                            setFormData({
+                              ...formData,
+                              dimensions: {
+                                ...formData.dimensions,
+                                unit: value,
+                              },
+                            })
+                          }
+                        >
+                          <SelectTrigger id="dimensions_unit">
+                            <SelectValue placeholder="Select unit" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cm">cm</SelectItem>
+                            <SelectItem value="m">m</SelectItem>
+                            <SelectItem value="mm">mm</SelectItem>
+                            <SelectItem value="in">in</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Dimensions are saved as structured values: length × width ×
+                      height + unit.
+                    </p>
                   </CardContent>
                 </Card>
               </TabsContent>

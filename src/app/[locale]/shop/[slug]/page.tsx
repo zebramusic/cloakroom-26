@@ -266,7 +266,7 @@ export default async function ProductDetailPage({
                         <dd className="mt-1 text-sm">
                           {product.dimensions.length} ×{" "}
                           {product.dimensions.width} ×{" "}
-                          {product.dimensions.height} cm
+                          {product.dimensions.height} {product.dimensions.unit || "cm"}
                         </dd>
                       </div>
                     )}

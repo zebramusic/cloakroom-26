@@ -3,6 +3,47 @@ import connectDB from "@/lib/mongodb";
 import { Product } from "@/lib/models";
 import mongoose from "mongoose";
 
+function normalizeDimensions(dimensions: any) {
+  if (!dimensions) return undefined;
+
+  if (typeof dimensions === "string") {
+    const parts = dimensions
+      .replace(/[^0-9.xX]/g, "")
+      .split(/[xX]/)
+      .map((part) => Number(part.trim()));
+
+    if (parts.length >= 3 && parts.every((value) => !Number.isNaN(value))) {
+      return {
+        length: parts[0],
+        width: parts[1],
+        height: parts[2],
+        unit: "cm",
+      };
+    }
+
+    return undefined;
+  }
+
+  if (typeof dimensions === "object") {
+    const length = Number(dimensions.length) || 0;
+    const width = Number(dimensions.width) || 0;
+    const height = Number(dimensions.height) || 0;
+
+    if (length === 0 && width === 0 && height === 0) {
+      return undefined;
+    }
+
+    return {
+      length,
+      width,
+      height,
+      unit: dimensions.unit || "cm",
+    };
+  }
+
+  return undefined;
+}
+
 /**
  * GET /api/products/[id] - Get single product with variants
  */
@@ -94,7 +135,7 @@ export async function PATCH(
     if (body.isFeatured !== undefined) updateData.isFeatured = body.isFeatured;
     if (body.weight_kg !== undefined) updateData.weight = body.weight_kg;
     if (body.weight !== undefined) updateData.weight = body.weight;
-    if (body.dimensions !== undefined) updateData.dimensions = body.dimensions;
+    if (body.dimensions !== undefined) updateData.dimensions = normalizeDimensions(body.dimensions);
     if (body.images !== undefined) updateData.images = body.images;
     if (body.tags !== undefined) updateData.tags = body.tags;
     if (body.metaTitle !== undefined) updateData.metaTitle = body.metaTitle;
