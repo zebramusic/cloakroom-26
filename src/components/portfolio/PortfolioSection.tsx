@@ -79,7 +79,6 @@ export function PortfolioSection({ locale }: PortfolioSectionProps) {
           </div>
         </div>
       </section>
-
     </>
   );
 }

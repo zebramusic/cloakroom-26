@@ -166,7 +166,6 @@ export function PortfolioGrid({
           <p className="text-muted-foreground">{t("noResultsDesc")}</p>
         </div>
       )}
-
     </div>
   );
 }

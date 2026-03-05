@@ -129,7 +129,9 @@ export default function CustomerLoginPage() {
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                     disabled={isLoading}
                   >
                     {showPassword ? (
