@@ -198,7 +198,10 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
                       type="email"
                       value={formData.contactEmail}
                       onChange={(e) =>
-                        setFormData({ ...formData, contactEmail: e.target.value })
+                        setFormData({
+                          ...formData,
+                          contactEmail: e.target.value,
+                        })
                       }
                       placeholder="contact@partner.com"
                     />
@@ -209,7 +212,10 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
                       id="contactPhone"
                       value={formData.contactPhone}
                       onChange={(e) =>
-                        setFormData({ ...formData, contactPhone: e.target.value })
+                        setFormData({
+                          ...formData,
+                          contactPhone: e.target.value,
+                        })
                       }
                       placeholder="+40 712 345 678"
                     />
