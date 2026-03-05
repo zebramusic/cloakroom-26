@@ -5,6 +5,11 @@ import connectDB from "@/lib/mongodb";
 import { Partner } from "@/lib/models";
 import mongoose from "mongoose";
 
+function isValidUploadedPartnerLogo(logo?: string) {
+  if (!logo) return true;
+  return logo.startsWith("/uploads/partners/");
+}
+
 /**
  * GET /api/partners/[id] - Get single partner
  */
@@ -56,6 +61,18 @@ export async function PATCH(
     const { id } = await context.params;
     const body = await request.json();
     await connectDB();
+
+    const nextLogoValue =
+      body.logo_url !== undefined ? body.logo_url : body.logo;
+    if (
+      nextLogoValue !== undefined &&
+      !isValidUploadedPartnerLogo(nextLogoValue)
+    ) {
+      return NextResponse.json(
+        { error: "Logo must be uploaded via the platform" },
+        { status: 400 },
+      );
+    }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid partner ID" }, { status: 400 });

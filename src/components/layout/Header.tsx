@@ -26,15 +26,25 @@ import { useSession } from "next-auth/react";
 interface HeaderProps {
   locale: string;
   transparent?: boolean;
+  companySettings?: {
+    companyName?: string;
+    logo?: string;
+  } | null;
 }
 
-export function Header({ locale, transparent = false }: HeaderProps) {
+export function Header({
+  locale,
+  transparent = false,
+  companySettings,
+}: HeaderProps) {
   const t = useTranslations("nav");
   const itemCount = useCartStore((state) => state.getItemCount());
   const { data: session } = useSession();
   const [showAdminLink, setShowAdminLink] = useState(false);
   const [keySequence, setKeySequence] = useState<string[]>([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const companyName = companySettings?.companyName || "Garderobă Pro";
+  const brandInitial = companyName.charAt(0).toUpperCase() || "G";
 
   // Show admin link if user has admin role
   const isAdmin =
@@ -92,10 +102,12 @@ export function Header({ locale, transparent = false }: HeaderProps) {
         {/* Logo */}
         <Link href={`/${locale}`} className="flex items-center space-x-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <span className="text-xl font-bold text-primary-foreground">G</span>
+            <span className="text-xl font-bold text-primary-foreground">
+              {brandInitial}
+            </span>
           </div>
           <span className="hidden font-bold sm:inline-block">
-            Garderobă Pro
+            {companyName}
           </span>
         </Link>
 

@@ -121,6 +121,15 @@ export default function ImageUpload({
 
   return (
     <div className="space-y-2">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={acceptedTypes.join(",")}
+        onChange={handleFileInputChange}
+        className="hidden"
+        disabled={isUploading}
+      />
+
       {!value ? (
         <div
           className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
@@ -132,15 +141,6 @@ export default function ImageUpload({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
         >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={acceptedTypes.join(",")}
-            onChange={handleFileInputChange}
-            className="hidden"
-            disabled={isUploading}
-          />
-
           {isUploading ? (
             <div className="flex flex-col items-center gap-2">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -175,23 +175,46 @@ export default function ImageUpload({
           )}
         </div>
       ) : (
-        <div
-          className={`relative rounded-lg overflow-hidden border border-gray-200 ${getAspectRatioClass()}`}
-        >
-          <Image
-            src={value}
-            alt="Uploaded image"
-            fill
-            className="object-cover"
-          />
+        <div className="space-y-3">
+          <div
+            className={`relative rounded-lg overflow-hidden border border-gray-200 ${getAspectRatioClass()}`}
+          >
+            <Image
+              src={value}
+              alt="Uploaded image"
+              fill
+              className="object-cover"
+            />
+            <Button
+              type="button"
+              variant="destructive"
+              size="icon"
+              className="absolute top-2 right-2"
+              onClick={handleRemove}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+
           <Button
             type="button"
-            variant="destructive"
-            size="icon"
-            className="absolute top-2 right-2"
-            onClick={handleRemove}
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+            className="w-full"
           >
-            <X className="w-4 h-4" />
+            {isUploading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4 mr-2" />
+                Change image
+              </>
+            )}
           </Button>
         </div>
       )}

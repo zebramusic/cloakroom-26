@@ -1,8 +1,7 @@
 import { unstable_setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/sections/Hero";
-import { Card } from "@/components/ui/card";
 import { QuoteCTA } from "@/components/sections/QuoteCTA";
-import Image from "next/image";
+import { PartnersGridModal } from "@/components/sections/PartnersGridModal";
 import connectDB from "@/lib/mongodb";
 import { Partner } from "@/lib/models";
 
@@ -61,56 +60,7 @@ export default async function PartnersPage({
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4">
-            {partners.length === 0 ? (
-              <div className="col-span-full text-center py-12">
-                <p className="text-muted-foreground">
-                  {locale === "ro"
-                    ? "Nu există parteneri momentan."
-                    : "No partners available at the moment."}
-                </p>
-              </div>
-            ) : (
-              partners.map((partner) => (
-                <Card
-                  key={partner._id}
-                  className="flex items-center justify-center p-8 transition-shadow hover:shadow-lg"
-                >
-                  {partner.logo ? (
-                    <a
-                      href={partner.website || "#"}
-                      target={partner.website ? "_blank" : undefined}
-                      rel={partner.website ? "noopener noreferrer" : undefined}
-                      className="text-center w-full"
-                    >
-                      <div className="mb-2 flex h-20 items-center justify-center">
-                        <div className="relative h-16 w-full">
-                          <Image
-                            src={partner.logo}
-                            alt={partner.name}
-                            fill
-                            className="object-contain"
-                          />
-                        </div>
-                      </div>
-                      <p className="text-sm font-medium">{partner.name}</p>
-                    </a>
-                  ) : (
-                    <div className="text-center">
-                      <div className="mb-2 flex h-20 items-center justify-center">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <span className="text-2xl font-bold">
-                            {partner.name.charAt(0)}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-sm font-medium">{partner.name}</p>
-                    </div>
-                  )}
-                </Card>
-              ))
-            )}
-          </div>
+          <PartnersGridModal partners={partners} locale={locale} />
         </div>
       </section>
 

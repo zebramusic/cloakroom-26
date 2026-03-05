@@ -38,6 +38,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [customerData, setCustomerData] = useState<any>(null);
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
+  const [companySettings, setCompanySettings] = useState<any>(null);
 
   // Fetch customer data if logged in
   useEffect(() => {
@@ -54,6 +55,19 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
         .finally(() => setIsLoadingCustomer(false));
     }
   }, [session]);
+
+  useEffect(() => {
+    fetch(`/api/site/company-settings?locale=${locale}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.settings) {
+          setCompanySettings(data.settings);
+        }
+      })
+      .catch((err) =>
+        console.error("Failed to fetch company settings for checkout:", err),
+      );
+  }, [locale]);
 
   const handleCheckoutSubmit = async (formData: any) => {
     setIsCreatingOrder(true);
@@ -245,6 +259,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
               locale={locale}
               value={paymentMethod}
               onChange={setPaymentMethod}
+              companySettings={companySettings}
             />
 
             <CheckoutForm

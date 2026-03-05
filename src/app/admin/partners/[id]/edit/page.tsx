@@ -1,4 +1,4 @@
-import PartnerForm from "../../new/page";
+import PartnerForm from "@/components/admin/PartnerForm";
 
 export const dynamic = "force-dynamic";
 

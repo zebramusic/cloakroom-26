@@ -50,6 +50,8 @@ export function Footer({ locale, companySettings }: FooterProps) {
 
   const socialNetworks = companySettings?.socialNetworks || {};
   const hasSocialNetworks = Object.values(socialNetworks).some((url) => !!url);
+  const legalCui = companySettings?.legalInfo?.cui || "RO12345678";
+  const brandInitial = companyName.charAt(0).toUpperCase() || "G";
 
   return (
     <footer className="border-t bg-background">
@@ -60,7 +62,7 @@ export function Footer({ locale, companySettings }: FooterProps) {
             <div className="flex items-center space-x-2">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
                 <span className="text-xl font-bold text-primary-foreground">
-                  G
+                  {brandInitial}
                 </span>
               </div>
               <span className="font-bold">{companyName}</span>
@@ -265,7 +267,7 @@ export function Footer({ locale, companySettings }: FooterProps) {
 
         <div className="flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground sm:flex-row">
           <p>
-            © {currentYear} Garderobă Pro. CUI: RO12345678.{" "}
+            © {currentYear} {companyName}. CUI: {legalCui}.{" "}
             {locale === "ro"
               ? "Toate drepturile rezervate."
               : "All rights reserved."}

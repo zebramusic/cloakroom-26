@@ -4,6 +4,11 @@ import { hasPermission } from "@/lib/auth/permissions";
 import connectDB from "@/lib/mongodb";
 import { Partner } from "@/lib/models";
 
+function isValidUploadedPartnerLogo(logo?: string) {
+  if (!logo) return true;
+  return logo.startsWith("/uploads/partners/");
+}
+
 /**
  * GET /api/partners - Get all partners (public)
  */
@@ -48,10 +53,18 @@ export async function POST(request: Request) {
     const body = await request.json();
     await connectDB();
 
+    const logoValue = body.logo_url || body.logo;
+    if (!isValidUploadedPartnerLogo(logoValue)) {
+      return NextResponse.json(
+        { error: "Logo must be uploaded via the platform" },
+        { status: 400 },
+      );
+    }
+
     const partner = await Partner.create({
       name: body.name,
       slug: body.slug,
-      logo: body.logo_url || body.logo || undefined,
+      logo: logoValue || undefined,
       website: body.website_url || body.website || undefined,
       description: body.description || undefined,
       order: body.display_order || body.order || 0,

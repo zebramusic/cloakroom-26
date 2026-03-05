@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Mail, Clock, Phone } from "lucide-react";
 import Link from "next/link";
+import { getCompanySettings } from "@/lib/utils/company-settings";
 
 export default async function QuoteConfirmationPage({
   params,
@@ -19,6 +20,10 @@ export default async function QuoteConfirmationPage({
 }) {
   const { locale } = await params;
   unstable_setRequestLocale(locale);
+  const companySettings = await getCompanySettings(locale as "ro" | "en");
+  const contactEmail = companySettings?.email || "contact@garderobapro.ro";
+  const contactPhone = companySettings?.phone || "+40 123 456 789";
+  const phoneHref = `tel:${contactPhone.replace(/\s/g, "")}`;
 
   const awaitedSearchParams = await searchParams;
   const email = awaitedSearchParams.email || "";
@@ -157,10 +162,10 @@ export default async function QuoteConfirmationPage({
                     {locale === "ro" ? "Scrie-ne la" : "Email us at"}
                   </p>
                   <a
-                    href="mailto:contact@garderobapro.ro"
+                    href={`mailto:${contactEmail}`}
                     className="font-medium text-primary hover:underline"
                   >
-                    contact@garderobapro.ro
+                    {contactEmail}
                   </a>
                 </div>
               </CardContent>
@@ -176,10 +181,10 @@ export default async function QuoteConfirmationPage({
                     {locale === "ro" ? "Sună-ne la" : "Call us at"}
                   </p>
                   <a
-                    href="tel:+40123456789"
+                    href={phoneHref}
                     className="font-medium text-primary hover:underline"
                   >
-                    +40 123 456 789
+                    {contactPhone}
                   </a>
                 </div>
               </CardContent>

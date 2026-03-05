@@ -25,7 +25,7 @@ export default async function LocaleLayout({
     <AuthProvider>
       <NextIntlClientProvider messages={messages}>
         <CartStoreHydration />
-        <Header locale={locale} />
+        <Header locale={locale} companySettings={companySettings} />
         <main>{children}</main>
         <Footer locale={locale} companySettings={companySettings} />
       </NextIntlClientProvider>

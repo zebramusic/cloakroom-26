@@ -10,13 +10,29 @@ interface PaymentMethodSelectorProps {
   locale: string;
   value: string;
   onChange: (value: string) => void;
+  companySettings?: {
+    companyName?: string;
+    legalInfo?: {
+      bankName?: string;
+      iban?: string;
+      swift?: string;
+    };
+  } | null;
 }
 
 export function PaymentMethodSelector({
   locale,
   value,
   onChange,
+  companySettings,
 }: PaymentMethodSelectorProps) {
+  const beneficiaryName =
+    companySettings?.companyName || "Garderobă Profesională SRL";
+  const iban =
+    companySettings?.legalInfo?.iban || "RO49 AAAA 1B31 0075 9384 0000";
+  const bankName = companySettings?.legalInfo?.bankName || "Banca Transilvania";
+  const swift = companySettings?.legalInfo?.swift;
+
   return (
     <Card>
       <CardHeader>
@@ -95,18 +111,23 @@ export function PaymentMethodSelector({
                       <strong>
                         {locale === "ro" ? "Beneficiar:" : "Beneficiary:"}
                       </strong>{" "}
-                      Garderobă Profesională SRL
+                      {beneficiaryName}
                     </p>
                     <p>
                       <strong>
                         {locale === "ro" ? "Cont IBAN:" : "IBAN:"}
                       </strong>{" "}
-                      RO49 AAAA 1B31 0075 9384 0000
+                      {iban}
                     </p>
                     <p>
                       <strong>{locale === "ro" ? "Bancă:" : "Bank:"}</strong>{" "}
-                      Banca Transilvania
+                      {bankName}
                     </p>
+                    {swift && (
+                      <p>
+                        <strong>SWIFT:</strong> {swift}
+                      </p>
+                    )}
                     <p className="mt-2 text-xs">
                       {locale === "ro"
                         ? "* Vă rugăm să includeți numărul comenzii în detaliile transferului."
