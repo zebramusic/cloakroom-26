@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/lib/models";
 import mongoose from "mongoose";
+import { normalizeRichText } from "@/lib/utils/richText";
 
 function normalizeDimensions(dimensions: any) {
   if (!dimensions) return undefined;
@@ -90,21 +91,28 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // Create product with variants
+    const normalizedDescriptionRo = normalizeRichText(
+      body.description_ro || body.description,
+    );
+    const normalizedDescriptionEn = normalizeRichText(
+      body.description_en || body.description,
+    );
+
     const productData: any = {
       name: body.name || body.name_ro, // Backwards compatibility
       slug: body.slug,
       sku: body.sku,
-      description: body.description || body.description_ro, // Backwards compatibility
+      description: normalizedDescriptionRo, // Backwards compatibility
       shortDescription: body.shortDescription,
       localeContent: {
         ro: {
           name: body.name_ro || body.name,
-          description: body.description_ro || body.description,
+          description: normalizedDescriptionRo,
           shortDescription: body.features_ro,
         },
         en: {
           name: body.name_en || body.name,
-          description: body.description_en || body.description,
+          description: normalizedDescriptionEn,
           shortDescription: body.features_en,
         },
       },

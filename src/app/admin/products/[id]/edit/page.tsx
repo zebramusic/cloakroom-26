@@ -1,4 +1,4 @@
-import ProductForm from "../../new/page";
+import ProductForm from "@/components/admin/ProductForm";
 
 export const dynamic = "force-dynamic";
 

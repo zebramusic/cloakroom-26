@@ -23,6 +23,7 @@ import { AddToCartButton } from "@/components/shop/AddToCartButton";
 import { ProductGallery } from "@/components/shop/ProductGallery";
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/lib/models";
+import { normalizeRichText } from "@/lib/utils/richText";
 
 export default async function ProductDetailPage({
   params,
@@ -48,6 +49,7 @@ export default async function ProductDetailPage({
   const description =
     product.localeContent?.[locale as "ro" | "en"]?.description ||
     product.description;
+  const descriptionHtml = normalizeRichText(description);
   const features =
     product.localeContent?.[locale as "ro" | "en"]?.shortDescription ||
     product.shortDescription;
@@ -123,7 +125,10 @@ export default async function ProductDetailPage({
                 <h3 className="mb-2 font-semibold">
                   {locale === "ro" ? "Descriere" : "Description"}
                 </h3>
-                <p className="text-muted-foreground">{description}</p>
+                <div
+                  className="prose prose-slate max-w-none text-muted-foreground dark:prose-invert"
+                  dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                />
               </div>
             )}
 
@@ -210,7 +215,11 @@ export default async function ProductDetailPage({
             <TabsContent value="description" className="mt-6">
               <Card>
                 <CardContent className="prose max-w-none pt-6 dark:prose-invert">
-                  {description || (
+                  {descriptionHtml ? (
+                    <div
+                      dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                    />
+                  ) : (
                     <p className="text-muted-foreground">
                       {locale === "ro"
                         ? "Descriere indisponibilă"
@@ -266,7 +275,8 @@ export default async function ProductDetailPage({
                         <dd className="mt-1 text-sm">
                           {product.dimensions.length} ×{" "}
                           {product.dimensions.width} ×{" "}
-                          {product.dimensions.height} {product.dimensions.unit || "cm"}
+                          {product.dimensions.height}{" "}
+                          {product.dimensions.unit || "cm"}
                         </dd>
                       </div>
                     )}

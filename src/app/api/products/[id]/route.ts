@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { Product } from "@/lib/models";
 import mongoose from "mongoose";
+import { normalizeRichText } from "@/lib/utils/richText";
 
 function normalizeDimensions(dimensions: any) {
   if (!dimensions) return undefined;
@@ -93,6 +94,14 @@ export async function PATCH(
 
     await connectDB();
     const body = await request.json();
+    const normalizedDescriptionRo =
+      body.description_ro !== undefined || body.description !== undefined
+        ? normalizeRichText(body.description_ro || body.description)
+        : undefined;
+    const normalizedDescriptionEn =
+      body.description_en !== undefined || body.description !== undefined
+        ? normalizeRichText(body.description_en || body.description)
+        : undefined;
 
     // Build update object - map old field names to new
     const updateData: any = {};
@@ -102,21 +111,22 @@ export async function PATCH(
     if (body.name_ro !== undefined) updateData.name = body.name_ro;
     if (body.slug !== undefined) updateData.slug = body.slug;
     if (body.sku !== undefined) updateData.sku = body.sku;
-    if (body.description !== undefined) updateData.description = body.description;
-    if (body.description_ro !== undefined) updateData.description = body.description_ro;
+    if (body.description !== undefined || body.description_ro !== undefined) {
+      updateData.description = normalizedDescriptionRo;
+    }
     if (body.shortDescription !== undefined) updateData.shortDescription = body.shortDescription;
     
     // Update localeContent for both languages
-    if (body.name_ro || body.name_en || body.description_ro || body.description_en || body.features_ro || body.features_en) {
+    if (body.name_ro || body.name_en || body.description_ro || body.description_en || body.description || body.features_ro || body.features_en) {
       updateData.localeContent = {
         ro: {
           name: body.name_ro || body.name,
-          description: body.description_ro || body.description,
+          description: normalizedDescriptionRo,
           shortDescription: body.features_ro,
         },
         en: {
           name: body.name_en || body.name,
-          description: body.description_en || body.description,
+          description: normalizedDescriptionEn,
           shortDescription: body.features_en,
         },
       };
